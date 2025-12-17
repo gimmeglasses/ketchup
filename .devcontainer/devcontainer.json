@@ -1,0 +1,36 @@
+{
+  "name": "ketchup",
+  "runArgs": ["--name", "ketchup"],
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20-bullseye",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node_modules,target=/workspace/node_modules,type=volume"
+  ],
+  "containerEnv": {
+    "WATCHPACK_POLLING": "true"
+  },
+  "forwardPorts": [3000],
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "streetsidesoftware.code-spell-checker",
+        "oderwat.indent-rainbow",
+        "pkief.material-icon-theme",
+        "bradlc.vscode-tailwindcss",
+        "github.copilot-chat",
+        "github.copilot"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2,
+        "typescript.tsserver.experimental.enableProjectDiagnostics": true
+      }
+    }
+  }
+}
