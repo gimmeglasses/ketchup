@@ -23,7 +23,8 @@
         "pkief.material-icon-theme",
         "bradlc.vscode-tailwindcss",
         "github.copilot-chat",
-        "github.copilot"
+        "github.copilot",
+        "yzhang.markdown-all-in-one"
       ],
       "settings": {
         "editor.formatOnSave": true,
