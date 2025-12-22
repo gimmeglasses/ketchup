@@ -61,6 +61,18 @@ npm run dev
 
 `app/page.tsx`を編集することでページを編集できます。ファイルを編集すると自動的にページが更新されます。
 
+## Drizzle ORM コマンド（簡易まとめ）
+
+| やりたいこと                       | コマンド                     | 説明                                            |
+| ---------------------------------- | ---------------------------- | ----------------------------------------------- |
+| スキーマ変更から SQL 生成          | `npx drizzle-kit generate`   | `schema.ts` → `drizzle/migrations/*.sql` を作成 |
+| 生成済みマイグレーションを実行     | `npx drizzle-kit migrate`    | SQL を DB に適用                                |
+| 変更を即 DB に反映（SQL 生成省略） | `npx drizzle-kit push`       | 開発向けの簡易反映                              |
+| 既存 DB → schema.ts 生成           | `npx drizzle-kit introspect` | 逆生成                                          |
+| GUI で DB を確認                   | `npx drizzle-kit studio`     | Drizzle Studio 起動                             |
+
+※ ローカル開発では **push** が手軽、本番や履歴管理する場合は **generate → migrate** 推奨。
+
 ## Tailwind CSS について
 
 このプロジェクトでは Tailwind CSS を使用しています。Tailwind のユーティリティクラスを使って簡単にスタイリングできます。
