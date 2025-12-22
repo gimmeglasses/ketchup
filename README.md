@@ -37,6 +37,12 @@ docker compose up -d
 docker compose down
 ```
 
+| 画面 / サービス         | URL                                                | 説明                                                                   |
+| ----------------------- | -------------------------------------------------- | ---------------------------------------------------------------------- |
+| API Gateway (Kong) HTTP | **[http://localhost:8000](http://localhost:8000)** | Supabase の各サービスへの入り口。REST/Auth/Realtime などは基本ここ経由 |
+| Mailpit UI              | **[http://localhost:8025](http://localhost:8025)** | Supabase Auth から送信されたメールを確認できる Web UI                  |
+| Analytics (Logflare UI) | **[http://localhost:4000](http://localhost:4000)** | Supabase ログ/Analytics の UI                                          |
+
 ## 開発環境の起動
 
 まず、依存パッケージをインストールします：
