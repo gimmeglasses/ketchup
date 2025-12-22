@@ -19,6 +19,23 @@ VS Code でこのプロジェクトを開くと、Dev Container で再度開く�
 - **Next.js** - React フレームワーク
 - **TypeScript** - 型安全な開発
 - **Tailwind CSS** - ユーティリティファーストの CSS フレームワーク
+- **Supabase** - DB（ローカルは docker-compose で起動）
+- **Drizzle ORM** - TypeScript フレンドリーな ORM
+
+## Supabase コンテナの起動
+
+ローカルの Supabase は[supabase-project/docker-compose.yml](supabase-project/docker-compose.yml)を使って起動します。**ホスト側（コンテナ外）のターミナル**で以下を実行してください。
+
+```bash
+cd supabase-project
+docker compose up -d
+```
+
+停止する場合は次を実行します。
+
+```bash
+docker compose down
+```
 
 ## 開発環境の起動
 
