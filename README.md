@@ -19,6 +19,29 @@ VS Code でこのプロジェクトを開くと、Dev Container で再度開く�
 - **Next.js** - React フレームワーク
 - **TypeScript** - 型安全な開発
 - **Tailwind CSS** - ユーティリティファーストの CSS フレームワーク
+- **Supabase** - DB（ローカルは docker-compose で起動）
+- **Drizzle ORM** - TypeScript フレンドリーな ORM
+
+## Supabase コンテナの起動
+
+ローカルの Supabase は[supabase-project/docker-compose.yml](supabase-project/docker-compose.yml)を使って起動します。**ホスト側（コンテナ外）のターミナル**で以下を実行してください。
+
+```bash
+cd supabase-project
+docker compose up -d
+```
+
+停止する場合は次を実行します。
+
+```bash
+docker compose down
+```
+
+| 画面 / サービス         | URL                                                | 説明                                                                   |
+| ----------------------- | -------------------------------------------------- | ---------------------------------------------------------------------- |
+| Supabase Studio         | **[http://localhost:8000](http://localhost:8000)** | Supabase の各サービスへの入り口。REST/Auth/Realtime などは基本ここ経由 |
+| Mailpit UI              | **[http://localhost:8025](http://localhost:8025)** | Supabase Auth から送信されたメールを確認できる Web UI                  |
+| Analytics (Logflare UI) | **[http://localhost:4000](http://localhost:4000)** | Supabase ログ/Analytics の UI                                          |
 
 ## 開発環境の起動
 
@@ -37,6 +60,38 @@ npm run dev
 ブラウザで [http://localhost:3000](http://localhost:3000) を開いて結果を確認してください。
 
 `app/page.tsx`を編集することでページを編集できます。ファイルを編集すると自動的にページが更新されます。
+
+## Drizzle ORM について
+
+本プロジェクトでは、データベース操作のために **Drizzle ORM** を採用しています。
+
+### Drizzle ORM とは
+
+TypeScript 向けの軽量 ORM で、次のような特徴があります。
+
+- **型安全**（スキーマベースで型が自動反映される）
+- **軽量・高速**（ランタイム依存が少ない）
+- **SQL が分かりやすい**（直感的な API）
+- **マイグレーションが扱いやすい**
+- Supabase / PostgreSQL と相性が良い
+
+### 役割
+
+- DB スキーマ管理
+- マイグレーション管理
+- TypeScript から安全に DB 操作するためのレイヤー
+
+### Drizzle ORM コマンド
+
+| やりたいこと                       | コマンド                     | 説明                                            |
+| ---------------------------------- | ---------------------------- | ----------------------------------------------- |
+| スキーマ変更から SQL 生成          | `npx drizzle-kit generate`   | `schema.ts` → `drizzle/migrations/*.sql` を作成 |
+| 生成済みマイグレーションを実行     | `npx drizzle-kit migrate`    | SQL を DB に適用                                |
+| 変更を即 DB に反映（SQL 生成省略） | `npx drizzle-kit push`       | 開発向けの簡易反映                              |
+| 既存 DB → schema.ts 生成           | `npx drizzle-kit introspect` | 逆生成                                          |
+| GUI で DB を確認                   | `npx drizzle-kit studio`     | Drizzle Studio 起動                             |
+
+※ ローカル開発では **push** が手軽、本番や履歴管理する場合は **generate → migrate** 推奨。
 
 ## Tailwind CSS について
 
