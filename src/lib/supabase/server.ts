@@ -11,26 +11,39 @@ import { cookies } from "next/headers";
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Server Component から呼ばれた場合など、
-            // cookie の set が無視されるケースはここで握りつぶす。
-            // セッション更新は middleware などでハンドリングする想定。
-          }
-        },
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl) {
+    throw new Error(
+      "Environment variable NEXT_PUBLIC_SUPABASE_URL is not set. " +
+        "Please define it before creating the Supabase server client."
+    );
+  }
+
+  if (!supabaseAnonKey) {
+    throw new Error(
+      "Environment variable NEXT_PUBLIC_SUPABASE_ANON_KEY is not set. " +
+        "Please define it before creating the Supabase server client."
+    );
+  }
+
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        } catch {
+          // Server Component から呼ばれた場合など、
+          // cookie の set が無視されるケースはここで握りつぶす。
+          // セッション更新は middleware などでハンドリングする想定。
+        }
+      },
+    },
+  });
 }
