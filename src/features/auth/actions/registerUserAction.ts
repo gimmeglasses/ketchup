@@ -1,11 +1,11 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { registerSchema } from "../validations/registerSchema";
 import { registerUser } from "../services/registerUser";
-import { redirect } from "next/navigation";
 
 export type RegisterActionResult =
-  | { success: true }
+  | { success: true; errors: {} }
   | { success: false; errors: Record<string, string[]> };
 
 /**
@@ -14,7 +14,7 @@ export type RegisterActionResult =
  * 成功時は登録完了ページにリダイレクトします。
  * @param prevState サーバーアクションの前回の状態
  * @param formData フォーム送信された FormData
- * @returns 登録結果（成功か、フィールドエラー/共通エラーを含む）
+ * @returns 成否とエラーマップ（成功時は空オブジェクトを返します）
  */
 export async function registerUserAction(
   prevState: RegisterActionResult,
@@ -44,11 +44,10 @@ export async function registerUserAction(
     return {
       success: false,
       errors: {
-        _form: [message], // フォーム共通エラーとして返す
+        _form: [message],
       },
     };
   }
-  await registerUser(parsed.data);
   redirect("/auth/register/success");
-  return { success: true };
+  return { success: true, errors: {} };
 }
