@@ -51,7 +51,7 @@ function makeFormData(values: Record<string, string>) {
   return fd;
 }
 
-describe("registerUser", () => {
+describe("registerUserAction", () => {
   // ✅ 正常系：全ての入力値が妥当な場合
   it("妥当な入力の場合はsuccess: trueを返し、registerUserが1回呼ばれること", async () => {
     const result = await registerUserAction(
