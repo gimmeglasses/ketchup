@@ -125,4 +125,83 @@ describe("registerUserAction", () => {
     }
     expect(service.registerUser).not.toHaveBeenCalled();
   });
+
+  it("複数のフィールドにエラーがある場合、すべてのエラーを返すこと", async () => {
+    const result = await registerUserAction(
+      initialState,
+      makeFormData({
+        name: "",
+        email: "invalid-email",
+        password: "short",
+      })
+    );
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.errors.name).toBeDefined();
+      expect(result.errors.email).toBeDefined();
+      expect(result.errors.password).toBeDefined();
+    }
+  });
+
+  it("パスワードがちょうど8文字の場合は成功すること", async () => {
+    await registerUserAction(
+      initialState,
+      makeFormData({
+        name: "Ketchup",
+        email: "test@example.com",
+        password: "12345678",
+      })
+    );
+
+    expect(service.registerUser).toHaveBeenCalledTimes(1);
+  });
+
+  it("registerUserがエラーをスローした場合、適切にハンドリングすること", async () => {
+    vi.spyOn(service, "registerUser").mockRejectedValueOnce(
+      new Error("Database error")
+    );
+
+    const result = await registerUserAction(
+      initialState,
+      makeFormData({
+        name: "Ketchup",
+        email: "test@example.com",
+        password: "password123",
+      })
+    );
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.errors._form).toContain(
+        "登録に失敗しました。時間をおいて再度お試しください。"
+      );
+    }
+  });
+
+  it("メールアドレスに特殊文字が含まれる場合", async () => {
+    await registerUserAction(
+      initialState,
+      makeFormData({
+        name: "Ketchup",
+        email: "test+tag@example.com",
+        password: "password123",
+      })
+    );
+
+    expect(service.registerUser).toHaveBeenCalled();
+  });
+
+  it("名前にスペースのみが含まれる場合", async () => {
+    const result = await registerUserAction(
+      initialState,
+      makeFormData({
+        name: "   ",
+        email: "test@example.com",
+        password: "password123",
+      })
+    );
+
+    expect(result.success).toBe(false);
+  });
 });
