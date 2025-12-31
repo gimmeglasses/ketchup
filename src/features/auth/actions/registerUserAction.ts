@@ -3,10 +3,18 @@
 import { redirect } from "next/navigation";
 import { registerSchema } from "../validations/registerSchema";
 import { registerUser } from "../services/registerUser";
+import { z } from "zod";
+import { toFieldErrors } from "@/lib/zodError";
+
+type RegisterFields = keyof z.infer<typeof registerSchema>;
+
+type FieldErrors = Partial<Record<RegisterFields, string[]>> & {
+  _form?: string[];
+};
 
 export type RegisterActionResult =
-  | { success: true; errors: {} }
-  | { success: false; errors: Record<string, string[]> };
+  | { success: true; errors: object }
+  | { success: false; errors: FieldErrors };
 
 /**
  * フォームから受け取った登録情報を検証し、Supabase 経由でユーザー作成を実行します。
@@ -29,17 +37,13 @@ export async function registerUserAction(
   const parsed = registerSchema.safeParse(raw);
 
   if (!parsed.success) {
-    const fieldErrors = parsed.error.flatten().fieldErrors;
-    return { success: false, errors: fieldErrors };
+    return { success: false, errors: toFieldErrors(parsed.error) };
   }
 
   try {
     await registerUser(parsed.data);
   } catch (e) {
-    const message =
-      e instanceof Error
-        ? e.message
-        : "登録に失敗しました。時間をおいて再度お試しください。";
+    const message = "登録に失敗しました。時間をおいて再度お試しください。";
 
     return {
       success: false,
