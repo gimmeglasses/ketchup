@@ -49,5 +49,4 @@ export async function registerUserAction(
     };
   }
   redirect("/auth/register/success");
-  return { success: true, errors: {} };
 }

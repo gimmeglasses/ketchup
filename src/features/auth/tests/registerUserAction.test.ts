@@ -7,6 +7,7 @@ import {
   RegisterActionResult,
   registerUserAction,
 } from "../actions/registerUserAction";
+import { redirect } from "next/navigation";
 import * as service from "../services/registerUser";
 
 vi.mock("next/navigation", () => ({
@@ -54,7 +55,7 @@ function makeFormData(values: Record<string, string>) {
 describe("registerUserAction", () => {
   // ✅ 正常系：全ての入力値が妥当な場合
   it("妥当な入力の場合はsuccess: trueを返し、registerUserが1回呼ばれること", async () => {
-    const result = await registerUserAction(
+    await registerUserAction(
       initialState,
       makeFormData({
         name: "Ketchup",
@@ -63,8 +64,8 @@ describe("registerUserAction", () => {
       })
     );
 
-    expect(result.success).toBe(true);
     expect(service.registerUser).toHaveBeenCalledTimes(1);
+    expect(redirect).toHaveBeenCalledWith("/auth/register/success");
   });
 
   // ❌ 検証エラー：名前が空の場合
