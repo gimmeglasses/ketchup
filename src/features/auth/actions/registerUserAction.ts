@@ -22,7 +22,7 @@ export type RegisterActionResult =
  * 成功時は登録完了ページにリダイレクトします。
  * @param prevState サーバーアクションの前回の状態
  * @param formData フォーム送信された FormData
- * @returns 成否とエラーマップ（成功時は空オブジェクトを返します）
+ * @returns 成否とエラーマップ（エラー時のみ値を返し、成功時は登録完了ページへリダイレクトして値は返しません）
  */
 export async function registerUserAction(
   prevState: RegisterActionResult,
