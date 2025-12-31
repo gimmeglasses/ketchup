@@ -36,7 +36,10 @@ vi.mock("@/lib/supabase/server", () => {
 });
 
 // registerUserサービスをスパイ化してモック動作を設定
-vi.spyOn(service, "registerUser").mockResolvedValue(undefined as never);
+vi.spyOn(service, "registerUser").mockResolvedValue({
+  user: { id: "fake-user-id", email: "test@example.com" },
+  session: null,
+});
 
 const initialState: RegisterActionResult = {
   success: false,
