@@ -12,9 +12,10 @@ type FieldErrors = Partial<Record<RegisterFields, string[]>> & {
   _form?: string[];
 };
 
-export type RegisterActionResult =
-  | { success: true; errors: object }
-  | { success: false; errors: FieldErrors };
+export type RegisterActionResult = {
+  success: false;
+  errors: FieldErrors;
+};
 
 /**
  * フォームから受け取った登録情報を検証し、Supabase 経由でユーザー作成を実行します。
@@ -22,7 +23,7 @@ export type RegisterActionResult =
  * 成功時は登録完了ページにリダイレクトします。
  * @param prevState サーバーアクションの前回の状態
  * @param formData フォーム送信された FormData
- * @returns 成否とエラーマップ（エラー時のみ値を返し、成功時は登録完了ページへリダイレクトして値は返しません）
+ * @returns エラーマップ（エラー時のみ値を返し、成功時は登録完了ページへリダイレクトして値は返しません）
  */
 export async function registerUserAction(
   prevState: RegisterActionResult,
