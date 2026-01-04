@@ -1,0 +1,136 @@
+/**
+ * listTasks サービスのテスト
+ * SQLiteインメモリDBを使用してクエリの正確性を検証
+ */
+import { describe, it, expect, beforeAll, afterEach, vi } from "vitest";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { tasks } from "@/app/db/schema";
+
+// テスト用インメモリDB
+let sqliteDb: Database.Database;
+let testDb: ReturnType<typeof drizzle>;
+
+// DBクライアントをモック化
+vi.mock("@/app/db/client", () => ({
+  get db() {
+    return testDb;
+  },
+  get client() {
+    return sqliteDb;
+  },
+}));
+
+describe("listTasks DBテスト", () => {
+  const testUserId = "00000000-0000-0000-0000-000000000001";
+  const otherUserId = "00000000-0000-0000-0000-000000000002";
+
+  beforeAll(() => {
+    // SQLiteDB
+    sqliteDb = new Database(":memory:");
+    testDb = drizzle(sqliteDb);
+
+    // テーブルを作成
+    sqliteDb.exec(`
+      CREATE TABLE tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        estimated_minutes INTEGER,
+        due_at DATETIME,
+        completed_at DATETIME,
+        note TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+      );
+    `);
+  });
+
+  afterEach(() => {
+    sqliteDb.exec("DELETE FROM tasks");
+  });
+
+  it("指定ユーザーのタスクのみを作成日時の降順で取得すること", async () => {
+    const { listTasks } = await import("../services/listTasks");
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 86400000);
+    const twoDaysAgo = new Date(now.getTime() - 172800000);
+
+    await testDb.insert(tasks).values([
+      { userId: testUserId, title: "古いタスク", createdAt: twoDaysAgo },
+      { userId: testUserId, title: "最新タスク", createdAt: now },
+      { userId: testUserId, title: "中間タスク", createdAt: oneDayAgo },
+      { userId: otherUserId, title: "他ユーザーのタスク", createdAt: now },
+    ]);
+
+    const result = await listTasks(testUserId);
+
+    expect(result).toHaveLength(3);
+    // 降順（新しい順）で返されること
+    expect(result[0].title).toBe("最新タスク");
+    expect(result[1].title).toBe("中間タスク");
+    expect(result[2].title).toBe("古いタスク");
+    // 他ユーザーのタスクは含まれないこと
+    expect(result.every((task) => task.userId === testUserId)).toBe(true);
+  });
+
+  it("タスクが存在しない場合は空の配列を返すこと", async () => {
+    const { listTasks } = await import("../services/listTasks");
+
+    const result = await listTasks(testUserId);
+
+    expect(result).toEqual([]);
+    expect(result).toHaveLength(0);
+  });
+
+  it("タスクのすべての属性が正しく取得されること", async () => {
+    const { listTasks } = await import("../services/listTasks");
+    const createdAt = new Date();
+
+    await testDb.insert(tasks).values({
+      userId: testUserId,
+      title: "詳細タスク",
+      estimatedMinutes: 120,
+      dueAt: new Date(createdAt.getTime() + 86400000),
+      completedAt: null,
+      note: "重要なタスク",
+      createdAt,
+    });
+
+    const result = await listTasks(testUserId);
+
+    expect(result).toHaveLength(1);
+    const task = result[0];
+    expect(task).toEqual({
+      id: expect.any(Number),
+      userId: testUserId,
+      title: "詳細タスク",
+      estimatedMinutes: 120,
+      dueAt: expect.any(Date),
+      completedAt: null,
+      note: "重要なタスク",
+      createdAt: expect.any(Date),
+    });
+  });
+
+  it("完了済みタスクおよびNULL値も正しく取得されること", async () => {
+    const { listTasks } = await import("../services/listTasks");
+
+    await testDb.insert(tasks).values({
+      userId: testUserId,
+      title: "シンプルなタスク",
+      estimatedMinutes: null,
+      dueAt: null,
+      completedAt: new Date(),
+      note: null,
+      createdAt: new Date(),
+    });
+
+    const result = await listTasks(testUserId);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].estimatedMinutes).toBeNull();
+    expect(result[0].dueAt).toBeNull();
+    expect(result[0].note).toBeNull();
+    expect(result[0].completedAt).not.toBeNull();
+  });
+});
