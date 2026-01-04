@@ -50,7 +50,9 @@ describe("listTasksAction", () => {
       mockSupabase
     );
 
-    await expect(listTasksAction()).rejects.toThrow("Unauthorized");
+    await expect(listTasksAction()).rejects.toThrow(
+      "タスクの一覧を表示するにはユーザ認証が必要です。"
+    );
     expect(service.listTasks).not.toHaveBeenCalled();
   });
 });
