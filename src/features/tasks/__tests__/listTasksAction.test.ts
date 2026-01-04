@@ -71,7 +71,7 @@ describe("listTasksAction", () => {
     );
 
     await expect(listTasksAction()).rejects.toThrow(
-      "タスクの一覧を表示するにはユーザ認証が必要です。"
+      "タスクの一覧を表示するにはユーザー認証が必要です。"
     );
     expect(service.listTasks).not.toHaveBeenCalled();
   });

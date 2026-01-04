@@ -17,7 +17,7 @@ export async function listTasksAction(): Promise<Task[]> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    throw new Error("タスクの一覧を表示するにはユーザ認証が必要です。");
+    throw new Error("タスクの一覧を表示するにはユーザー認証が必要です。");
   }
 
   return listTasks(user.id);
