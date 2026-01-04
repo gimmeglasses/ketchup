@@ -19,7 +19,7 @@ const DashboardContainer = ({ incompleteTasks }: { incompleteTasks: Task[] }) =>
   const handleChecked = (taskId: string, event: React.ChangeEvent<HTMLInputElement>) => {
     setCheckedTasks(prev => ({
       ...prev,
-      [taskId] : event?.target.checked
+      [taskId] : event.target.checked
     }))
   };
 

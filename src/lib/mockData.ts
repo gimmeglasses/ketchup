@@ -67,7 +67,7 @@ const tasks: Task[] = [
     name: "牛乳を買う",
     description: null,
     dueDate: "2026-01-04",
-    estimatedMin: undefined, // 見積なし
+    estimatedMin: null, // 見積なし
     completedAt: null,
     createdAt: "2026-01-03T18:00:00Z"
   },
