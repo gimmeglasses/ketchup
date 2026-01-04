@@ -20,11 +20,9 @@ const DashboardHeader = () => {
       </div>
 
       <nav className="flex items-center gap-3 text-xs sm:text-sm font-bold text-gray-600">
-        <button>
-            <Link href='/'>
-              <span>マイページ</span>
-            </Link>
-        </button>
+        <Link href='/'>
+          <span>マイページ</span>
+        </Link>
       </nav>
     </header>
   );

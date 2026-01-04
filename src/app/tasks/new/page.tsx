@@ -1,4 +1,4 @@
-const NewHome = () => {
+const NewTaskPage = () => {
   return (
     <div>
       <p>Add a new task here</p>
@@ -6,4 +6,4 @@ const NewHome = () => {
   )
 }
 
-export default NewHome;
+export default NewTaskPage;

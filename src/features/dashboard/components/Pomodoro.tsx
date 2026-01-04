@@ -1,14 +1,6 @@
 import { memo } from "react"
 import { Task } from "@/types/task"
-
-const PomodoroButton = ( {onClick, children}: {onClick: () => void, children: React.ReactNode} ) => {
-  return (
-    <button type="button" onClick={onClick}
-      className="w-30 justfy-center group h-8 select-none rounded-lg bg-red-600 text-sm font-bold text-white">
-      {children}
-    </button>
-  );
-};
+import PomodoroButton from "@/features/dashboard/components/Button"
 
 const Pomodoro = ( { task }: { task: Task } ) => {
 
@@ -38,7 +30,7 @@ const Pomodoro = ( { task }: { task: Task } ) => {
             flex flex-col gap-3 bg-red-50 border border-white border-l-red-600 border-l-4 rounded-lg">
           <div className="flex items-center w-full">          
             {/* タスク名 */}
-            <div className="flex−1 min-w-0 px-2 text-gray-600">
+            <div className="flex-1 min-w-0 px-2 text-gray-600">
               <span className="font-extrabold truncate block">{task.name}</span>
             </div>
           </div>
