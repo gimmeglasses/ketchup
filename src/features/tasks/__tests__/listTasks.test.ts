@@ -56,10 +56,22 @@ describe("listTasks DBテスト", () => {
     const twoDaysAgo = new Date(now.getTime() - 172800000);
 
     await testDb.insert(tasks).values([
-      { userId: testUserId, title: "古いタスク", createdAt: twoDaysAgo },
-      { userId: testUserId, title: "最新タスク", createdAt: now },
-      { userId: testUserId, title: "中間タスク", createdAt: oneDayAgo },
-      { userId: otherUserId, title: "他ユーザーのタスク", createdAt: now },
+      {
+        userId: testUserId,
+        title: "古いタスク",
+        createdAt: twoDaysAgo.toISOString(),
+      },
+      { userId: testUserId, title: "最新タスク", createdAt: now.toISOString() },
+      {
+        userId: testUserId,
+        title: "中間タスク",
+        createdAt: oneDayAgo.toISOString(),
+      },
+      {
+        userId: otherUserId,
+        title: "他ユーザーのタスク",
+        createdAt: now.toISOString(),
+      },
     ]);
 
     const result = await listTasks(testUserId);
@@ -90,10 +102,10 @@ describe("listTasks DBテスト", () => {
       userId: testUserId,
       title: "詳細タスク",
       estimatedMinutes: 120,
-      dueAt: new Date(createdAt.getTime() + 86400000),
+      dueAt: new Date(createdAt.getTime() + 86400000).toISOString(),
       completedAt: null,
       note: "重要なタスク",
-      createdAt,
+      createdAt: createdAt.toISOString(),
     });
 
     const result = await listTasks(testUserId);
@@ -105,10 +117,10 @@ describe("listTasks DBテスト", () => {
       userId: testUserId,
       title: "詳細タスク",
       estimatedMinutes: 120,
-      dueAt: expect.any(Date),
+      dueAt: expect.any(String),
       completedAt: null,
       note: "重要なタスク",
-      createdAt: expect.any(Date),
+      createdAt: expect.any(String),
     });
   });
 
@@ -120,9 +132,9 @@ describe("listTasks DBテスト", () => {
       title: "シンプルなタスク",
       estimatedMinutes: null,
       dueAt: null,
-      completedAt: new Date(),
+      completedAt: new Date().toISOString(),
       note: null,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     });
 
     const result = await listTasks(testUserId);
