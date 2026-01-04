@@ -7,18 +7,14 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { tasks } from "@/app/db/schema";
 
-// テスト用インメモリDB
-let sqliteDb: Database.Database;
-let testDb: ReturnType<typeof drizzle>;
+// テスト用インメモリDBのセットアップ
+const sqliteDb = new Database(":memory:");
+const testDb = drizzle(sqliteDb);
 
 // DBクライアントをモック化
 vi.mock("@/app/db/client", () => ({
-  get db() {
-    return testDb;
-  },
-  get client() {
-    return sqliteDb;
-  },
+  db: testDb,
+  client: sqliteDb,
 }));
 
 describe("listTasks DBテスト", () => {
@@ -26,10 +22,6 @@ describe("listTasks DBテスト", () => {
   const otherUserId = "00000000-0000-0000-0000-000000000002";
 
   beforeAll(() => {
-    // SQLiteDB
-    sqliteDb = new Database(":memory:");
-    testDb = drizzle(sqliteDb);
-
     // テーブルを作成
     sqliteDb.exec(`
       CREATE TABLE tasks (
