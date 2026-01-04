@@ -21,16 +21,16 @@ export const tasks = pgTable(
     estimatedMinutes: integer("estimated_minutes"),
     dueAt: timestamp("due_at", {
       withTimezone: true,
-      mode: "string",
+      mode: "date",
     }),
     completedAt: timestamp("completed_at", {
       withTimezone: true,
-      mode: "string",
+      mode: "date",
     }),
     note: text("note"),
     createdAt: timestamp("created_at", {
       withTimezone: true,
-      mode: "string",
+      mode: "date",
     })
       .defaultNow()
       .notNull(),
