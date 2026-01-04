@@ -8,7 +8,7 @@ import * as service from "@/features/tasks/services/listTasks";
 import * as supabaseServer from "@/lib/supabase/server";
 
 // listTasksサービスをスパイ化
-vi.spyOn(service, "listTasks");
+vi.spyOn(service, "listTasks").mockResolvedValue([]);
 
 // Supabase クライアントをモック化
 vi.mock("@/lib/supabase/server", () => ({
