@@ -39,6 +39,26 @@ describe("listTasksAction", () => {
     expect(service.listTasks).toHaveBeenCalledWith("test-user-id");
   });
 
+  it("listTasks が例外を投げた場合に例外を再スローすること", async () => {
+    const mockUser = { id: "test-user-id" };
+    const mockSupabase = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: mockUser } }),
+      },
+    };
+
+    vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
+      mockSupabase
+    );
+    vi.mocked(service.listTasks).mockRejectedValue(
+      new Error("DB connection failed")
+    );
+
+    await expect(listTasksAction()).rejects.toThrow("DB connection failed");
+    expect(service.listTasks).toHaveBeenCalledTimes(1);
+    expect(service.listTasks).toHaveBeenCalledWith("test-user-id");
+  });
+
   it("未認証の場合はエラーをスローすること", async () => {
     const mockSupabase = {
       auth: {
@@ -53,6 +73,15 @@ describe("listTasksAction", () => {
     await expect(listTasksAction()).rejects.toThrow(
       "タスクの一覧を表示するにはユーザ認証が必要です。"
     );
+    expect(service.listTasks).not.toHaveBeenCalled();
+  });
+
+  it("Supabase クライアント生成が失敗した場合に例外を再スローすること", async () => {
+    vi.mocked(supabaseServer.createSupabaseServerClient).mockRejectedValue(
+      new Error("supabase down")
+    );
+
+    await expect(listTasksAction()).rejects.toThrow("supabase down");
     expect(service.listTasks).not.toHaveBeenCalled();
   });
 });
