@@ -23,6 +23,6 @@ CREATE POLICY "tasks_insert_own" ON "tasks" AS PERMISSIVE FOR
 INSERT TO "authenticated" WITH CHECK (auth.uid() = "tasks"."user_id");
 --> statement-breakpoint
 CREATE POLICY "tasks_update_own" ON "tasks" AS PERMISSIVE FOR
-UPDATE TO "authenticated" USING (auth.uid() = "tasks"."user_id");
+UPDATE TO "authenticated" USING (auth.uid() = "tasks"."user_id") WITH CHECK (auth.uid() = "tasks"."user_id");
 --> statement-breakpoint
 CREATE POLICY "tasks_delete_own" ON "tasks" AS PERMISSIVE FOR DELETE TO "authenticated" USING (auth.uid() = "tasks"."user_id");

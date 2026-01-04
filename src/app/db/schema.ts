@@ -59,6 +59,7 @@ export const tasks = pgTable(
       for: "update",
       to: authenticatedRole,
       using: sql`auth.uid() = ${t.userId}`,
+      withCheck: sql`auth.uid() = ${t.userId}`,
     }),
     pgPolicy("tasks_delete_own", {
       as: "permissive",

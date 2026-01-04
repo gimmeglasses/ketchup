@@ -1,5 +1,5 @@
 {
-  "id": "fd17ad9b-82f0-4af9-8053-510aa4ef1110",
+  "id": "b95a4174-14b7-4529-8ca6-f382fcdccfd9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -119,7 +119,8 @@
           "to": [
             "authenticated"
           ],
-          "using": "auth.uid() = \"tasks\".\"user_id\""
+          "using": "auth.uid() = \"tasks\".\"user_id\"",
+          "withCheck": "auth.uid() = \"tasks\".\"user_id\""
         },
         "tasks_delete_own": {
           "name": "tasks_delete_own",
