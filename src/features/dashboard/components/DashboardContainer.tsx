@@ -5,7 +5,7 @@ import Link from "next/link"
 import Pomodoro from "@/features/dashboard/components/Pomodoro"
 import { Task } from "@/types/task"
 
-const DashboardContainer = ( { incompleteTasks }: { incompleteTasks: Task[] }  ) => {
+const DashboardContainer = ({ incompleteTasks }: { incompleteTasks: Task[] }) => {
 
 
   // Pomodoroタイマーを利用するタスクを格納。画面からタスクをクリックすることで div tag の onClick が呼ばれる。
@@ -17,8 +17,6 @@ const DashboardContainer = ( { incompleteTasks }: { incompleteTasks: Task[] }  )
   // チェックボックスがONになったタスクを格納。
   const [ checkedTasks, setCheckedTasks ] = useState<{ [id: string] : boolean }>({});
   const handleChecked = (taskId: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    // div tag の onClick イベントを回避
-    event.stopPropagation(); 
     setCheckedTasks(prev => ({
       ...prev,
       [taskId] : event?.target.checked
@@ -42,7 +40,7 @@ const DashboardContainer = ( { incompleteTasks }: { incompleteTasks: Task[] }  )
 
       {/* Display task list */}
       <div className="flex flex-col gap-4 mt-4 text-gray-600">
-        <h1 className="text-1.5xl font-bold">今日のタスク</h1>
+        <h1 className="text-2xl font-bold">今日のタスク</h1>
         {incompleteTasks.map((task) => (
           <div key={task.id} 
             className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-700 
@@ -53,7 +51,7 @@ const DashboardContainer = ( { incompleteTasks }: { incompleteTasks: Task[] }  )
             <div className="flex items-center w-full">
               {/* チェックボックス*/}
               {/* 今後、削除機能またはタスク完了処理で利用（仮） */}
-              <div className="flex-none">
+              <div className="flex-none" onClick={(e) => e.stopPropagation()}>
                 <input className="text-red-600 rounded focus:ring-red-500" 
                        type="checkbox" 
                        checked={checkedTasks[task.id] || false} 

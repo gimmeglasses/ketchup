@@ -12,7 +12,7 @@ const DashboardHeader = () => {
               src="/logo.png"
               alt="Ketchup Logo"
               fill
-              className="object-contain drop-shadow-md w-2 h-2"
+              className="object-contain drop-shadow-md"
               priority
             />
           </Link>

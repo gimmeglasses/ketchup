@@ -2,7 +2,7 @@ import { memo } from "react"
 import { Task } from "@/types/task"
 import PomodoroButton from "@/features/dashboard/components/Button"
 
-const Pomodoro = ( { task }: { task: Task } ) => {
+const Pomodoro = ({ task }: { task: Task }) => {
 
   // No rendering if task is invalid
   if (!task || !task.id) {
@@ -25,7 +25,7 @@ const Pomodoro = ( { task }: { task: Task } ) => {
     <div className="flex flex-col rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-700">
       
       <div className="p-3 border rounded-lg flex flex-col gap-3 bg-white">
-        <h1 className="text-1xl font-bold text-gray-500 text-sm"> ポモドーロタイマー </h1>
+        <h1 className="font-bold text-gray-500 text-sm"> ポモドーロタイマー </h1>
         <div className="p-3 
             flex flex-col gap-3 bg-red-50 border border-white border-l-red-600 border-l-4 rounded-lg">
           <div className="flex items-center w-full">          
