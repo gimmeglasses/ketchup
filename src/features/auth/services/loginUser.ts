@@ -22,8 +22,8 @@ const SUPABASE_LOGIN_ERROR_MESSAGES: Record<string, string> = {
  * @returns {string} 日本語に変換されたメッセージ、マッピングがない場合は元のメッセージを返す
  */
 function translateSupabaseLoginError(message: string) {
-  for (const key in SUPABASE_LOGIN_ERROR_MESSAGES) {
-    if (message.includes(key)) return SUPABASE_LOGIN_ERROR_MESSAGES[key];
+  for (const [key, translated] of Object.entries(SUPABASE_LOGIN_ERROR_MESSAGES)) {
+    if (message.includes(key)) return translated;
   }
   return message;
 }
