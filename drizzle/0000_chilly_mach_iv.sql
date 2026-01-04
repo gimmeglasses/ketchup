@@ -45,3 +45,22 @@ create trigger on_email_verified
     and new.email_confirmed_at is not null
   )
   execute procedure public.handle_verified_user();
+--> statement-breakpoint
+
+-- profiles.updated_at を自動更新するトリガー関数
+create or replace function public.set_profiles_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+--> statement-breakpoint
+
+-- profiles の更新時に updated_at を更新するトリガー
+create trigger set_profiles_updated_at
+  before update on public.profiles
+  for each row
+  execute procedure public.set_profiles_updated_at();
