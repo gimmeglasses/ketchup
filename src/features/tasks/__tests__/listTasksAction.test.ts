@@ -3,6 +3,7 @@
  * actionがサービスを正しく呼び出すことを確認
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { type SupabaseClient } from "@supabase/supabase-js";
 import { listTasksAction } from "@/features/tasks/actions/listTasksAction";
 import * as service from "@/features/tasks/services/listTasks";
 import * as supabaseServer from "@/lib/supabase/server";
@@ -22,14 +23,14 @@ afterEach(() => {
 describe("listTasksAction", () => {
   it("認証されたユーザーでlistTasksサービスを呼び出すこと", async () => {
     const mockUser = { id: "test-user-id" };
-    const mockSupabase = {
+    const mockSupabase: Partial<SupabaseClient> = {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: mockUser } }),
-      },
+      } as Partial<SupabaseClient["auth"]>,
     };
 
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
-      mockSupabase
+      mockSupabase as SupabaseClient
     );
     vi.mocked(service.listTasks).mockResolvedValue([]);
 
@@ -41,14 +42,14 @@ describe("listTasksAction", () => {
 
   it("listTasks が例外を投げた場合に例外を再スローすること", async () => {
     const mockUser = { id: "test-user-id" };
-    const mockSupabase = {
+    const mockSupabase: Partial<SupabaseClient> = {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: mockUser } }),
-      },
+      } as Partial<SupabaseClient["auth"]>,
     };
 
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
-      mockSupabase
+      mockSupabase as SupabaseClient
     );
     vi.mocked(service.listTasks).mockRejectedValue(
       new Error("DB connection failed")
@@ -60,14 +61,14 @@ describe("listTasksAction", () => {
   });
 
   it("未認証の場合はエラーをスローすること", async () => {
-    const mockSupabase = {
+    const mockSupabase: Partial<SupabaseClient> = {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
-      },
+      } as Partial<SupabaseClient["auth"]>,
     };
 
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
-      mockSupabase
+      mockSupabase as SupabaseClient
     );
 
     await expect(listTasksAction()).rejects.toThrow(
