@@ -51,6 +51,7 @@ create trigger on_email_verified
 create or replace function public.set_profiles_updated_at()
 returns trigger
 language plpgsql
+security definer set search_path = public
 as $$
 begin
   new.updated_at = now();
