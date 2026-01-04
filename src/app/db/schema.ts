@@ -75,26 +75,22 @@ export const tasks = pgTable(
       name: "tasks_user_id_fk",
     }).onDelete("cascade"),
     pgPolicy("tasks_select_own", {
-      as: "permissive",
       for: "select",
       to: authenticatedRole,
       using: sql`auth.uid() = ${t.userId}`,
     }),
     pgPolicy("tasks_insert_own", {
-      as: "permissive",
       for: "insert",
       to: authenticatedRole,
       withCheck: sql`auth.uid() = ${t.userId}`,
     }),
     pgPolicy("tasks_update_own", {
-      as: "permissive",
       for: "update",
       to: authenticatedRole,
       using: sql`auth.uid() = ${t.userId}`,
       withCheck: sql`auth.uid() = ${t.userId}`,
     }),
     pgPolicy("tasks_delete_own", {
-      as: "permissive",
       for: "delete",
       to: authenticatedRole,
       using: sql`auth.uid() = ${t.userId}`,
