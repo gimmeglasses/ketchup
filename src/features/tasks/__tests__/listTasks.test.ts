@@ -9,7 +9,6 @@ import { tasks } from "@/app/db/schema";
 
 // テスト用インメモリDBのセットアップ
 // NOTE: 本番は Postgres を使用するがテストは軽量化のため SQLite を使用している。
-// UUID を TEXT に、serial を INTEGER AUTOINCREMENT に置き換えており、
 // 型制約・タイムスタンプ精度・NULL ソート順などの差異を検知できない可能性がある。
 const sqliteDb = new Database(":memory:");
 const testDb = drizzle(sqliteDb);
