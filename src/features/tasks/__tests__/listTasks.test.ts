@@ -26,9 +26,10 @@ describe("listTasks DBテスト", () => {
 
   beforeAll(() => {
     // テーブルを作成
+    // NOTE: PostgreSQLのUUIDはSQLiteではTEXTとして扱う
     sqliteDb.exec(`
       CREATE TABLE tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY NOT NULL,
         user_id TEXT NOT NULL,
         title TEXT NOT NULL,
         estimated_minutes INTEGER,
@@ -52,17 +53,25 @@ describe("listTasks DBテスト", () => {
 
     await testDb.insert(tasks).values([
       {
+        id: "10000000-0000-0000-0000-000000000001",
         userId: testUserId,
         title: "古いタスク",
         createdAt: twoDaysAgo.toISOString(),
       },
-      { userId: testUserId, title: "最新タスク", createdAt: now.toISOString() },
       {
+        id: "10000000-0000-0000-0000-000000000002",
+        userId: testUserId,
+        title: "最新タスク",
+        createdAt: now.toISOString(),
+      },
+      {
+        id: "10000000-0000-0000-0000-000000000003",
         userId: testUserId,
         title: "中間タスク",
         createdAt: oneDayAgo.toISOString(),
       },
       {
+        id: "10000000-0000-0000-0000-000000000004",
         userId: otherUserId,
         title: "他ユーザーのタスク",
         createdAt: now.toISOString(),
@@ -94,6 +103,7 @@ describe("listTasks DBテスト", () => {
     const createdAt = new Date();
 
     await testDb.insert(tasks).values({
+      id: "20000000-0000-0000-0000-000000000001",
       userId: testUserId,
       title: "詳細タスク",
       estimatedMinutes: 120,
@@ -108,7 +118,7 @@ describe("listTasks DBテスト", () => {
     expect(result).toHaveLength(1);
     const task = result[0];
     expect(task).toEqual({
-      id: expect.any(Number),
+      id: expect.any(String),
       userId: testUserId,
       title: "詳細タスク",
       estimatedMinutes: 120,
@@ -123,6 +133,7 @@ describe("listTasks DBテスト", () => {
     const { listTasks } = await import("../services/listTasks");
 
     await testDb.insert(tasks).values({
+      id: "30000000-0000-0000-0000-000000000001",
       userId: testUserId,
       title: "シンプルなタスク",
       estimatedMinutes: null,

@@ -1,5 +1,5 @@
 {
-  "id": "0d536915-6902-483e-80a6-fececc8f02e2",
+  "id": "63d11b7b-a008-4f11-bd5b-cbea4f45afe8",
   "prevId": "89dd640d-4d3c-4801-a33d-f173b4e89646",
   "version": "7",
   "dialect": "postgresql",
@@ -74,9 +74,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "user_id": {
           "name": "user_id",
@@ -143,8 +144,7 @@
         "tasks_user_id_fk": {
           "name": "tasks_user_id_fk",
           "tableFrom": "tasks",
-          "tableTo": "users",
-          "schemaTo": "auth",
+          "tableTo": "profiles",
           "columnsFrom": [
             "user_id"
           ],

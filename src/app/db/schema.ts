@@ -4,7 +4,6 @@ import {
   integer,
   pgPolicy,
   pgTable,
-  serial,
   text,
   timestamp,
   uuid,
@@ -47,7 +46,7 @@ export const profiles = pgTable(
 export const tasks = pgTable(
   "tasks",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom().notNull(),
     userId: uuid("user_id").notNull(),
     title: text("title").notNull(),
     estimatedMinutes: integer("estimated_minutes"),
@@ -71,7 +70,7 @@ export const tasks = pgTable(
     index("tasks_user_id_idx").on(t.userId),
     foreignKey({
       columns: [t.userId],
-      foreignColumns: [authUsers.id],
+      foreignColumns: [profiles.id],
       name: "tasks_user_id_fk",
     }).onDelete("cascade"),
     pgPolicy("tasks_select_own", {
