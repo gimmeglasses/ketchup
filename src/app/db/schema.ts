@@ -47,7 +47,7 @@ export const tasks = pgTable(
   "tasks",
   {
     id: uuid("id").primaryKey().defaultRandom().notNull(),
-    userId: uuid("user_id").notNull(),
+    profileId: uuid("profile_id").notNull(),
     title: text("title").notNull(),
     estimatedMinutes: integer("estimated_minutes"),
     dueAt: timestamp("due_at", {
@@ -67,32 +67,32 @@ export const tasks = pgTable(
       .notNull(),
   },
   (t) => [
-    index("tasks_user_id_idx").on(t.userId),
+    index("tasks_profile_id_idx").on(t.profileId),
     foreignKey({
-      columns: [t.userId],
+      columns: [t.profileId],
       foreignColumns: [profiles.id],
-      name: "tasks_user_id_fk",
+      name: "tasks_profile_id_fk",
     }).onDelete("cascade"),
     pgPolicy("tasks_select_own", {
       for: "select",
       to: authenticatedRole,
-      using: sql`auth.uid() = ${t.userId}`,
+      using: sql`auth.uid() = ${t.profileId}`,
     }),
     pgPolicy("tasks_insert_own", {
       for: "insert",
       to: authenticatedRole,
-      withCheck: sql`auth.uid() = ${t.userId}`,
+      withCheck: sql`auth.uid() = ${t.profileId}`,
     }),
     pgPolicy("tasks_update_own", {
       for: "update",
       to: authenticatedRole,
-      using: sql`auth.uid() = ${t.userId}`,
-      withCheck: sql`auth.uid() = ${t.userId}`,
+      using: sql`auth.uid() = ${t.profileId}`,
+      withCheck: sql`auth.uid() = ${t.profileId}`,
     }),
     pgPolicy("tasks_delete_own", {
       for: "delete",
       to: authenticatedRole,
-      using: sql`auth.uid() = ${t.userId}`,
+      using: sql`auth.uid() = ${t.profileId}`,
     }),
   ]
 );

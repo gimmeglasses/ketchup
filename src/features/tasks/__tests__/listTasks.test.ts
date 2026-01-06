@@ -30,7 +30,7 @@ describe("listTasks DBテスト", () => {
     sqliteDb.exec(`
       CREATE TABLE tasks (
         id TEXT PRIMARY KEY NOT NULL,
-        user_id TEXT NOT NULL,
+        profile_id TEXT NOT NULL,
         title TEXT NOT NULL,
         estimated_minutes INTEGER,
         due_at DATETIME,
@@ -54,25 +54,25 @@ describe("listTasks DBテスト", () => {
     await testDb.insert(tasks).values([
       {
         id: "10000000-0000-0000-0000-000000000001",
-        userId: testUserId,
+        profileId: testUserId,
         title: "古いタスク",
         createdAt: twoDaysAgo.toISOString(),
       },
       {
         id: "10000000-0000-0000-0000-000000000002",
-        userId: testUserId,
+        profileId: testUserId,
         title: "最新タスク",
         createdAt: now.toISOString(),
       },
       {
         id: "10000000-0000-0000-0000-000000000003",
-        userId: testUserId,
+        profileId: testUserId,
         title: "中間タスク",
         createdAt: oneDayAgo.toISOString(),
       },
       {
         id: "10000000-0000-0000-0000-000000000004",
-        userId: otherUserId,
+        profileId: otherUserId,
         title: "他ユーザーのタスク",
         createdAt: now.toISOString(),
       },
@@ -86,7 +86,7 @@ describe("listTasks DBテスト", () => {
     expect(result[1].title).toBe("中間タスク");
     expect(result[2].title).toBe("古いタスク");
     // 他ユーザーのタスクは含まれないこと
-    expect(result.every((task) => task.userId === testUserId)).toBe(true);
+    expect(result.every((task) => task.profileId === testUserId)).toBe(true);
   });
 
   it("タスクが存在しない場合は空の配列を返すこと", async () => {
@@ -104,7 +104,7 @@ describe("listTasks DBテスト", () => {
 
     await testDb.insert(tasks).values({
       id: "20000000-0000-0000-0000-000000000001",
-      userId: testUserId,
+      profileId: testUserId,
       title: "詳細タスク",
       estimatedMinutes: 120,
       dueAt: new Date(createdAt.getTime() + 86400000).toISOString(),
@@ -119,7 +119,7 @@ describe("listTasks DBテスト", () => {
     const task = result[0];
     expect(task).toEqual({
       id: expect.any(String),
-      userId: testUserId,
+      profileId: testUserId,
       title: "詳細タスク",
       estimatedMinutes: 120,
       dueAt: expect.any(String),
@@ -134,7 +134,7 @@ describe("listTasks DBテスト", () => {
 
     await testDb.insert(tasks).values({
       id: "30000000-0000-0000-0000-000000000001",
-      userId: testUserId,
+      profileId: testUserId,
       title: "シンプルなタスク",
       estimatedMinutes: null,
       dueAt: null,

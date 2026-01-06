@@ -13,6 +13,6 @@ export async function listTasks(userId: string): Promise<Task[]> {
   return db
     .select()
     .from(tasks)
-    .where(eq(tasks.userId, userId))
+    .where(eq(tasks.profileId, userId))
     .orderBy(desc(tasks.createdAt));
 }

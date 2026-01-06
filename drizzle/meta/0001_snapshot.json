@@ -1,5 +1,5 @@
 {
-  "id": "63d11b7b-a008-4f11-bd5b-cbea4f45afe8",
+  "id": "6eb3b6e2-5ad3-412a-9755-691a894cef0c",
   "prevId": "89dd640d-4d3c-4801-a33d-f173b4e89646",
   "version": "7",
   "dialect": "postgresql",
@@ -79,8 +79,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "user_id": {
-          "name": "user_id",
+        "profile_id": {
+          "name": "profile_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -124,11 +124,11 @@
         }
       },
       "indexes": {
-        "tasks_user_id_idx": {
-          "name": "tasks_user_id_idx",
+        "tasks_profile_id_idx": {
+          "name": "tasks_profile_id_idx",
           "columns": [
             {
-              "expression": "user_id",
+              "expression": "profile_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -141,12 +141,12 @@
         }
       },
       "foreignKeys": {
-        "tasks_user_id_fk": {
-          "name": "tasks_user_id_fk",
+        "tasks_profile_id_fk": {
+          "name": "tasks_profile_id_fk",
           "tableFrom": "tasks",
           "tableTo": "profiles",
           "columnsFrom": [
-            "user_id"
+            "profile_id"
           ],
           "columnsTo": [
             "id"
@@ -165,7 +165,7 @@
           "to": [
             "authenticated"
           ],
-          "using": "auth.uid() = \"tasks\".\"user_id\""
+          "using": "auth.uid() = \"tasks\".\"profile_id\""
         },
         "tasks_insert_own": {
           "name": "tasks_insert_own",
@@ -174,7 +174,7 @@
           "to": [
             "authenticated"
           ],
-          "withCheck": "auth.uid() = \"tasks\".\"user_id\""
+          "withCheck": "auth.uid() = \"tasks\".\"profile_id\""
         },
         "tasks_update_own": {
           "name": "tasks_update_own",
@@ -183,8 +183,8 @@
           "to": [
             "authenticated"
           ],
-          "using": "auth.uid() = \"tasks\".\"user_id\"",
-          "withCheck": "auth.uid() = \"tasks\".\"user_id\""
+          "using": "auth.uid() = \"tasks\".\"profile_id\"",
+          "withCheck": "auth.uid() = \"tasks\".\"profile_id\""
         },
         "tasks_delete_own": {
           "name": "tasks_delete_own",
@@ -193,7 +193,7 @@
           "to": [
             "authenticated"
           ],
-          "using": "auth.uid() = \"tasks\".\"user_id\""
+          "using": "auth.uid() = \"tasks\".\"profile_id\""
         }
       },
       "checkConstraints": {},
