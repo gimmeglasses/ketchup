@@ -25,7 +25,7 @@ export function RegisterForm() {
         Ketchup アカウントを作成して、ポモドーロとタスク管理をはじめましょう。
       </p>
 
-      <form className="mt-6 space-y-4" method="POST" action={formAction}>
+      <form className="mt-6 space-y-4" action={formAction}>
         {state.success === false && state.errors._form && (
           <p className="mt-3 text-center text-sm text-red-500">
             {state.errors._form[0]}

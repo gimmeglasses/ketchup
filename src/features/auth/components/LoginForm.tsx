@@ -25,7 +25,7 @@ export function LoginForm() {
         登録済みのメールアドレスとパスワードで Ketchup にログインします。
       </p>
 
-      <form className="mt-6 space-y-4" method="POST" action={formAction}>
+      <form className="mt-6 space-y-4" action={formAction}>
         {/* フォーム共通エラー */}
         {state.success === false && state.errors._form && (
           <p className="mt-3 text-center text-sm text-red-500">
