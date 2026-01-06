@@ -1,4 +1,3 @@
-import { memo } from "react"
 import { Task } from "@/types/task"
 import PomodoroButton from "@/features/dashboard/components/Button"
 
@@ -53,4 +52,4 @@ const Pomodoro = ({ task }: { task: Task }) => {
   );
 };
 
-export default memo(Pomodoro);
+export default Pomodoro;
