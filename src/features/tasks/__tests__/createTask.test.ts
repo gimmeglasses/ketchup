@@ -102,6 +102,15 @@ describe("createTask", () => {
     });
   });
 
+  it("DBが空配列を返した時に例外がスローされること", async () => {
+    const { createTask } = await import("../services/createTask");
+    mockReturning.mockResolvedValue([]);
+
+    await expect(
+      createTask(testUserId, { title: "タスク" })
+    ).rejects.toThrow("Failed to create task");
+  });
+
   it("DBエラー時に例外がスローされること", async () => {
     const { createTask } = await import("../services/createTask");
     mockReturning.mockRejectedValue(new Error("Database error"));
