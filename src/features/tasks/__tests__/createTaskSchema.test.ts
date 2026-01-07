@@ -142,7 +142,7 @@ describe("createTaskSchema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.flatten().fieldErrors.estimatedMinutes).toContain(
-          "作業時間は整数で入力してください"
+          "作業時間は有効な整数で入力してください"
         );
       }
     });
@@ -152,6 +152,11 @@ describe("createTaskSchema", () => {
       const result = createTaskSchema.safeParse(input);
 
       expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.estimatedMinutes).toContain(
+          "作業時間は有効な整数で入力してください"
+        );
+      }
     });
   });
 

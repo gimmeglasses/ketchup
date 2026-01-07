@@ -240,7 +240,7 @@ describe("createTaskAction", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors.estimatedMinutes).toContain(
-          "作業時間は整数で入力してください"
+          "作業時間は有効な整数で入力してください"
         );
       }
       expect(service.createTask).not.toHaveBeenCalled();
@@ -318,6 +318,7 @@ describe("createTaskAction", () => {
           "タスクの作成に失敗しました。時間をおいて再度お試しください。"
         );
       }
+      expect(service.createTask).toHaveBeenCalledTimes(1);
     });
   });
 });
