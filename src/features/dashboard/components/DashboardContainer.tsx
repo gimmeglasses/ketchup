@@ -49,7 +49,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         {tasks.map((task) => (
           <div
             key={task.id}
-            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-700 
+            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-300 
               flex flex-col gap-3 bg-white"
             onClick={() => handleClick(task)}
           >
