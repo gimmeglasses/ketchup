@@ -1,14 +1,8 @@
-import type { Metadata } from "next";
-import DashboardHeader from "@/features/dashboard/components/DashboardHeader"
-
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Dashboard to display a task list"
-}
+import DashboardHeader from "@/shared/components/app/DashboardHeader";
 
 export default function DashboardLayout({
-   children 
-  }: Readonly<{
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
@@ -20,5 +14,5 @@ export default function DashboardLayout({
         </div>
       </div>
     </main>
-  )
-};
+  );
+}
