@@ -65,4 +65,4 @@ const Pomodoro = ({ task }: { task: Task }) => {
   );
 };
 
-export default memo(Pomodoro);
+export default Pomodoro;
