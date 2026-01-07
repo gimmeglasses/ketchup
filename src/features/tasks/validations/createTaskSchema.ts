@@ -10,11 +10,11 @@ const estimatedMinutesSchema = z.preprocess(
     .optional()
     .transform((val) => {
       if (val === undefined) return undefined;
-      const num = typeof val === "number" ? val : parseFloat(val);
+      const num = typeof val === "number" ? val : Number(val);
       return num;
     })
     .refine((val) => val === undefined || Number.isInteger(val), {
-      message: "作業時間は整数で入力してください",
+      message: "作業時間は有効な整数で入力してください",
     })
     .refine((val) => val === undefined || val >= 1, {
       message: "作業時間は1分以上で入力してください",

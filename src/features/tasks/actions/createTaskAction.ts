@@ -65,7 +65,8 @@ export async function createTaskAction(
 
     const task = await createTask(user.id, parsed.data);
     return { success: true, task };
-  } catch {
+  } catch (error) {
+    console.error("Failed to create task:", error);
     return {
       success: false,
       errors: {

@@ -25,5 +25,9 @@ export async function createTask(
     })
     .returning();
 
+  if (!created) {
+    throw new Error("Failed to create task");
+  }
+
   return created;
 }
