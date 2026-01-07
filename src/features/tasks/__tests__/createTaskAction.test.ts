@@ -163,6 +163,30 @@ describe("createTaskAction", () => {
       expect(service.createTask).not.toHaveBeenCalled();
     });
 
+    it("バリデーションエラー時に入力値が返されること", async () => {
+      setupAuthenticatedUser();
+
+      const result = await createTaskAction(
+        initialState,
+        makeFormData({
+          title: "",
+          estimatedMinutes: "30",
+          dueAt: "2030-12-31",
+          note: "メモ",
+        })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.values).toEqual({
+          title: "",
+          estimatedMinutes: "30",
+          dueAt: "2030-12-31",
+          note: "メモ",
+        });
+      }
+    });
+
     it("タイトルがスペースのみの場合はエラーを返すこと", async () => {
       setupAuthenticatedUser();
 
@@ -280,7 +304,29 @@ describe("createTaskAction", () => {
       expect(service.createTask).not.toHaveBeenCalled();
     });
 
+    it("未認証の場合でも入力値が返されること", async () => {
+      setupUnauthenticatedUser();
+
+      const result = await createTaskAction(
+        initialState,
+        makeFormData({ title: "タスク", note: "メモ" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.values).toEqual({
+          title: "タスク",
+          estimatedMinutes: undefined,
+          dueAt: undefined,
+          note: "メモ",
+        });
+      }
+    });
+
     it("Supabaseクライアント生成に失敗した場合はエラーを返すこと", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       vi.mocked(supabaseServer.createSupabaseServerClient).mockRejectedValue(
         new Error("supabase down")
       );
@@ -297,11 +343,15 @@ describe("createTaskAction", () => {
         );
       }
       expect(service.createTask).not.toHaveBeenCalled();
+      consoleErrorSpy.mockRestore();
     });
   });
 
   describe("サービスエラー", () => {
     it("createTaskがエラーをスローした場合、適切にハンドリングすること", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       setupAuthenticatedUser();
       vi.mocked(service.createTask).mockRejectedValue(
         new Error("Database error")
@@ -319,6 +369,33 @@ describe("createTaskAction", () => {
         );
       }
       expect(service.createTask).toHaveBeenCalledTimes(1);
+      consoleErrorSpy.mockRestore();
+    });
+
+    it("サービスエラー時でも入力値が返されること", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      setupAuthenticatedUser();
+      vi.mocked(service.createTask).mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const result = await createTaskAction(
+        initialState,
+        makeFormData({ title: "タスク", estimatedMinutes: "25" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.values).toEqual({
+          title: "タスク",
+          estimatedMinutes: "25",
+          dueAt: undefined,
+          note: undefined,
+        });
+      }
+      consoleErrorSpy.mockRestore();
     });
   });
 });

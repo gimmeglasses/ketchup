@@ -13,6 +13,13 @@ type FieldErrors = Partial<Record<CreateTaskFields, string[]>> & {
   _form?: string[];
 };
 
+type FormValues = {
+  title: string;
+  estimatedMinutes?: string;
+  dueAt?: string;
+  note?: string;
+};
+
 export type CreateTaskActionResult =
   | {
       success: true;
@@ -21,6 +28,7 @@ export type CreateTaskActionResult =
   | {
       success: false;
       errors: FieldErrors;
+      values?: FormValues;
     };
 
 /**
@@ -35,17 +43,17 @@ export async function createTaskAction(
   prevState: CreateTaskActionResult,
   formData: FormData
 ): Promise<CreateTaskActionResult> {
-  const raw = {
-    title: formData.get("title"),
-    estimatedMinutes: formData.get("estimatedMinutes"),
-    dueAt: formData.get("dueAt"),
-    note: formData.get("note"),
+  const values: FormValues = {
+    title: formData.get("title") as string,
+    estimatedMinutes: (formData.get("estimatedMinutes") as string) || undefined,
+    dueAt: (formData.get("dueAt") as string) || undefined,
+    note: (formData.get("note") as string) || undefined,
   };
 
-  const parsed = createTaskSchema.safeParse(raw);
+  const parsed = createTaskSchema.safeParse(values);
 
   if (!parsed.success) {
-    return { success: false, errors: toFieldErrors(parsed.error) };
+    return { success: false, errors: toFieldErrors(parsed.error), values };
   }
 
   try {
@@ -60,6 +68,7 @@ export async function createTaskAction(
         errors: {
           _form: ["タスクを作成するにはログインが必要です。"],
         },
+        values,
       };
     }
 
@@ -72,6 +81,7 @@ export async function createTaskAction(
       errors: {
         _form: ["タスクの作成に失敗しました。時間をおいて再度お試しください。"],
       },
+      values,
     };
   }
 }
