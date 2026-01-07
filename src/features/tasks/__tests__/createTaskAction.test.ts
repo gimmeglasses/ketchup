@@ -55,7 +55,7 @@ function setupAuthenticatedUser(userId = "test-user-id") {
   const mockSupabase: Partial<SupabaseClient> = {
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: mockUser } }),
-    } as Partial<SupabaseClient["auth"]>,
+    } as unknown as SupabaseClient["auth"],
   };
   vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
     mockSupabase as SupabaseClient
@@ -69,7 +69,7 @@ function setupUnauthenticatedUser() {
   const mockSupabase: Partial<SupabaseClient> = {
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
-    } as Partial<SupabaseClient["auth"]>,
+    } as unknown as SupabaseClient["auth"],
   };
   vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
     mockSupabase as SupabaseClient
