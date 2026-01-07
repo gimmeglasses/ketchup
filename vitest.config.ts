@@ -1,4 +1,6 @@
-// React / JS DOM を利用
+/**
+ * Vitest configuration for React components using the jsdom environment.
+ */
 import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
 import react from "@vitejs/plugin-react";

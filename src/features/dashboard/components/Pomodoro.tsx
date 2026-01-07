@@ -24,8 +24,7 @@ const Pomodoro = ({ task }: { task: Task }) => {
     <div className="flex flex-col rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-700">
       <div className="p-3 border rounded-lg flex flex-col gap-3 bg-white">
         <h1 className="font-bold text-gray-500 text-sm">
-          {" "}
-          ポモドーロタイマーを使う{" "}
+          ポモドーロタイマーを使う
         </h1>
         <div
           className="p-3 
