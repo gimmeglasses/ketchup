@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const DashboardHeader = () => {
   return (
-    <header className="flex items-center justify-between py-2">
+    <header className="flex items-center justify-between py-2 px-4">
       <div className="flex items-center gap-2">
         <div className="relative h-9 w-24 sm:h-10 sm:w-28">
           {/* logo */}

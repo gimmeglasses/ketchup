@@ -1,4 +1,5 @@
 import DashboardHeader from "@/shared/components/app/DashboardHeader";
+import DashboardFooter from "@/shared/components/app/DashboardFooter";
 
 export default function DashboardLayout({
   children,
@@ -6,12 +7,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="min-h-screen bg-gray-200">
-      <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col items-center justify-center pb-10">
-          {children}
-        </div>
+    <main className="flex flex-col min-h-screen bg-gray-200">
+      <DashboardHeader />
+      <div className="flex-1 pb-10 mx-auto max-w-5xl w-full px-4">
+        {children}
+      </div>
+      <div className="mx-auto max-w-5xl w-full px-4">
+        <DashboardFooter />
       </div>
     </main>
   );

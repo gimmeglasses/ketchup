@@ -1,8 +1,6 @@
-// src/features/dashboard/__tests__/Pomodoro.test.tsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Pomodoro from "../components/Pomodoro";
-// import { Task } from "@/types/task";
 import { Task } from "@/features/tasks/types";
 import "@testing-library/jest-dom/vitest";
 

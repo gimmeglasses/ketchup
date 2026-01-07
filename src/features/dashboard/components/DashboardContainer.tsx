@@ -45,7 +45,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
 
       {/* Display task list */}
       <div className="flex flex-col gap-4 mt-4 text-gray-600">
-        <h1 className="text-2xl font-bold">今日のタスク</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">今日のタスク</h1>
         {tasks.map((task) => (
           <div
             key={task.id}
@@ -72,7 +72,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
                 </span>
               </div>
             </div>
-            <div className="flex ">
+            <div className="flex">
               {/* 残りの項目を縦に表示 */}
               <div className="flex flex-col ml-6 text-sm text-gray-600">
                 <span>期限: {task.dueAt ? task.dueAt : "None"}</span>

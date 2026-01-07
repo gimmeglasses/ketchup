@@ -47,12 +47,12 @@ const Pomodoro = ({ task }: { task: Task }) => {
             </span>
           </div>
         </div>
-        <div className="p-3 flex flex-col gap-3">
+        <div className="p-2 sm:p-3 flex flex-col gap-2 sm:gap-3">
           <div className="flex mx-auto text-5xl text-red-600 font-extralight">
             {/* Tentative: 今後の拡張で対応 */}
             25:00
           </div>
-          <div className="flex mx-auto gap-6">
+          <div className="flex mx-auto gap-3 sm:gap-6">
             <span>
               <PomodoroButton onClick={handleStartButton}>START</PomodoroButton>
             </span>
