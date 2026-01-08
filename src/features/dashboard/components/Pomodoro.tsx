@@ -1,4 +1,3 @@
-import { memo } from "react";
 import { Task } from "@/features/tasks/types";
 import PomodoroButton from "@/features/dashboard/components/PomodoroButton";
 

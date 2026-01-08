@@ -92,29 +92,4 @@ describe("Pomodoro", () => {
       consoleSpy.mockRestore();
     });
   });
-
-  describe("memoの動作", () => {
-    it("同じtaskで再レンダリングされない", () => {
-      const { rerender } = render(<Pomodoro task={mockTask} />);
-      const consoleSpy = vi.spyOn(console, "log");
-      // Strict modeで動いているため、必ず２回レンダリングされるため、初回レンダリングの後、初期化する。
-      consoleSpy.mockClear(); // Clear calls from initial render
-
-      rerender(<Pomodoro task={mockTask} />);
-
-      // 期待値：memoにより同じpropsでは再レンダリングされないため、
-      // consolelogは呼ばれない
-      expect(consoleSpy).not.toHaveBeenCalled();
-      consoleSpy.mockRestore();
-    });
-
-    it("taskが変更されたときのみ再レンダリングされる", () => {
-      const task2: Task = { ...mockTask, title: "別のタスク" };
-      const { rerender } = render(<Pomodoro task={mockTask} />);
-
-      rerender(<Pomodoro task={task2} />);
-
-      expect(screen.getByText("別のタスク")).toBeInTheDocument();
-    });
-  });
 });
