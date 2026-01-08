@@ -1,10 +1,14 @@
+/**
+ * Vitest configuration for React components using the jsdom environment.
+ */
 import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  plugins: [react(), tsconfigPaths()],
   test: {
     globals: true,
-    environment: "node",
+    environment: "jsdom",
   },
 });
