@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Pomodoro from "../components/Pomodoro";
+import type { PomodoroButtonProps } from "../components/PomodoroButton";
 import { Task } from "@/features/tasks/types";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("../components/PomodoroButton", () => ({
-  default: ({ onClick, children }: React.ComponentProps<"button">) => (
+  default: ({ onClick, children }: PomodoroButtonProps) => (
     <button onClick={onClick} data-testid={`button-${children}`}>
       {children}
     </button>
