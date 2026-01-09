@@ -96,3 +96,56 @@ export const tasks = pgTable(
     }),
   ]
 );
+
+export const pomodoroSessions = pgTable(
+  "pomodoro_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom().notNull(),
+    taskId: uuid("task_id").notNull(),
+    profileId: uuid("profile_id").notNull(),
+    startedAt: timestamp("started_at", {
+      withTimezone: true,
+      mode: "string",
+    }).notNull(),
+    stoppedAt: timestamp("stopped_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("pomodoro_sessions_task_id_idx").on(t.taskId),
+    index("pomodoro_sessions_profile_id_idx").on(t.profileId),
+    foreignKey({
+      columns: [t.taskId],
+      foreignColumns: [tasks.id],
+      name: "pomodoro_sessions_task_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [t.profileId],
+      foreignColumns: [profiles.id],
+      name: "pomodoro_sessions_profile_id_fk",
+    }).onDelete("cascade"),
+    pgPolicy("pomodoro_sessions_select_own", {
+      for: "select",
+      to: authenticatedRole,
+      using: sql`auth.uid() = ${t.profileId}`,
+    }),
+    pgPolicy("pomodoro_sessions_insert_own", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`auth.uid() = ${t.profileId}`,
+    }),
+    pgPolicy("pomodoro_sessions_update_own", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`auth.uid() = ${t.profileId}`,
+      withCheck: sql`auth.uid() = ${t.profileId}`,
+    }),
+  ]
+);
