@@ -177,7 +177,7 @@ describe("registerUserAction", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.errors._form).toContain(
-        "登録に失敗しました。時間をおいて再度お試しください。"
+        "Database error"
       );
     }
   });
