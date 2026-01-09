@@ -26,7 +26,7 @@ describe("listTasksAction", () => {
     const mockSupabase: Partial<SupabaseClient> = {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: mockUser } }),
-      } as Partial<SupabaseClient["auth"]>,
+      } as Partial<SupabaseClient["auth"]> as SupabaseClient["auth"],
     };
 
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
@@ -45,7 +45,7 @@ describe("listTasksAction", () => {
     const mockSupabase: Partial<SupabaseClient> = {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: mockUser } }),
-      } as Partial<SupabaseClient["auth"]>,
+      } as Partial<SupabaseClient["auth"]> as SupabaseClient["auth"],
     };
 
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
@@ -64,7 +64,7 @@ describe("listTasksAction", () => {
     const mockSupabase: Partial<SupabaseClient> = {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
-      } as Partial<SupabaseClient["auth"]>,
+      } as Partial<SupabaseClient["auth"]> as SupabaseClient["auth"],
     };
 
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
