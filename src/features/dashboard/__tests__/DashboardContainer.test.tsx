@@ -7,7 +7,7 @@ import { Task } from "@/features/tasks/types";
 
 // モック化
 vi.mock("next/link", () => ({
-  default: ({ href, children, ...props }: any) => (
+  default: ({ href, children, ...props }: React.ComponentProps<"a">) => (
     <a href={href} {...props}>
       {children}
     </a>

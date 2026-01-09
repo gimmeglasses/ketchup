@@ -1,11 +1,10 @@
 // Buttons
-const PomodoroButton = ({
-  onClick,
-  children,
-}: {
+export type PomodoroButtonProps = {
   onClick: () => void;
   children: React.ReactNode;
-}) => {
+};
+
+const PomodoroButton = ({ onClick, children }: PomodoroButtonProps) => {
   return (
     <button
       type="button"
