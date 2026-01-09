@@ -5,7 +5,7 @@ import { Task } from "@/features/tasks/types";
 import "@testing-library/jest-dom/vitest";
 
 vi.mock("../components/PomodoroButton", () => ({
-  default: ({ onClick, children }: any) => (
+  default: ({ onClick, children }: React.ComponentProps<"button">) => (
     <button onClick={onClick} data-testid={`button-${children}`}>
       {children}
     </button>
@@ -26,12 +26,12 @@ describe("Pomodoro", () => {
 
   describe("バリデーション・エラーハンドリング", () => {
     it("taskがnullのときnullをレンダリング", () => {
-      const { container } = render(<Pomodoro task={null as any} />);
+      const { container } = render(<Pomodoro task={null as unknown as Task} />);
       expect(container.firstChild).toBeNull();
     });
 
     it("task.idが存在しないときnullをレンダリング", () => {
-      const invalidTask = { ...mockTask, id: undefined } as any;
+      const invalidTask = { ...mockTask, id: undefined } as unknown as Task;
       const { container } = render(<Pomodoro task={invalidTask} />);
       expect(container.firstChild).toBeNull();
     });
