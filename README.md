@@ -22,26 +22,50 @@ VS Code でこのプロジェクトを開くと、Dev Container で再度開く�
 - **Supabase** - DB（ローカルは docker-compose で起動）
 - **Drizzle ORM** - TypeScript フレンドリーな ORM
 
-## Supabase コンテナの起動
+## Supabase（Docker in Docker + Supabase CLI）
 
-ローカルの Supabase は[supabase-project/docker-compose.yml](supabase-project/docker-compose.yml)を使って起動します。**ホスト側（コンテナ外）のターミナル**で以下を実行してください。
+本プロジェクトでは、ローカル Supabase を  
+**Docker in Docker（DinD）環境上で Supabase CLI により起動**します。
+
+### Docker in Docker（DinD）とは
+
+Docker in Docker とは、
+
+- **コンテナの中から Docker を操作できる構成**
+- Dev Container 内で `docker` / `docker ps` / `npx supabase` が実行可能
+- Supabase CLI が内部的に Docker コンテナを起動
+
+という仕組みです。
+
+## Supabase の起動・停止（重要）
+
+⚠️ **必ず Dev Container のターミナル内で実行してください**
+
+### Supabase 起動
 
 ```bash
-cd supabase-project
-docker compose up -d
+npx supabase start
 ```
 
-停止する場合は次を実行します。
+初回起動時は、必要な Docker イメージが自動的に pull されます。
 
 ```bash
-docker compose down
+docker ps
 ```
 
-| 画面 / サービス         | URL                                                | 説明                                                                   |
-| ----------------------- | -------------------------------------------------- | ---------------------------------------------------------------------- |
-| Supabase Studio         | **[http://localhost:8000](http://localhost:8000)** | Supabase の各サービスへの入り口。REST/Auth/Realtime などは基本ここ経由 |
-| Mailpit UI              | **[http://localhost:8025](http://localhost:8025)** | Supabase Auth から送信されたメールを確認できる Web UI                  |
-| Analytics (Logflare UI) | **[http://localhost:4000](http://localhost:4000)** | Supabase ログ/Analytics の UI                                          |
+`supabase_*` といったコンテナが表示されていれば正常です。
+
+### Supabase 状態確認（URL 確認）
+
+```bash
+npx supabase status
+```
+
+### Supabase 停止
+
+```bash
+npx supabase stop
+```
 
 ## 開発環境の起動
 

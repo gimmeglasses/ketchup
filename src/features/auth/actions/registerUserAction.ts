@@ -43,8 +43,11 @@ export async function registerUserAction(
 
   try {
     await registerUser(parsed.data);
-  } catch (e) {
-    const message = "登録に失敗しました。時間をおいて再度お試しください。";
+  } catch (e: unknown) {
+    const message =
+      e instanceof Error
+        ? e.message
+        : "登録に失敗しました。時間をおいて再度お試しください。";
 
     return {
       success: false,

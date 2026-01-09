@@ -33,6 +33,7 @@
     "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "15.5.9",
+    "supabase": "^2.70.5",
     "jsdom": "^27.4.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",

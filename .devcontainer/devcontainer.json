@@ -10,6 +10,9 @@
   "containerEnv": {
     "WATCHPACK_POLLING": "true"
   },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
   "forwardPorts": [3000],
   "remoteUser": "root",
   "customizations": {
