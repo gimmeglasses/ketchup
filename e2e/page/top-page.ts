@@ -138,12 +138,6 @@ export class TopPage extends BasePage {
     await this.registerButton.click({ force: true });
   }
 
-  /**
-   * CTAセクションのログインボタンをクリックします
-   *
-   * Next.js の overlay 要素により Playwright が
-   * pointer block と判定することがあるため、
-   * 遷移確認目的として force:true を使用します。   */
   async clickCTALoginButton() {
     await this.ctaLoginButton.click({ force: true });
   }
