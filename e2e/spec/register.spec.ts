@@ -117,7 +117,10 @@ test.describe("会員登録ページ", () => {
       );
 
       // 確認リンクにアクセス
-      await page.goto(confirmationLink);
+      const response = await page.goto(confirmationLink);
+
+      expect(response?.status()).toBeLessThan(400);
+
       // 本登録完了後のリダイレクトを待つ
       await page.waitForURL(/.*/, { timeout: 15000 });
 
