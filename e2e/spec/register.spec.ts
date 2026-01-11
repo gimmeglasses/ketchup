@@ -69,7 +69,7 @@ test.describe("会員登録ページ", () => {
     test("正しい情報で登録処理を実行できること", async ({ page }) => {
       const testName = `会員登録 User ${Date.now()}`;
       const testEmail = `test-${Date.now()}@example.com`;
-      const testPassword = "SecurePass123! ";
+      const testPassword = "SecurePass123!";
 
       await registerPage.fillRegisterForm(testName, testEmail, testPassword);
       await registerPage.clickRegisterButton();
