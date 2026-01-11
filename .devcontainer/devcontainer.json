@@ -1,7 +1,7 @@
 {
   "name": "ketchup",
   "runArgs": ["--name", "ketchup"],
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:20-bullseye",
+  "image": "mcr.microsoft.com/playwright:v1.57.0-noble",
   "workspaceFolder": "/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
   "mounts": [

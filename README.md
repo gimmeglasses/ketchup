@@ -140,16 +140,48 @@ TypeScript 向けの軽量 ORM で、次のような特徴があります。
 
 Tailwind CSS の詳細については[公式ドキュメント](https://tailwindcss.com/docs)をご覧ください。
 
-## さらに学ぶ
+## E2E テスト (Playwright)
 
-Next.js についてさらに学ぶには、以下のリソースをご覧ください：
+### Playwright とは
 
-- [Next.js ドキュメント](https://nextjs.org/docs) - Next.js の機能と API について学ぶ
-- [Learn Next.js](https://nextjs.org/learn) - インタラクティブな Next.js チュートリアル
-- [Next.js GitHub リポジトリ](https://github.com/vercel/next.js)
+[Playwright](https://playwright.dev/) は Microsoft が開発したモダンな E2E テストフレームワークです。
 
-## デプロイ
+### コマンド
 
-Next.js アプリをデプロイする最も簡単な方法は、Next.js の開発元である[Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)を使用することです。
+#### 特定のテストファイルを実行
 
-詳細については[Next.js デプロイメントドキュメント](https://nextjs.org/docs/app/building-your-application/deploying)をご覧ください。
+```
+npx playwright test e2e/spec/register.spec.ts
+```
+
+#### 特定のテストファイルを UI モードで実行
+
+```
+npx playwright test e2e/spec/register.spec.ts --ui-host=0.0.0.0
+```
+
+- UI モードではテストの実行状況をブラウザ上で確認できます
+- Docker コンテナ上で実行するため、--ui-host=0.0.0.0 を指定しています
+
+#### 全ての E2E テストを実行
+
+```
+npx playwright test
+```
+
+### ディレクトリ構成
+
+```
+e2e/
+├── page/                   // 画面ごとの操作・要素取得を責務として持つ
+│ └── {page}-page.ts
+│
+└── spec/                   // テストシナリオを記述するディレクトリ
+  ├── {page}.spec.ts        // 単一ページ単位の振る舞いを検証するテスト
+  └── application.spec.ts   // アプリケーション全体の動線・統合シナリオを検証するテスト
+```
+
+### 注意事項（Docker 環境）
+
+`--headed` オプション（ブラウザを表示して実行）は Docker コンテナ上では使用できません。
+そのため、本プロジェクトでは headless モードのみ を利用しています
