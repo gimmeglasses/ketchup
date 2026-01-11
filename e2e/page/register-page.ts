@@ -42,7 +42,7 @@ export class RegisterPage extends BasePage {
       .getByRole("link", { name: "ログイン" });
 
     // エラーメッセージ
-    this.errorMessage = this.page.locator('[role="alert"], . error-message');
+    this.errorMessage = this.page.locator('[role="alert"], .error-message');
   }
 
   /**
