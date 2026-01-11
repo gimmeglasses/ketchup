@@ -37,7 +37,6 @@ test.describe("トップページ（ランディングページ）", () => {
     });
 
     test("会員登録ボタンが正しいリンク先を持つこと", async () => {
-      await topPage.pause();
       await topPage.verifyRegisterButtonLink();
     });
 
