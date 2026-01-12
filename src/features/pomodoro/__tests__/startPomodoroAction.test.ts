@@ -9,7 +9,6 @@ import {
   type StartPomodoroActionResult,
 } from "../actions/startPomodoroAction";
 import * as service from "../services/createPomodoroSession";
-import * as getActiveSessionService from "../services/getActiveSession";
 import * as supabaseServer from "@/lib/supabase/server";
 
 // createPomodoroSession サービスをスパイ化
@@ -24,9 +23,6 @@ const mockCreatedSession = {
 vi.spyOn(service, "createPomodoroSession").mockResolvedValue(
   mockCreatedSession
 );
-
-// getActiveSession サービスをスパイ化
-vi.spyOn(getActiveSessionService, "getActiveSession").mockResolvedValue(null);
 
 // Supabase クライアントをモック化
 vi.mock("@/lib/supabase/server", () => ({
@@ -84,9 +80,6 @@ describe("startPomodoroAction", () => {
   describe("正常系", () => {
     it("有効なtaskIdでセッション作成が成功すること", async () => {
       setupAuthenticatedUser();
-      vi.mocked(getActiveSessionService.getActiveSession).mockResolvedValue(
-        null
-      );
       vi.mocked(service.createPomodoroSession).mockResolvedValue(
         mockCreatedSession
       );
@@ -100,10 +93,6 @@ describe("startPomodoroAction", () => {
       if (result.success) {
         expect(result.session).toEqual(mockCreatedSession);
       }
-      expect(getActiveSessionService.getActiveSession).toHaveBeenCalledWith(
-        "test-user-id",
-        "20000000-0000-4000-8000-000000000001"
-      );
       expect(service.createPomodoroSession).toHaveBeenCalledWith(
         "test-user-id",
         "20000000-0000-4000-8000-000000000001"
@@ -159,27 +148,6 @@ describe("startPomodoroAction", () => {
     });
   });
 
-  describe("ビジネスロジックエラー", () => {
-    it("既にアクティブなセッションが存在する場合はエラーを返すこと", async () => {
-      setupAuthenticatedUser();
-      vi.mocked(getActiveSessionService.getActiveSession).mockResolvedValue(
-        mockCreatedSession
-      );
-
-      const result = await startPomodoroAction(
-        initialState,
-        makeFormData({ taskId: "20000000-0000-4000-8000-000000000001" })
-      );
-
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.errors._form).toContain(
-          "このタスクには既にアクティブなポモドーロセッションが存在します。"
-        );
-      }
-      expect(service.createPomodoroSession).not.toHaveBeenCalled();
-    });
-  });
 
   describe("認証エラー", () => {
     it("未認証の場合はエラーを返すこと", async () => {
@@ -245,9 +213,6 @@ describe("startPomodoroAction", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
       setupAuthenticatedUser();
-      vi.mocked(getActiveSessionService.getActiveSession).mockResolvedValue(
-        null
-      );
       vi.mocked(service.createPomodoroSession).mockRejectedValue(
         new Error("Database error")
       );

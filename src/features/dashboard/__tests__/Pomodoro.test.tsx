@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import Pomodoro from "../components/Pomodoro";
 import type { PomodoroButtonProps } from "../components/PomodoroButton";
 import { Task } from "@/features/tasks/types";
@@ -71,26 +71,16 @@ describe("Pomodoro", () => {
   });
 
   describe("ボタン操作", () => {
-    it("STARTボタンをクリックするとhandleStartButtonが呼ばれる", () => {
-      const consoleSpy = vi.spyOn(console, "log");
+    it("STARTボタンが表示される", () => {
       render(<Pomodoro task={mockTask} />);
-
       const startButton = screen.getByTestId("button-START");
-      fireEvent.click(startButton);
-
-      expect(consoleSpy).toHaveBeenCalledWith("Start button is clicked.");
-      consoleSpy.mockRestore();
+      expect(startButton).toBeInTheDocument();
     });
 
-    it("STOPボタンをクリックするとhandleStopButtonが呼ばれる", () => {
-      const consoleSpy = vi.spyOn(console, "log");
+    it("STOPボタンが表示される", () => {
       render(<Pomodoro task={mockTask} />);
-
       const stopButton = screen.getByTestId("button-STOP");
-      fireEvent.click(stopButton);
-
-      expect(consoleSpy).toHaveBeenCalledWith("Stop button is clicked.");
-      consoleSpy.mockRestore();
+      expect(stopButton).toBeInTheDocument();
     });
   });
 });

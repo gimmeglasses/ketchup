@@ -1,11 +1,11 @@
 "use server";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { stopPomodoroSchema } from "../validations/pomodoroSchemas";
-import { stopPomodoroSession } from "../services/stopPomodoroSession";
+import { type z } from "zod";
 import { toFieldErrors } from "@/lib/zodError";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { stopPomodoroSession } from "../services/stopPomodoroSession";
 import { type PomodoroSession } from "../types";
-import { z } from "zod";
+import { stopPomodoroSchema } from "../validations/pomodoroSchemas";
 
 type StopPomodoroFields = keyof z.output<typeof stopPomodoroSchema>;
 
@@ -18,15 +18,8 @@ type FormValues = {
 };
 
 export type StopPomodoroActionResult =
-  | {
-      success: true;
-      session: PomodoroSession;
-    }
-  | {
-      success: false;
-      errors: FieldErrors;
-      values?: FormValues;
-    };
+  | { success: true; session: PomodoroSession }
+  | { success: false; errors: FieldErrors; values?: FormValues };
 
 /**
  * フォームから受け取ったセッションIDを検証し、ポモドーロセッションを停止します。
@@ -44,7 +37,6 @@ export async function stopPomodoroAction(
   };
 
   const parsed = stopPomodoroSchema.safeParse(values);
-
   if (!parsed.success) {
     return { success: false, errors: toFieldErrors(parsed.error), values };
   }
@@ -65,10 +57,7 @@ export async function stopPomodoroAction(
       };
     }
 
-    const session = await stopPomodoroSession(
-      parsed.data.sessionId,
-      user.id
-    );
+    const session = await stopPomodoroSession(parsed.data.sessionId, user.id);
     return { success: true, session };
   } catch (error) {
     console.error("Failed to stop pomodoro session:", error);

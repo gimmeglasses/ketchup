@@ -1,15 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
-import Pomodoro from "@/features/dashboard/components/Pomodoro";
+import Pomodoro, {
+  type PomodoroHandle,
+} from "@/features/dashboard/components/Pomodoro";
+import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { Task } from "@/features/tasks/types";
 
 const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   // Pomodoroタイマーを利用するタスクを格納。画面からタスクをクリックすることで div tag の onClick が呼ばれる。
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [pendingTask, setPendingTask] = useState<Task | null>(null);
+  const pomodoroRef = useRef<PomodoroHandle>(null);
+
   const handleClick = (task: Task) => {
-    setSelectedTask(task);
+    if (isTimerRunning && selectedTask?.id !== task.id) {
+      // タイマー実行中で、別のタスクを選択した場合 → 警告ダイアログ
+      setPendingTask(task);
+      setShowConfirm(true);
+    } else {
+      // タイマー停止中、または同じタスクをクリックした場合 → 通常の切り替え
+      setSelectedTask(task);
+    }
+  };
+
+  const handleConfirmSwitch = async () => {
+    // 現在のセッションをSTOP
+    if (pomodoroRef.current) {
+      await pomodoroRef.current.stopTimer();
+    }
+
+    // タスク切り替え
+    setSelectedTask(pendingTask);
+    setPendingTask(null);
+    setShowConfirm(false);
+  };
+
+  const handleCancelSwitch = () => {
+    setPendingTask(null);
+    setShowConfirm(false);
   };
 
   // チェックボックスがONになったタスクを格納。
@@ -41,7 +73,21 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
       </div>
 
       {/* Dynamically display a selected task for using Pomodoro timer */}
-      {selectedTask && <Pomodoro task={selectedTask} />}
+      {selectedTask && (
+        <Pomodoro
+          ref={pomodoroRef}
+          task={selectedTask}
+          onTimerStateChange={setIsTimerRunning}
+        />
+      )}
+
+      {/* Confirm dialog for task switching */}
+      <ConfirmDialog
+        open={showConfirm}
+        message="タイマー実行中です。停止してから切り替えますか?"
+        onConfirm={handleConfirmSwitch}
+        onCancel={handleCancelSwitch}
+      />
 
       {/* Display task list */}
       <div className="flex flex-col gap-4 mt-4 text-gray-600">

@@ -1,12 +1,11 @@
 "use server";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { startPomodoroSchema } from "../validations/pomodoroSchemas";
-import { createPomodoroSession } from "../services/createPomodoroSession";
-import { getActiveSession } from "../services/getActiveSession";
+import { type z } from "zod";
 import { toFieldErrors } from "@/lib/zodError";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createPomodoroSession } from "../services/createPomodoroSession";
 import { type PomodoroSession } from "../types";
-import { z } from "zod";
+import { startPomodoroSchema } from "../validations/pomodoroSchemas";
 
 type StartPomodoroFields = keyof z.output<typeof startPomodoroSchema>;
 
@@ -19,15 +18,8 @@ type FormValues = {
 };
 
 export type StartPomodoroActionResult =
-  | {
-      success: true;
-      session: PomodoroSession;
-    }
-  | {
-      success: false;
-      errors: FieldErrors;
-      values?: FormValues;
-    };
+  | { success: true; session: PomodoroSession }
+  | { success: false; errors: FieldErrors; values?: FormValues };
 
 /**
  * フォームから受け取ったタスクIDを検証し、新しいポモドーロセッションを開始します。
@@ -46,7 +38,6 @@ export async function startPomodoroAction(
   };
 
   const parsed = startPomodoroSchema.safeParse(values);
-
   if (!parsed.success) {
     return { success: false, errors: toFieldErrors(parsed.error), values };
   }
@@ -62,20 +53,6 @@ export async function startPomodoroAction(
         success: false,
         errors: {
           _form: ["ポモドーロセッションを開始するにはログインが必要です。"],
-        },
-        values,
-      };
-    }
-
-    // 既にアクティブなセッションが存在するかチェック
-    const activeSession = await getActiveSession(user.id, parsed.data.taskId);
-    if (activeSession) {
-      return {
-        success: false,
-        errors: {
-          _form: [
-            "このタスクには既にアクティブなポモドーロセッションが存在します。",
-          ],
         },
         values,
       };
