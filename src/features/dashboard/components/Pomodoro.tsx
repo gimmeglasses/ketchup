@@ -129,7 +129,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
       setRemainingSeconds(WORK_DURATION_SECONDS);
       setIsRunning(true);
     } else {
-      alert(
+      toast.error(
         extractErrorMessage(result.errors, "セッションの開始に失敗しました")
       );
     }
@@ -146,7 +146,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
       );
 
       if (!result.success) {
-        alert(
+        toast.error(
           extractErrorMessage(result.errors, "セッションの停止に失敗しました")
         );
         return;
