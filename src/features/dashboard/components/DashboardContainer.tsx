@@ -6,10 +6,9 @@ import Pomodoro, {
   type PomodoroHandle,
 } from "@/features/dashboard/components/Pomodoro";
 import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
-import { Task } from "@/features/tasks/types";
+import { type Task } from "@/features/tasks/types";
 
 const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
-  // Pomodoroタイマーを利用するタスクを格納。画面からタスクをクリックすることで div tag の onClick が呼ばれる。
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -28,12 +27,9 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   };
 
   const handleConfirmSwitch = async () => {
-    // 現在のセッションをSTOP
     if (pomodoroRef.current) {
       await pomodoroRef.current.stopTimer();
     }
-
-    // タスク切り替え
     setSelectedTask(pendingTask);
     setPendingTask(null);
     setShowConfirm(false);
@@ -65,7 +61,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         <Link
           href="/tasks/new"
           className="flex justify-center rounded-lg bg-red-600
-              font-semibold text-white shadow-md shadow-gray-400 
+              font-semibold text-white shadow-md shadow-gray-400
               transition hover:-translate-y-0.5 hover:bg-gray-700 mb-4"
         >
           タスク追加
@@ -95,7 +91,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         {tasks.map((task) => (
           <div
             key={task.id}
-            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-300 
+            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-300
               flex flex-col gap-3 bg-white"
             onClick={() => handleClick(task)}
           >

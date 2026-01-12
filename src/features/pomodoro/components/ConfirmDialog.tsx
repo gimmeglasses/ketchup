@@ -25,14 +25,10 @@ export function ConfirmDialog({
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (open) {
-      if (typeof dialog.showModal === "function") {
-        dialog.showModal();
-      }
-    } else {
-      if (typeof dialog.close === "function") {
-        dialog.close();
-      }
+    if (open && !dialog.open) {
+      dialog.showModal();
+    } else if (!open && dialog.open) {
+      dialog.close();
     }
   }, [open]);
 

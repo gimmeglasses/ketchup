@@ -1,4 +1,3 @@
-// Buttons
 export type PomodoroButtonProps = {
   onClick: () => void;
   children: React.ReactNode;
