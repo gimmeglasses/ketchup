@@ -35,7 +35,7 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="rounded-lg p-6 shadow-xl backdrop:bg-black/50"
+      className="rounded-lg p-6 shadow-xl backdrop:bg-black/50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md"
       onCancel={(e) => {
         e.preventDefault();
         onCancel();
@@ -56,7 +56,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
-            停止して切り替える
+            切り替える
           </button>
         </div>
       </div>
