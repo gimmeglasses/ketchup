@@ -23,7 +23,6 @@ export type StartPomodoroActionResult =
 
 /**
  * フォームから受け取ったタスクIDを検証し、新しいポモドーロセッションを開始します。
- * 既にアクティブなセッションが存在する場合はエラーを返します。
  *
  * @param prevState サーバーアクションの前回の状態
  * @param formData フォーム送信された FormData
