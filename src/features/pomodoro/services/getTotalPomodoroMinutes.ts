@@ -27,6 +27,10 @@ export async function getTotalPomodoroMinutes(
     );
 
   return sessions.reduce((total, session) => {
+    if (!session.stoppedAt) {
+      return total;
+    }
+
     const startedAt = new Date(session.startedAt);
     const stoppedAt = new Date(session.stoppedAt);
     const durationMinutes = Math.floor(
