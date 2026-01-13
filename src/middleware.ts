@@ -65,5 +65,5 @@ export async function middleware(req: NextRequest) {
  * API routesは除外されます。
  */
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|logo.png).*)"],
 };
