@@ -19,7 +19,7 @@ export const ModalContainer = ({ isOpen, onClose, children }: ModalProps) => {
     >
       {/* モーダル内をクリックしても閉じないようにstopPropagation */}
       <div
-        className="w-full max-w-md rounded bg-white p-6 shadow-lg"
+        className="w-full max-w-md rounded bg-white shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         {children}

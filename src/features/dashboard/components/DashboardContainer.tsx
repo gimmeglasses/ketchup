@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pomodoro, {
   type PomodoroHandle,
@@ -16,6 +17,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [pendingTask, setPendingTask] = useState<Task | null>(null);
   const pomodoroRef = useRef<PomodoroHandle>(null);
+  const router = useRouter();
 
   const handleClick = (task: Task) => {
     if (isTimerRunning && selectedTask?.id !== task.id) {
@@ -59,6 +61,13 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   // モーダルを閉じた時にステータスを更新
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // タスク登録後にモーダルを閉じて画面を更新
+  const handleNewTaskCreated = () => {
+    setIsModalOpen(false);
+    router.refresh();
+  };
+
+  // モーダルを閉じる処理
   const handleClose = () => {
     setIsModalOpen(false);
   };
@@ -79,8 +88,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
 
       {/* モーダルの配置 */}
       <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
-        <NewTaskForm onSuccess={handleClose} />
-        <button onClick={handleClose}>ダッシュボードへ戻る</button>
+        <NewTaskForm onSuccess={handleNewTaskCreated} onClose={handleClose} />
       </ModalContainer>
 
       {/* Dynamically display a selected task for using Pomodoro timer */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState, useEffect } from "react";
+import { useActionState, useEffect } from "react";
 import {
   createTaskAction,
   type CreateTaskActionResult,
@@ -13,16 +13,10 @@ const initialState: CreateTaskActionResult = {
 
 interface NewTaskFormProps {
   onSuccess: () => void;
+  onClose: () => void;
 }
 
-export const NewTaskForm = ({ onSuccess }: NewTaskFormProps) => {
-  const [date, setDate] = useState<string>("");
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDate(event.target.value);
-    console.log(date);
-  };
-
+export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
   const [state, formAction, pending] = useActionState<
     CreateTaskActionResult,
     FormData
@@ -35,14 +29,20 @@ export const NewTaskForm = ({ onSuccess }: NewTaskFormProps) => {
   }, [state, onSuccess]);
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white/90 p-6 shadow-xl shadow-red-200">
+    <div className="relative w-full max-w-md rounded-2xl bg-white/90 p-6 ">
+      <button
+        onClick={onClose}
+        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-2xl text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+        aria-label="閉じる"
+      >
+        ×
+      </button>
       <h1 className="text-center text-2xl font-bold text-red-800">
         タスク登録
       </h1>
       <p className="mt-2 text-center text-sm text-red-900/70">
         新しいタスクを入力してください
       </p>
-
       <form className="mt-6 space-y-4" action={formAction}>
         {state.success === false && state.errors._form && (
           <p className="mt-3 text-center text-sm text-red-500">
@@ -52,22 +52,27 @@ export const NewTaskForm = ({ onSuccess }: NewTaskFormProps) => {
 
         {/* タスク名 */}
         <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-semibold text-red-900"
-          >
-            タスク名
-          </label>
+          <div className="flex gap-1">
+            <label
+              htmlFor="name"
+              className="block text-sm font-semibold text-red-900"
+            >
+              タスク名
+            </label>
+            <label className="px-1 py-0.5 rounded text-xs bg-red-700 text-red-100">
+              必須
+            </label>
+          </div>
           <input
             id="title"
             name="title"
             type="text"
             required
             className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
-            placeholder="例）デイリースクラム"
+            placeholder="例）最初の25分に集中する。"
           />
-          {state.success === false && state.errors.name && (
-            <p className="text-red-500 text-sm">{state.errors.name[0]}</p>
+          {state.success === false && state.errors.title && (
+            <p className="text-red-500 text-sm">{state.errors.title[0]}</p>
           )}
         </div>
 
@@ -79,18 +84,14 @@ export const NewTaskForm = ({ onSuccess }: NewTaskFormProps) => {
           >
             タスクの説明
           </label>
-          <input
+          <textarea
             id="note"
             name="note"
-            type="textarea"
-            required
             className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
-            placeholder="例）コラボレイティブ特論スプリントイベント"
+            placeholder="例）Ketchupのポモドーロタイマーで25分集中。終わったら5分休憩。まずは1セットやってみよう。"
           />
-          {state.success === false && state.errors.description && (
-            <p className="text-red-500 text-sm">
-              {state.errors.description[0]}
-            </p>
+          {state.success === false && state.errors.note && (
+            <p className="text-red-500 text-sm">{state.errors.note[0]}</p>
           )}
         </div>
 
@@ -108,11 +109,9 @@ export const NewTaskForm = ({ onSuccess }: NewTaskFormProps) => {
             type="date"
             className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
             placeholder="yyyy-mm-dd"
-            value={date}
-            onChange={handleChange}
           />
-          {state.success === false && state.errors.dueDate && (
-            <p className="text-red-500 text-sm">{state.errors.dueDate[0]}</p>
+          {state.success === false && state.errors.dueAt && (
+            <p className="text-red-500 text-sm">{state.errors.dueAt[0]}</p>
           )}
         </div>
 
@@ -133,9 +132,9 @@ export const NewTaskForm = ({ onSuccess }: NewTaskFormProps) => {
             className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
             placeholder=""
           />
-          {state.success === false && state.errors.estimatedMin && (
+          {state.success === false && state.errors.estimatedMinutes && (
             <p className="text-red-500 text-sm">
-              {state.errors.estimatedMin[0]}
+              {state.errors.estimatedMinutes[0]}
             </p>
           )}
         </div>
