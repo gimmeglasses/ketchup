@@ -7,6 +7,8 @@ import Pomodoro, {
 } from "@/features/dashboard/components/Pomodoro";
 import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { type Task } from "@/features/tasks/types";
+import { ModalContainer } from "@/features/tasks/components/ModalContainer";
+import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
 
 const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -54,19 +56,32 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
     }));
   };
 
+  // モーダルを閉じた時にステータスを更新
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       {/* Display "New task entry" button */}
       <div>
-        <Link
-          href="/tasks/new"
-          className="flex justify-center rounded-lg bg-red-600
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex w-full justify-center rounded-lg bg-red-600
               font-semibold text-white shadow-md shadow-gray-400
               transition hover:-translate-y-0.5 hover:bg-gray-700 mb-4"
         >
           タスク追加
-        </Link>
+        </button>
       </div>
+
+      {/* モーダルの配置 */}
+      <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
+        <NewTaskForm onSuccess={handleClose} />
+        <button onClick={handleClose}>ダッシュボードへ戻る</button>
+      </ModalContainer>
 
       {/* Dynamically display a selected task for using Pomodoro timer */}
       {selectedTask && (
