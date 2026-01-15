@@ -54,7 +54,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
         <div>
           <div className="flex gap-1">
             <label
-              htmlFor="name"
+              htmlFor="title"
               className="block text-sm font-semibold text-red-900"
             >
               タスク名
@@ -79,7 +79,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
         {/* タスクの説明 */}
         <div>
           <label
-            htmlFor="text"
+            htmlFor="note"
             className="block text-sm font-semibold text-red-900"
           >
             タスクの説明
@@ -98,7 +98,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
         {/* 期限 */}
         <div>
           <label
-            htmlFor="dueDate"
+            htmlFor="dueAt"
             className="block text-sm font-semibold text-red-900"
           >
             期限
@@ -118,7 +118,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
         {/* 見積もり */}
         <div>
           <label
-            htmlFor="estimatedMin"
+            htmlFor="estimatedMinutes"
             className="block text-sm font-semibold text-red-900"
           >
             予定（分）

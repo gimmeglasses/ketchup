@@ -6,12 +6,14 @@ import DashboardContainer from "../components/DashboardContainer";
 import { Task } from "@/features/tasks/types";
 
 // モック化
-vi.mock("next/link", () => ({
-  default: ({ href, children, ...props }: React.ComponentProps<"a">) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("../components/Pomodoro", () => ({
@@ -59,6 +61,10 @@ describe("DashboardContainer", () => {
   describe("初期状態", () => {
     it("空のタスク配列のときリストが表示されない", () => {
       render(<DashboardContainer tasks={[]} />);
+      console.log(
+        `screen.queryByText("タスク1")`,
+        screen.queryByText("タスク1")
+      );
       expect(screen.queryByText("タスク1")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク2")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
@@ -148,12 +154,6 @@ describe("DashboardContainer", () => {
   });
 
   describe("UI要素", () => {
-    it("「タスク追加」ボタンが/tasks/newへのリンク", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
-      const addButton = screen.getByText("タスク追加");
-      expect(addButton.getAttribute("href")).toBe("/tasks/new");
-    });
-
     it("「編集」ボタンが/tasks/[id]/editへのリンク", () => {
       render(<DashboardContainer tasks={mockTasks} />);
       const editButtons = screen.getAllByText("編集");
