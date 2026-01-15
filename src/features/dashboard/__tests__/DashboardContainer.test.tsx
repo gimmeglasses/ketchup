@@ -11,6 +11,7 @@ vi.mock("next/navigation", () => ({
     push: vi.fn(),
     replace: vi.fn(),
     prefetch: vi.fn(),
+    refresh: vi.fn(),
   }),
   usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
@@ -61,10 +62,6 @@ describe("DashboardContainer", () => {
   describe("初期状態", () => {
     it("空のタスク配列のときリストが表示されない", () => {
       render(<DashboardContainer tasks={[]} />);
-      console.log(
-        `screen.queryByText("タスク1")`,
-        screen.queryByText("タスク1")
-      );
       expect(screen.queryByText("タスク1")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク2")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();

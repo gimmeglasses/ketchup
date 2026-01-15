@@ -26,7 +26,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
     if (state.success) {
       onSuccess();
     }
-  }, [state, onSuccess]);
+  }, [state.success, onSuccess]);
 
   return (
     <div className="relative w-full max-w-md rounded-2xl bg-white/90 p-6 ">
@@ -59,9 +59,9 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
             >
               タスク名
             </label>
-            <label className="px-1 py-0.5 rounded text-xs bg-red-700 text-red-100">
+            <span className="px-1 py-0.5 rounded text-xs bg-red-700 text-red-100">
               必須
-            </label>
+            </span>
           </div>
           <input
             id="title"

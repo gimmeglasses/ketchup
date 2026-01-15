@@ -58,7 +58,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
     }));
   };
 
-  // モーダルを閉じた時にステータスを更新
+  // モーダルの開閉状態を管理
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // タスク登録後にモーダルを閉じて画面を更新

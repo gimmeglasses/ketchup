@@ -21,6 +21,9 @@ export const ModalContainer = ({ isOpen, onClose, children }: ModalProps) => {
       <div
         className="w-full max-w-md rounded bg-white shadow-lg"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add aa new task"
       >
         {children}
       </div>
