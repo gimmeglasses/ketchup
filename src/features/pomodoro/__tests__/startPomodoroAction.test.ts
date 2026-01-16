@@ -1,0 +1,258 @@
+/**
+ * startPomodoroAction のテストスイート
+ * ポモドーロセッション開始処理の入力検証とサービス呼び出しが正しく動作することを確認
+ */
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { type SupabaseClient } from "@supabase/supabase-js";
+import {
+  startPomodoroAction,
+  type StartPomodoroActionResult,
+} from "../actions/startPomodoroAction";
+import * as service from "../services/createPomodoroSession";
+import * as supabaseServer from "@/lib/supabase/server";
+
+// createPomodoroSession サービスをスパイ化
+const mockCreatedSession = {
+  id: "10000000-0000-4000-8000-000000000001",
+  profileId: "test-user-id",
+  taskId: "20000000-0000-4000-8000-000000000001",
+  startedAt: "2030-01-01T00:00:00.000Z",
+  stoppedAt: null,
+  createdAt: "2030-01-01T00:00:00.000Z",
+};
+vi.spyOn(service, "createPomodoroSession").mockResolvedValue(
+  mockCreatedSession
+);
+
+// Supabase クライアントをモック化
+vi.mock("@/lib/supabase/server", () => ({
+  createSupabaseServerClient: vi.fn(),
+}));
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+const initialState: StartPomodoroActionResult = {
+  success: false,
+  errors: {},
+};
+
+/**
+ * FormData オブジェクトを生成するヘルパー関数
+ */
+function makeFormData(values: Record<string, string>) {
+  const fd = new FormData();
+  Object.entries(values).forEach(([key, value]) => fd.append(key, value));
+  return fd;
+}
+
+/**
+ * 認証済みユーザーのモックを設定するヘルパー関数
+ */
+function setupAuthenticatedUser(userId = "test-user-id") {
+  const mockUser = { id: userId };
+  const mockSupabase: Partial<SupabaseClient> = {
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: mockUser } }),
+    } as Partial<SupabaseClient["auth"]> as SupabaseClient["auth"],
+  };
+  vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
+    mockSupabase as SupabaseClient
+  );
+}
+
+/**
+ * 未認証ユーザーのモックを設定するヘルパー関数
+ */
+function setupUnauthenticatedUser() {
+  const mockSupabase: Partial<SupabaseClient> = {
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
+    } as Partial<SupabaseClient["auth"]> as SupabaseClient["auth"],
+  };
+  vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
+    mockSupabase as SupabaseClient
+  );
+}
+
+describe("startPomodoroAction", () => {
+  describe("正常系", () => {
+    it("有効なtaskIdでセッション作成が成功すること", async () => {
+      setupAuthenticatedUser();
+      vi.mocked(service.createPomodoroSession).mockResolvedValue(
+        mockCreatedSession
+      );
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "20000000-0000-4000-8000-000000000001" })
+      );
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.session).toEqual(mockCreatedSession);
+      }
+      expect(service.createPomodoroSession).toHaveBeenCalledWith(
+        "test-user-id",
+        "20000000-0000-4000-8000-000000000001"
+      );
+    });
+  });
+
+  describe("バリデーションエラー", () => {
+    it("taskIdが空の場合はエラーを返すこと", async () => {
+      setupAuthenticatedUser();
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors.taskId).toBeDefined();
+      }
+      expect(service.createPomodoroSession).not.toHaveBeenCalled();
+    });
+
+    it("taskIdがUUID形式でない場合はエラーを返すこと", async () => {
+      setupAuthenticatedUser();
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "invalid-uuid" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors.taskId).toContain("Invalid task ID");
+      }
+      expect(service.createPomodoroSession).not.toHaveBeenCalled();
+    });
+
+    it("バリデーションエラー時に入力値が返されること", async () => {
+      setupAuthenticatedUser();
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "invalid" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.values).toEqual({
+          taskId: "invalid",
+        });
+      }
+    });
+  });
+
+
+  describe("認証エラー", () => {
+    it("未認証の場合はエラーを返すこと", async () => {
+      setupUnauthenticatedUser();
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "20000000-0000-4000-8000-000000000001" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors._form).toContain(
+          "ポモドーロセッションを開始するにはログインが必要です。"
+        );
+      }
+      expect(service.createPomodoroSession).not.toHaveBeenCalled();
+    });
+
+    it("未認証の場合でも入力値が返されること", async () => {
+      setupUnauthenticatedUser();
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "20000000-0000-4000-8000-000000000001" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.values).toEqual({
+          taskId: "20000000-0000-4000-8000-000000000001",
+        });
+      }
+    });
+
+    it("Supabaseクライアント生成に失敗した場合はエラーを返すこと", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      vi.mocked(supabaseServer.createSupabaseServerClient).mockRejectedValue(
+        new Error("supabase down")
+      );
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "20000000-0000-4000-8000-000000000001" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors._form).toContain(
+          "ポモドーロセッションの開始に失敗しました。時間をおいて再度お試しください。"
+        );
+      }
+      expect(service.createPomodoroSession).not.toHaveBeenCalled();
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe("サービスエラー", () => {
+    it("createPomodoroSessionがエラーをスローした場合、適切にハンドリングすること", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      setupAuthenticatedUser();
+      vi.mocked(service.createPomodoroSession).mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "20000000-0000-4000-8000-000000000001" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors._form).toContain(
+          "ポモドーロセッションの開始に失敗しました。時間をおいて再度お試しください。"
+        );
+      }
+      expect(service.createPomodoroSession).toHaveBeenCalledTimes(1);
+      consoleErrorSpy.mockRestore();
+    });
+
+    it("サービスエラー時でも入力値が返されること", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      setupAuthenticatedUser();
+      vi.mocked(service.createPomodoroSession).mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const result = await startPomodoroAction(
+        initialState,
+        makeFormData({ taskId: "20000000-0000-4000-8000-000000000001" })
+      );
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.values).toEqual({
+          taskId: "20000000-0000-4000-8000-000000000001",
+        });
+      }
+      consoleErrorSpy.mockRestore();
+    });
+  });
+});

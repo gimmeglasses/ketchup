@@ -15,6 +15,13 @@
       "when": 1767704327417,
       "tag": "0001_aromatic_valeria_richards",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767968858182,
+      "tag": "0002_round_mimic",
+      "breakpoints": true
     }
   ]
 }
