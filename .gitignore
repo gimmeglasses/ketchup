@@ -48,3 +48,11 @@ supabase/.temp/*
 # バージョン固定しないと不具合（カスタムメールテンプレートが反映されない）が起きるため、例外として除外
 # https://github.com/supabase/cli/issues/4668
 !supabase/.temp/gotrue-version
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
