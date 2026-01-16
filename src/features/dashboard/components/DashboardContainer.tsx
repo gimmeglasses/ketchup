@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pomodoro, {
   type PomodoroHandle,
 } from "@/features/dashboard/components/Pomodoro";
 import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { type Task } from "@/features/tasks/types";
+import { ModalContainer } from "@/features/tasks/components/ModalContainer";
+import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
 
 const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -14,6 +17,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [pendingTask, setPendingTask] = useState<Task | null>(null);
   const pomodoroRef = useRef<PomodoroHandle>(null);
+  const router = useRouter();
 
   const handleClick = (task: Task) => {
     if (isTimerRunning && selectedTask?.id !== task.id) {
@@ -54,19 +58,38 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
     }));
   };
 
+  // モーダルの開閉状態を管理
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // タスク登録後にモーダルを閉じて画面を更新
+  const handleNewTaskCreated = () => {
+    setIsModalOpen(false);
+    router.refresh();
+  };
+
+  // モーダルを閉じる処理
+  const handleClose = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       {/* Display "New task entry" button */}
       <div>
-        <Link
-          href="/tasks/new"
-          className="flex justify-center rounded-lg bg-red-600
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex w-full justify-center rounded-lg bg-red-600
               font-semibold text-white shadow-md shadow-gray-400
               transition hover:-translate-y-0.5 hover:bg-gray-700 mb-4"
         >
           タスク追加
-        </Link>
+        </button>
       </div>
+
+      {/* モーダルの配置 */}
+      <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
+        <NewTaskForm onSuccess={handleNewTaskCreated} onClose={handleClose} />
+      </ModalContainer>
 
       {/* Dynamically display a selected task for using Pomodoro timer */}
       {selectedTask && (

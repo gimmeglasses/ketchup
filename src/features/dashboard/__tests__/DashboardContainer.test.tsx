@@ -6,12 +6,15 @@ import DashboardContainer from "../components/DashboardContainer";
 import { Task } from "@/features/tasks/types";
 
 // モック化
-vi.mock("next/link", () => ({
-  default: ({ href, children, ...props }: React.ComponentProps<"a">) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("../components/Pomodoro", () => ({
@@ -148,12 +151,6 @@ describe("DashboardContainer", () => {
   });
 
   describe("UI要素", () => {
-    it("「タスク追加」ボタンが/tasks/newへのリンク", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
-      const addButton = screen.getByText("タスク追加");
-      expect(addButton.getAttribute("href")).toBe("/tasks/new");
-    });
-
     it("「編集」ボタンが/tasks/[id]/editへのリンク", () => {
       render(<DashboardContainer tasks={mockTasks} />);
       const editButtons = screen.getAllByText("編集");
