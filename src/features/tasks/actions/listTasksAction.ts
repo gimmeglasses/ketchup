@@ -1,7 +1,10 @@
 "use server";
 
 import { type Task } from "@/features/tasks/types";
-import { listTasks } from "@/features/tasks/services/listTasks";
+import {
+  listTasks,
+  listUncompletedTasks,
+} from "@/features/tasks/services/listTasks";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
@@ -20,5 +23,6 @@ export async function listTasksAction(): Promise<Task[]> {
     throw new Error("タスクの一覧を表示するにはユーザー認証が必要です。");
   }
 
-  return listTasks(user.id);
+  // 未完了タスクを取得する様に変更 Issue #67
+  return listUncompletedTasks(user.id);
 }
