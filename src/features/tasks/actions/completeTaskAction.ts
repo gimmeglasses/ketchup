@@ -37,12 +37,8 @@ export async function completeTaskAction(
       };
     }
     const completedAt = new Date().toISOString();
-    console.log(
-      `user.id, taskId, completedAt ${user.id}, ${taskId}, ${completedAt}`
-    );
-    const updatedTaskId = await completeTask(taskId, completedAt);
+    await completeTask(taskId, completedAt);
     revalidatePath("/dashboard");
-    console.log(`completed ${updatedTaskId}`);
     return { success: true };
   } catch (error) {
     console.error("Failed to complete task:", error);

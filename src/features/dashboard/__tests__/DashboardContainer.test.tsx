@@ -65,7 +65,6 @@ describe("DashboardContainer", () => {
       expect(screen.queryByText("タスク1")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク2")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
-      // expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
     });
 
     it("tasksのみ表示される", () => {
@@ -73,7 +72,6 @@ describe("DashboardContainer", () => {
       expect(screen.getByText("タスク1")).toBeInTheDocument();
       expect(screen.getByText("タスク2")).toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
-      // expect(screen.getAllByRole("checkbox")).toHaveLength(2);
     });
 
     it("selectedTaskの初期値がnullでPomodoroが表示されない", () => {
