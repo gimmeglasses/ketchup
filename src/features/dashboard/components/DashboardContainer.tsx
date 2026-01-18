@@ -11,7 +11,13 @@ import { type Task } from "@/features/tasks/types";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
 
-const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
+const DashboardContainer = ({
+  tasks,
+  pomodoroMinutes,
+}: {
+  tasks: Task[];
+  pomodoroMinutes: Record<string, number>;
+}) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -96,6 +102,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         <Pomodoro
           ref={pomodoroRef}
           task={selectedTask}
+          actualMinutes={pomodoroMinutes[selectedTask.id] ?? 0}
           onTimerStateChange={setIsTimerRunning}
         />
       )}
@@ -146,7 +153,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
                   {task.estimatedMinutes
                     ? `${task.estimatedMinutes} 分`
                     : "None"}{" "}
-                  / 実績: XX 分
+                  / 実績: {pomodoroMinutes[task.id] ?? 0} 分
                 </span>
               </div>
               {/* 編集ボタン */}

@@ -64,6 +64,16 @@ describe("Pomodoro", () => {
       ).toBeInTheDocument();
     });
 
+    it("実績時間が渡されない場合、0分と表示される", () => {
+      render(<Pomodoro task={mockTask} />);
+      expect(screen.getByText(/実績: 0 分/)).toBeInTheDocument();
+    });
+
+    it("実績時間が渡された場合、その値が表示される", () => {
+      render(<Pomodoro task={mockTask} actualMinutes={50} />);
+      expect(screen.getByText(/実績: 50 分/)).toBeInTheDocument();
+    });
+
     it("常に『25:00』と表示される", () => {
       render(<Pomodoro task={mockTask} />);
       expect(screen.getByText("25:00")).toBeInTheDocument();

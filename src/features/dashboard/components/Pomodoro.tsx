@@ -46,6 +46,7 @@ function formatTime(seconds: number): string {
 
 type PomodoroProps = {
   task: Task;
+  actualMinutes?: number;
   onTimerStateChange?: (isRunning: boolean) => void;
 };
 
@@ -54,7 +55,7 @@ export type PomodoroHandle = {
 };
 
 const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
-  { task, onTimerStateChange },
+  { task, actualMinutes = 0, onTimerStateChange },
   ref
 ) {
   const [session, setSession] = useState<PomodoroSession | null>(null);
@@ -213,7 +214,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
             </div>
           </div>
           <div className="flex flex-col ml-6 text-sm text-gray-700">
-            <span>予定: {estimatedDisplay} / 実績: XX 分</span>
+            <span>予定: {estimatedDisplay} / 実績: {actualMinutes} 分</span>
           </div>
         </div>
         <div className="p-2 sm:p-3 flex flex-col gap-2 sm:gap-3">
