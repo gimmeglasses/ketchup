@@ -30,31 +30,31 @@ describe("DashboardContainer", () => {
       id: "ID0000000001TASK",
       profileId: "profile1",
       title: "タスク1",
-      dueAt: "2026-01-10",
+      dueAt: "2030-01-10",
       estimatedMinutes: 120,
       completedAt: null,
       note: null,
-      createdAt: "2026-01-01T00:00:00Z",
+      createdAt: "2030-01-01T00:00:00Z",
     },
     {
       id: "ID0000000002TASK",
       profileId: "profile1",
       title: "タスク2",
-      dueAt: "2026-01-15",
+      dueAt: "2030-01-15",
       estimatedMinutes: 45,
       completedAt: null,
       note: null,
-      createdAt: "2026-01-01T00:00:00Z",
+      createdAt: "2030-01-01T00:00:00Z",
     },
     {
       id: "ID0000000003TASK",
       profileId: "profile1",
       title: "タスク3",
-      dueAt: "2026-01-03",
+      dueAt: "2030-01-03",
       estimatedMinutes: 90,
-      completedAt: "2026-01-02T10:00:00Z",
+      completedAt: "2030-01-02T10:00:00Z",
       note: null,
-      createdAt: "2026-01-01T00:00:00Z",
+      createdAt: "2030-01-01T00:00:00Z",
     },
   ];
   const mockTasks = mockTasksData.filter((task) => task.completedAt === null);
@@ -181,6 +181,54 @@ describe("DashboardContainer", () => {
 
       expect(screen.getByText("タスク1")).toBeInTheDocument();
       expect(screen.getByText("タスク2")).toBeInTheDocument();
+    });
+  });
+
+  describe("日付と時間の表示フォーマット", () => {
+    it("期限が設定されている場合、YYYY/MM/DD形式で表示される", () => {
+      render(<DashboardContainer tasks={mockTasks} />);
+      expect(screen.getByText("期限: 2030/01/10")).toBeInTheDocument();
+      expect(screen.getByText("期限: 2030/01/15")).toBeInTheDocument();
+    });
+
+    it("期限がnullの場合、'-'が表示される", () => {
+      const tasksWithNullDueAt = [
+        {
+          id: "ID0000000004TASK",
+          profileId: "profile1",
+          title: "期限未設定タスク",
+          dueAt: null,
+          estimatedMinutes: 60,
+          completedAt: null,
+          note: null,
+          createdAt: "2030-01-01T00:00:00Z",
+        },
+      ];
+      render(<DashboardContainer tasks={tasksWithNullDueAt} />);
+      expect(screen.getByText("期限: -")).toBeInTheDocument();
+    });
+
+    it("予定時間が設定されている場合、'XX 分'形式で表示される", () => {
+      render(<DashboardContainer tasks={mockTasks} />);
+      expect(screen.getByText(/予定: 120 分/)).toBeInTheDocument();
+      expect(screen.getByText(/予定: 45 分/)).toBeInTheDocument();
+    });
+
+    it("予定時間がnullの場合、'-'が表示される", () => {
+      const tasksWithNullEstimatedMinutes = [
+        {
+          id: "ID0000000005TASK",
+          profileId: "profile1",
+          title: "予定時間未設定タスク",
+          dueAt: "2030-12-31",
+          estimatedMinutes: null,
+          completedAt: null,
+          note: null,
+          createdAt: "2030-01-01T00:00:00Z",
+        },
+      ];
+      render(<DashboardContainer tasks={tasksWithNullEstimatedMinutes} />);
+      expect(screen.getByText(/予定: -/)).toBeInTheDocument();
     });
   });
 });
