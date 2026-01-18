@@ -30,7 +30,7 @@ export function TaskListFilter({
 }: TaskListFilterProps) {
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
-      <div className="grid grid-cols-1 md: grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* ステータスフィルター */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -79,7 +79,7 @@ export function TaskListFilter({
           <select
             value={sortBy}
             onChange={(e) => onSortByChange(e.target.value as TaskSortBy)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus: ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="dueAt">期限</option>
             <option value="createdAt">作成日時</option>
