@@ -66,7 +66,7 @@ export function TaskListFilter({
             <option value="all">すべて</option>
             <option value="withDue">期限あり</option>
             <option value="withoutDue">期限なし</option>
-            <option value="today">今日まで</option>
+            {/* <option value="today">今日まで</option> */}
             <option value="overdue">期限超過</option>
           </select>
         </div>
