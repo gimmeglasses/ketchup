@@ -89,10 +89,7 @@ describe("completeTaskAction", () => {
     it("未認証の場合はエラーを返すこと", async () => {
       setupUnauthenticatedUser();
 
-      const result = await completeTaskAction(
-        initialState,
-        makeFormData({ title: "タスク" })
-      );
+      const result = await completeTaskAction(taskId);
 
       expect(result.success).toBe(false);
       if (!result.success) {
