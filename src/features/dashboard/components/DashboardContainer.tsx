@@ -15,6 +15,7 @@ import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction"
 
 const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [pendingTask, setPendingTask] = useState<Task | null>(null);
@@ -96,6 +97,22 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         onCancel={handleCancelSwitch}
       />
 
+      {/* エラーメッセージの表示 */}
+      {completeError && (
+        <div
+          className="mt-4 p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg flex justify-between items-center"
+          role="alert"
+        >
+          <span>{completeError}</span>
+          <button
+            onClick={() => setCompleteError(null)}
+            className="text-red-500 hover:text-red-700 font-bold px-2"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Display task list */}
       <div className="flex flex-col gap-4 mt-4 text-gray-600">
         <h1 className="text-xl sm:text-2xl font-bold">今日のタスク</h1>
@@ -109,15 +126,20 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
             <div className="flex items-center w-full">
               {/* 完了ボタン */}
               <div className="flex-none" onClick={(e) => e.stopPropagation()}>
-                <form action={completeTaskAction.bind(null, task.id)}>
-                  <button
-                    type="submit"
-                    title="完了"
-                    className="flex items-center justify-center"
-                  >
-                    <FaCheckCircle size={25} />
-                  </button>
-                </form>
+                <button
+                  title="完了"
+                  className="flex items-center justify-center hover:text-green-500 transition-colors"
+                  onClick={async () => {
+                    const result = await completeTaskAction(task.id);
+                    if (!result.success && result.errors?._form) {
+                      setCompleteError(result.errors._form[0]);
+                    } else {
+                      setCompleteError(null);
+                    }
+                  }}
+                >
+                  <FaCheckCircle size={25} />
+                </button>
               </div>
 
               {/* タスク名 */}

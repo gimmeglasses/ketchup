@@ -10,6 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@react-icons/all-files": "^4.1.0",
     "@supabase/ssr": "^0.8.0",
     "dayjs": "^1.11.19",
     "drizzle-orm": "^0.45.1",

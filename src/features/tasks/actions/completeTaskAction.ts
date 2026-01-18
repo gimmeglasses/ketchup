@@ -16,11 +16,10 @@ export type CompleteTaskResult = {
  * 検証エラーはフィールド単位のエラーとして返し、実行時エラーはフォーム共通エラーとして返します。
  *
  * @param taskId タスクID
- * @param prevState サーバーアクションの前回の状態
- * @returns 成功時は作成されたタスク、失敗時はエラーマップ
+ * @returns 成功時は成功ステータス、失敗時はエラーマップ
  */
 export async function completeTaskAction(
-  taskId: string
+  taskId: string,
 ): Promise<CompleteTaskResult> {
   try {
     const supabase = await createSupabaseServerClient();
@@ -36,8 +35,7 @@ export async function completeTaskAction(
         },
       };
     }
-    const completedAt = new Date().toISOString();
-    await completeTask(taskId, completedAt);
+    await completeTask(taskId);
     revalidatePath("/dashboard");
     return { success: true };
   } catch (error) {
