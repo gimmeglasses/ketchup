@@ -1,8 +1,7 @@
 "use server";
 
-import { type Task } from "@/features/tasks/types";
 import { listTasks } from "@/features/tasks/services/listTasks";
-
+import { type Task, type ListTasksParams } from "@/features/tasks/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function listTasksAction(

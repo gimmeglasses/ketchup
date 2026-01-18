@@ -10,12 +10,9 @@ import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { type Task } from "@/features/tasks/types";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
-import { FaCheckCircle } from "react-icons/fa";
-import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction";
 
 const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [completeError, setCompleteError] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [pendingTask, setPendingTask] = useState<Task | null>(null);
@@ -45,6 +42,20 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const handleCancelSwitch = () => {
     setPendingTask(null);
     setShowConfirm(false);
+  };
+
+  // チェックボックスがONになったタスクを格納。
+  const [checkedTasks, setCheckedTasks] = useState<{ [id: string]: boolean }>(
+    {}
+  );
+  const handleChecked = (
+    taskId: string,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCheckedTasks((prev) => ({
+      ...prev,
+      [taskId]: event.target.checked,
+    }));
   };
 
   // モーダルの開閉状態を管理
@@ -97,22 +108,6 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         onCancel={handleCancelSwitch}
       />
 
-      {/* エラーメッセージの表示 */}
-      {completeError && (
-        <div
-          className="mt-4 p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg flex justify-between items-center"
-          role="alert"
-        >
-          <span>{completeError}</span>
-          <button
-            onClick={() => setCompleteError(null)}
-            className="text-red-500 hover:text-red-700 font-bold px-2"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
       {/* Display task list */}
       <div className="flex flex-col gap-4 mt-4 text-gray-600">
         <h1 className="text-xl sm:text-2xl font-bold">今日のタスク</h1>
@@ -124,23 +119,15 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
             onClick={() => handleClick(task)}
           >
             <div className="flex items-center w-full">
-              {/* 完了ボタン */}
+              {/* チェックボックス*/}
+              {/* 今後、削除機能またはタスク完了処理で利用（仮） */}
               <div className="flex-none" onClick={(e) => e.stopPropagation()}>
-                <button
-                  title="完了"
-                  aria-label="タスクを完了する"
-                  className="flex items-center justify-center hover:text-green-500 transition-colors"
-                  onClick={async () => {
-                    const result = await completeTaskAction(task.id);
-                    if (!result.success && result.errors?._form) {
-                      setCompleteError(result.errors._form[0]);
-                    } else {
-                      setCompleteError(null);
-                    }
-                  }}
-                >
-                  <FaCheckCircle size={25} />
-                </button>
+                <input
+                  className="text-red-600 rounded focus:ring-red-500"
+                  type="checkbox"
+                  checked={checkedTasks[task.id] || false}
+                  onChange={(event) => handleChecked(task.id, event)}
+                />
               </div>
 
               {/* タスク名 */}

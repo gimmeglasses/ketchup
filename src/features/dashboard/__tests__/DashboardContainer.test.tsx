@@ -65,6 +65,7 @@ describe("DashboardContainer", () => {
       expect(screen.queryByText("タスク1")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク2")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
+      expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
     });
 
     it("tasksのみ表示される", () => {
@@ -72,6 +73,7 @@ describe("DashboardContainer", () => {
       expect(screen.getByText("タスク1")).toBeInTheDocument();
       expect(screen.getByText("タスク2")).toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
+      expect(screen.getAllByRole("checkbox")).toHaveLength(2);
     });
 
     it("selectedTaskの初期値がnullでPomodoroが表示されない", () => {
@@ -112,6 +114,39 @@ describe("DashboardContainer", () => {
         fireEvent.click(task2Item);
       }
       expect(screen.getByText("Pomodoro: タスク2")).toBeInTheDocument();
+    });
+  });
+
+  describe("チェックボックス管理", () => {
+    it("チェックボックスをONにするとcheckedTasksが更新される", () => {
+      render(<DashboardContainer tasks={mockTasks} />);
+      const checkboxes = screen.getAllByRole("checkbox");
+
+      fireEvent.click(checkboxes[0]);
+      expect(checkboxes[0]).toBeChecked();
+    });
+
+    it("チェック状態が複数タスクで独立して管理される", () => {
+      render(<DashboardContainer tasks={mockTasks} />);
+      const checkboxes = screen.getAllByRole("checkbox");
+
+      fireEvent.click(checkboxes[0]);
+      fireEvent.click(checkboxes[1]);
+
+      expect(checkboxes[0]).toBeChecked();
+      expect(checkboxes[1]).toBeChecked();
+    });
+
+    it("チェックボックス操作がタスク項目のclickイベントを発火させない", async () => {
+      render(<DashboardContainer tasks={mockTasks} />);
+      const checkboxes = screen.getAllByRole("checkbox");
+
+      // onChange event
+      fireEvent.change(checkboxes[0]);
+      // Verify stopPropagation worked - Pomodoro should NOT appear
+      expect(
+        screen.queryByTestId("pomodoro-component")
+      ).not.toBeInTheDocument();
     });
   });
 
