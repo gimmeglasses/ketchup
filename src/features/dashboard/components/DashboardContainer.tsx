@@ -10,6 +10,8 @@ import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { type Task } from "@/features/tasks/types";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
+import { FaCheckCircle } from "react-icons/fa";
+import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction";
 
 const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -42,20 +44,6 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
   const handleCancelSwitch = () => {
     setPendingTask(null);
     setShowConfirm(false);
-  };
-
-  // チェックボックスがONになったタスクを格納。
-  const [checkedTasks, setCheckedTasks] = useState<{ [id: string]: boolean }>(
-    {}
-  );
-  const handleChecked = (
-    taskId: string,
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setCheckedTasks((prev) => ({
-      ...prev,
-      [taskId]: event.target.checked,
-    }));
   };
 
   // モーダルの開閉状態を管理
@@ -119,15 +107,17 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
             onClick={() => handleClick(task)}
           >
             <div className="flex items-center w-full">
-              {/* チェックボックス*/}
-              {/* 今後、削除機能またはタスク完了処理で利用（仮） */}
+              {/* 完了ボタン */}
               <div className="flex-none" onClick={(e) => e.stopPropagation()}>
-                <input
-                  className="text-red-600 rounded focus:ring-red-500"
-                  type="checkbox"
-                  checked={checkedTasks[task.id] || false}
-                  onChange={(event) => handleChecked(task.id, event)}
-                />
+                <form action={completeTaskAction.bind(null, task.id)}>
+                  <button
+                    type="submit"
+                    title="完了"
+                    className="flex items-center justify-center"
+                  >
+                    <FaCheckCircle size={25} />
+                  </button>
+                </form>
               </div>
 
               {/* タスク名 */}

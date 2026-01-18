@@ -5,7 +5,7 @@ import { type Task, type ListTasksParams } from "@/features/tasks/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function listTasksAction(
-  filter?: ListTasksParams
+  filter?: ListTasksParams,
 ): Promise<Task[]> {
   const supabase = await createSupabaseServerClient();
   const {
