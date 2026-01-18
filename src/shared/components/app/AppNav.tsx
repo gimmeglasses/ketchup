@@ -57,7 +57,7 @@ const AppNav = () => {
                   {/* アイコン */}
                   <span
                     className={`relative text-2xl md:text-base transition-transform duration-200 ${
-                      isActive ? "scale-110" : "group-hover: scale-105"
+                      isActive ? "scale-110" : "group-hover:scale-105"
                     }`}
                   >
                     {item.icon}
@@ -72,7 +72,7 @@ const AppNav = () => {
 
                   {/* PC版:  アクティブインジケーター */}
                   {isActive && (
-                    <div className="hidden md: block absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-orange-500 rounded-t-full"></div>
+                    <div className="hidden md:block absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-orange-500 rounded-t-full"></div>
                   )}
 
                   {/* ホバー時のアンダーライン */}
