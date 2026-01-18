@@ -16,6 +16,5 @@ export async function completeTask(
   if (!completed) {
     throw new Error("Failed to complete task");
   }
-  console.log(completed);
   return completed;
 }

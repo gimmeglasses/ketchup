@@ -26,7 +26,7 @@ vi.mock("@/app/db/client", () => ({
   },
 }));
 
-describe("createTask", () => {
+describe("completeTaskAction", () => {
   const testTaskId = "10000000-0000-0000-0000-000000000001";
   const testCompletedAt = "2026-01-18 06:45:53.747+00";
   const mockCompletedTask = {

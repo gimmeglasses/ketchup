@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { type SupabaseClient } from "@supabase/supabase-js";
 import {
   completeTaskAction,
-  type CompleteTaskActionResult,
+  type CompleteTaskResult,
 } from "../actions/completeTaskAction";
 import * as service from "../services/completeTask";
 import * as supabaseServer from "@/lib/supabase/server";
@@ -36,19 +36,10 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-const initialState: CompleteTaskActionResult = {
+const initialState: CompleteTaskResult = {
   success: false,
   errors: {},
 };
-
-/**
- * FormData オブジェクトを生成するヘルパー関数
- */
-function makeFormData(values: Record<string, string>) {
-  const fd = new FormData();
-  Object.entries(values).forEach(([key, value]) => fd.append(key, value));
-  return fd;
-}
 
 /**
  * 認証済みユーザーのモックを設定するヘルパー関数
@@ -79,7 +70,7 @@ function setupUnauthenticatedUser() {
   );
 }
 
-describe("createTaskAction", () => {
+describe("completeTaskAction", () => {
   describe("正常系", () => {
     it("タスク完了に成功すること", async () => {
       setupAuthenticatedUser();
@@ -120,10 +111,7 @@ describe("createTaskAction", () => {
         new Error("supabase down")
       );
 
-      const result = await completeTaskAction(
-        initialState,
-        makeFormData({ title: "タスク" })
-      );
+      const result = await completeTaskAction(taskId);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -146,10 +134,7 @@ describe("createTaskAction", () => {
         new Error("Database error")
       );
 
-      const result = await completeTaskAction(
-        initialState,
-        makeFormData({ title: "タスク" })
-      );
+      const result = await completeTaskAction(taskId);
 
       expect(result.success).toBe(false);
       if (!result.success) {

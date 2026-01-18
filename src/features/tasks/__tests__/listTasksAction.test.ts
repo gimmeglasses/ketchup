@@ -34,13 +34,9 @@ describe("listTasksAction", () => {
       mockSupabase as SupabaseClient
     );
     vi.mocked(service.listUncompletedTasks).mockResolvedValue([]);
-    // vi.mocked(service.listTasks).mockResolvedValue([]);
 
     await listTasksAction();
-
-    // expect(service.listTasks).toHaveBeenCalledTimes(1);
     expect(service.listUncompletedTasks).toHaveBeenCalledTimes(1);
-    // expect(service.listTasks).toHaveBeenCalledWith("test-user-id");
     expect(service.listUncompletedTasks).toHaveBeenCalledWith("test-user-id");
   });
 
@@ -55,15 +51,12 @@ describe("listTasksAction", () => {
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
       mockSupabase as SupabaseClient
     );
-    // vi.mocked(service.listTasks).mockRejectedValue(
     vi.mocked(service.listUncompletedTasks).mockRejectedValue(
       new Error("DB connection failed")
     );
 
     await expect(listTasksAction()).rejects.toThrow("DB connection failed");
-    // expect(service.listTasks).toHaveBeenCalledTimes(1);
     expect(service.listUncompletedTasks).toHaveBeenCalledTimes(1);
-    // expect(service.listTasks).toHaveBeenCalledWith("test-user-id");
     expect(service.listUncompletedTasks).toHaveBeenCalledWith("test-user-id");
   });
 
@@ -81,7 +74,6 @@ describe("listTasksAction", () => {
     await expect(listTasksAction()).rejects.toThrow(
       "タスクの一覧を表示するにはユーザー認証が必要です。"
     );
-    // expect(service.listTasks).not.toHaveBeenCalled();
     expect(service.listUncompletedTasks).not.toHaveBeenCalled();
   });
 
@@ -91,7 +83,6 @@ describe("listTasksAction", () => {
     );
 
     await expect(listTasksAction()).rejects.toThrow("supabase down");
-    // expect(service.listTasks).not.toHaveBeenCalled();
     expect(service.listUncompletedTasks).not.toHaveBeenCalled();
   });
 });

@@ -1,10 +1,7 @@
 "use server";
 
 import { type Task } from "@/features/tasks/types";
-import {
-  listTasks,
-  listUncompletedTasks,
-} from "@/features/tasks/services/listTasks";
+import { listUncompletedTasks } from "@/features/tasks/services/listTasks";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
