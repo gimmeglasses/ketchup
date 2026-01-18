@@ -10,6 +10,7 @@ import {
 } from "../actions/stopPomodoroAction";
 import * as service from "../services/stopPomodoroSession";
 import * as supabaseServer from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 // stopPomodoroSession サービスをスパイ化
 const mockStoppedSession = {
@@ -27,6 +28,11 @@ vi.spyOn(service, "stopPomodoroSession").mockResolvedValue(
 // Supabase クライアントをモック化
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn(),
+}));
+
+// revalidatePath をモック化
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
 }));
 
 afterEach(() => {
@@ -97,6 +103,20 @@ describe("stopPomodoroAction", () => {
         "10000000-0000-4000-8000-000000000001",
         "test-user-id"
       );
+    });
+
+    it("セッション停止成功時にrevalidatePathが呼ばれること", async () => {
+      setupAuthenticatedUser();
+      vi.mocked(service.stopPomodoroSession).mockResolvedValue(
+        mockStoppedSession
+      );
+
+      await stopPomodoroAction(
+        initialState,
+        makeFormData({ sessionId: "10000000-0000-4000-8000-000000000001" })
+      );
+
+      expect(revalidatePath).toHaveBeenCalledWith("/dashboard");
     });
   });
 
