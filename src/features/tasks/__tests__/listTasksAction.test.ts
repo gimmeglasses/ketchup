@@ -10,6 +10,7 @@ import * as supabaseServer from "@/lib/supabase/server";
 
 // listTasksサービスをスパイ化
 vi.spyOn(service, "listTasks").mockResolvedValue([]);
+vi.spyOn(service, "listUncompletedTasks").mockResolvedValue([]);
 
 // Supabase クライアントをモック化
 vi.mock("@/lib/supabase/server", () => ({
@@ -32,12 +33,11 @@ describe("listTasksAction", () => {
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
       mockSupabase as SupabaseClient
     );
-    vi.mocked(service.listTasks).mockResolvedValue([]);
+    vi.mocked(service.listUncompletedTasks).mockResolvedValue([]);
 
     await listTasksAction();
-
-    expect(service.listTasks).toHaveBeenCalledTimes(1);
-    expect(service.listTasks).toHaveBeenCalledWith("test-user-id");
+    expect(service.listUncompletedTasks).toHaveBeenCalledTimes(1);
+    expect(service.listUncompletedTasks).toHaveBeenCalledWith("test-user-id");
   });
 
   it("listTasks が例外を投げた場合に例外を再スローすること", async () => {
@@ -51,13 +51,13 @@ describe("listTasksAction", () => {
     vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
       mockSupabase as SupabaseClient
     );
-    vi.mocked(service.listTasks).mockRejectedValue(
+    vi.mocked(service.listUncompletedTasks).mockRejectedValue(
       new Error("DB connection failed")
     );
 
     await expect(listTasksAction()).rejects.toThrow("DB connection failed");
-    expect(service.listTasks).toHaveBeenCalledTimes(1);
-    expect(service.listTasks).toHaveBeenCalledWith("test-user-id");
+    expect(service.listUncompletedTasks).toHaveBeenCalledTimes(1);
+    expect(service.listUncompletedTasks).toHaveBeenCalledWith("test-user-id");
   });
 
   it("未認証の場合はエラーをスローすること", async () => {
@@ -74,7 +74,7 @@ describe("listTasksAction", () => {
     await expect(listTasksAction()).rejects.toThrow(
       "タスクの一覧を表示するにはユーザー認証が必要です。"
     );
-    expect(service.listTasks).not.toHaveBeenCalled();
+    expect(service.listUncompletedTasks).not.toHaveBeenCalled();
   });
 
   it("Supabase クライアント生成が失敗した場合に例外を再スローすること", async () => {
@@ -83,6 +83,6 @@ describe("listTasksAction", () => {
     );
 
     await expect(listTasksAction()).rejects.toThrow("supabase down");
-    expect(service.listTasks).not.toHaveBeenCalled();
+    expect(service.listUncompletedTasks).not.toHaveBeenCalled();
   });
 });
