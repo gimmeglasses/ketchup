@@ -2,7 +2,7 @@ import { db } from "@/app/db/client";
 import { tasks } from "@/app/db/schema";
 import { eq, and, sql, isNull } from "drizzle-orm";
 
-export async function completeTask(taskId: string): Promise<Void> {
+export async function completeTask(taskId: string): Promise<void> {
   const result = await db
     .update(tasks)
     .set({ completedAt: sql`now()` })
