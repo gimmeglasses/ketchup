@@ -14,7 +14,8 @@ export type ListTasksServiceParams = {
  * 指定ユーザーのタスク一覧を取得します。
  *
  * @param userId ユーザーID
- * @returns 作成日時の降順でソートされたタスクの配列
+ * @param filter タスクのフィルター条件およびソート条件
+ * @returns フィルターおよびソート条件に従って取得されたタスクの配列
  */
 export async function listTasks({
   userId,
