@@ -22,6 +22,8 @@ vi.mock("react", async () => {
   const actual = await vi.importActual<typeof import("react")>("react");
   return {
     ...actual,
+    // Mock useState to track setTimerState calls
+    // Note: This assumes Pomodoro component only uses useState once for timerState
     useState: vi.fn((initialState) => {
       const [state, setState] = actual.useState(initialState);
       mockSetTimerState = vi.fn((newState) => {
@@ -52,6 +54,15 @@ vi.mock("../components/PomodoroButton", () => ({
 
 vi.mock("@/features/pomodoro/actions/startPomodoroAction");
 vi.mock("@/features/pomodoro/actions/stopPomodoroAction");
+
+const WORK_DURATION_SECONDS = 25 * 60;
+
+const INITIAL_TIMER_STATE = {
+  isRunning: false,
+  timerMode: "idle" as const,
+  remainingSeconds: WORK_DURATION_SECONDS,
+  session: null,
+};
 
 const MOCK_TASK: Task = {
   id: "test-task-1",
@@ -241,12 +252,7 @@ describe("Pomodoro", () => {
 
       // Verify that setTimerState was called with INITIAL_TIMER_STATE to rollback
       await waitFor(() => {
-        expect(mockSetTimerState).toHaveBeenCalledWith({
-          isRunning: false,
-          timerMode: "idle",
-          remainingSeconds: 25 * 60,
-          session: null,
-        });
+        expect(mockSetTimerState).toHaveBeenCalledWith(INITIAL_TIMER_STATE);
       });
     });
 
