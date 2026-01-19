@@ -69,7 +69,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
             type="text"
             required
             className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
-            placeholder="例）最初の25分に集中する。"
+            placeholder="次にやる行動は？"
           />
           {state.success === false && state.errors.title && (
             <p className="text-red-500 text-sm">{state.errors.title[0]}</p>
@@ -88,7 +88,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
             id="note"
             name="note"
             className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
-            placeholder="例）Ketchupのポモドーロタイマーで25分集中。終わったら5分休憩。まずは1セットやってみよう。"
+            placeholder="いつ・どこで・何を？"
           />
           {state.success === false && state.errors.note && (
             <p className="text-red-500 text-sm">{state.errors.note[0]}</p>
