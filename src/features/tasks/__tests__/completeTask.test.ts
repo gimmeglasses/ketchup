@@ -23,7 +23,7 @@ vi.mock("@/app/db/client", () => ({
   },
 }));
 
-describe("completeTaskAction", () => {
+describe("completeTask", () => {
   const testTaskId = "10000000-0000-0000-0000-000000000001";
 
   beforeEach(() => {

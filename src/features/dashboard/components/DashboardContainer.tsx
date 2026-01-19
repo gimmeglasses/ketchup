@@ -128,6 +128,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
               <div className="flex-none" onClick={(e) => e.stopPropagation()}>
                 <button
                   title="完了"
+                  aria-label="タスクを完了する"
                   className="flex items-center justify-center hover:text-green-500 transition-colors"
                   onClick={async () => {
                     const result = await completeTaskAction(task.id);
