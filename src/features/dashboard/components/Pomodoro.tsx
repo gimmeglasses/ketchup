@@ -136,9 +136,10 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
       remainingSeconds: WORK_DURATION_SECONDS,
       session: null,
     };
-    setOptimisticTimerState(optimisticWorkState);
 
     startTransition(async () => {
+      setOptimisticTimerState(optimisticWorkState);
+
       try {
         const formData = new FormData();
         formData.append("taskId", task.id);
@@ -170,9 +171,9 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
     const currentSession = optimisticTimerState.session;
     const currentMode = optimisticTimerState.timerMode;
 
-    setOptimisticTimerState(INITIAL_TIMER_STATE);
-
     startTransition(async () => {
+      setOptimisticTimerState(INITIAL_TIMER_STATE);
+
       try {
         if (currentMode === "work" && currentSession) {
           const formData = new FormData();
