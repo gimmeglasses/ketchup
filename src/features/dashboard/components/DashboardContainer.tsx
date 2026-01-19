@@ -107,6 +107,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
           <button
             onClick={() => setCompleteError(null)}
             className="text-red-500 hover:text-red-700 font-bold px-2"
+            aria-label="エラーメッセージを閉じる"
           >
             ×
           </button>
