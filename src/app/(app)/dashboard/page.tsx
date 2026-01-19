@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { listTasksAction } from "@/features/tasks/actions/listTasksAction";
+import { getAllTasksPomodoroMinutesAction } from "@/features/pomodoro/actions/getAllTasksPomodoroMinutesAction";
 import DashboardContainer from "@/features/dashboard/components/DashboardContainer";
 
 export const metadata: Metadata = {
@@ -8,13 +9,19 @@ export const metadata: Metadata = {
 };
 
 const DashboardHome = async () => {
+  // 未完了タスクのみ取得
   const status = "todo";
-  const result = await listTasksAction({
-    status,
-  });
+  const [tasks, pomodoroMinutes] = await Promise.all([
+    listTasksAction({ status }),
+    getAllTasksPomodoroMinutesAction().catch((error) => {
+      console.error("Failed to load pomodoro minutes:", error);
+      return {} as Record<string, number>;
+    }),
+  ]);
+
   return (
     <main className="w-full max-w-4xl mx-auto p-4 md:p-8">
-      <DashboardContainer tasks={result} />
+      <DashboardContainer tasks={tasks} pomodoroMinutes={pomodoroMinutes} />
     </main>
   );
 };

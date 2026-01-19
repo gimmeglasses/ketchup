@@ -10,10 +10,27 @@ import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { type Task } from "@/features/tasks/types";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
+import { dayjs } from "@/lib/dayjs";
 import { FaCheckCircle } from "react-icons/fa";
 import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction";
 
-const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
+const DashboardContainer = ({
+  tasks,
+  pomodoroMinutes,
+}: {
+  tasks: Task[];
+  pomodoroMinutes: Record<string, number>;
+}) => {
+  const formatDueDate = (dueAt: string | null): string => {
+    if (!dueAt) return "-";
+    return dayjs(dueAt).format("YYYY/MM/DD");
+  };
+
+  const formatEstimatedMinutes = (estimatedMinutes: number | null): string => {
+    if (!estimatedMinutes) return "-";
+    return `${estimatedMinutes} 分`;
+  };
+
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [completeError, setCompleteError] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
@@ -85,6 +102,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         <Pomodoro
           ref={pomodoroRef}
           task={selectedTask}
+          actualMinutes={pomodoroMinutes[selectedTask.id] ?? 0}
           onTimerStateChange={setIsTimerRunning}
         />
       )}
@@ -165,13 +183,10 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
             <div className="flex">
               {/* 残りの項目を縦に表示 */}
               <div className="flex flex-col ml-6 text-sm text-gray-600">
-                <span>期限: {task.dueAt ? task.dueAt : "None"}</span>
+                <span>期限: {formatDueDate(task.dueAt)}</span>
                 <span>
-                  予定:{" "}
-                  {task.estimatedMinutes
-                    ? `${task.estimatedMinutes} 分`
-                    : "None"}{" "}
-                  / 実績: XX 分
+                  予定: {formatEstimatedMinutes(task.estimatedMinutes)} / 実績:{" "}
+                  {pomodoroMinutes[task.id] ?? 0} 分
                 </span>
               </div>
               {/* 編集ボタン */}

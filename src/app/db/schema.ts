@@ -121,6 +121,9 @@ export const pomodoroSessions = pgTable(
   (t) => [
     index("pomodoro_sessions_task_id_idx").on(t.taskId),
     index("pomodoro_sessions_profile_id_idx").on(t.profileId),
+    index("idx_pomodoro_profile_task_finished")
+      .on(t.profileId, t.taskId)
+      .where(sql`${t.stoppedAt} is not null`),
     foreignKey({
       columns: [t.taskId],
       foreignColumns: [tasks.id],

@@ -1,6 +1,7 @@
 "use server";
 
 import { type z } from "zod";
+import { revalidatePath } from "next/cache";
 import { toFieldErrors } from "@/lib/zodError";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { stopPomodoroSession } from "../services/stopPomodoroSession";
@@ -58,6 +59,9 @@ export async function stopPomodoroAction(
     }
 
     const session = await stopPomodoroSession(parsed.data.sessionId, user.id);
+
+    revalidatePath("/dashboard");
+
     return { success: true, session };
   } catch (error) {
     console.error("Failed to stop pomodoro session:", error);
