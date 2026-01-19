@@ -77,7 +77,7 @@ describe("listTasks DBテスト", () => {
       },
     ]);
 
-    const result = await listTasks(testUserId);
+    const result = await listTasks({ userId: testUserId });
 
     expect(result).toHaveLength(3);
     // 降順（新しい順）で返されること
@@ -91,7 +91,7 @@ describe("listTasks DBテスト", () => {
   it("タスクが存在しない場合は空の配列を返すこと", async () => {
     const { listTasks } = await import("../services/listTasks");
 
-    const result = await listTasks(testUserId);
+    const result = await listTasks({ userId: testUserId });
 
     expect(result).toEqual([]);
     expect(result).toHaveLength(0);
@@ -112,7 +112,7 @@ describe("listTasks DBテスト", () => {
       createdAt: createdAt.toISOString(),
     });
 
-    const result = await listTasks(testUserId);
+    const result = await listTasks({ userId: testUserId });
 
     expect(result).toHaveLength(1);
     const task = result[0];
@@ -142,7 +142,7 @@ describe("listTasks DBテスト", () => {
       createdAt: new Date().toISOString(),
     });
 
-    const result = await listTasks(testUserId);
+    const result = await listTasks({ userId: testUserId });
 
     expect(result).toHaveLength(1);
     expect(result[0].estimatedMinutes).toBeNull();
