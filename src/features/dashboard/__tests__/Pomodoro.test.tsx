@@ -16,11 +16,19 @@ let mockStartTransition: (callback: () => void | Promise<void>) => void = vi.fn(
   }
 );
 let mockIsPending = false;
+let mockSetTimerState: (value: unknown) => void = vi.fn();
 
 vi.mock("react", async () => {
   const actual = await vi.importActual<typeof import("react")>("react");
   return {
     ...actual,
+    useState: vi.fn((initialState) => {
+      const [state, setState] = actual.useState(initialState);
+      mockSetTimerState = vi.fn((newState) => {
+        setState(newState);
+      });
+      return [state, mockSetTimerState];
+    }),
     useOptimistic: vi.fn((state) => [state, mockUseOptimisticSetter]),
     useTransition: vi.fn(() => [mockIsPending, mockStartTransition]),
   };
@@ -69,6 +77,7 @@ function resetMocks(): void {
   vi.clearAllMocks();
   mockIsPending = false;
   mockUseOptimisticSetter = vi.fn();
+  mockSetTimerState = vi.fn();
   mockStartTransition = vi.fn((callback) => {
     void Promise.resolve(callback());
   });
@@ -228,6 +237,16 @@ describe("Pomodoro", () => {
 
       await waitFor(() => {
         expect(mockUseOptimisticSetter).toHaveBeenCalled();
+      });
+
+      // Verify that setTimerState was called with INITIAL_TIMER_STATE to rollback
+      await waitFor(() => {
+        expect(mockSetTimerState).toHaveBeenCalledWith({
+          isRunning: false,
+          timerMode: "idle",
+          remainingSeconds: 25 * 60,
+          session: null,
+        });
       });
     });
 

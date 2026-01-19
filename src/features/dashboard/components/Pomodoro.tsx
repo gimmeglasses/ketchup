@@ -156,6 +156,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
           toast.error(
             extractErrorMessage(result.errors, "セッションの開始に失敗しました")
           );
+          setTimerState(INITIAL_TIMER_STATE);
         }
       } catch (error) {
         console.error("Failed to start pomodoro session:", error);
