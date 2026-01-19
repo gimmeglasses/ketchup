@@ -29,7 +29,7 @@ type TimerState = {
   session: PomodoroSession | null;
 };
 
-const INITIAL_TIMER_STATE: TimerState = {
+export const INITIAL_TIMER_STATE: TimerState = {
   isRunning: false,
   timerMode: "idle",
   remainingSeconds: WORK_DURATION_SECONDS,

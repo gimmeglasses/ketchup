@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Pomodoro from "../components/Pomodoro";
+import Pomodoro, { INITIAL_TIMER_STATE } from "../components/Pomodoro";
 import type { PomodoroButtonProps } from "../components/PomodoroButton";
 import { Task } from "@/features/tasks/types";
 import { PomodoroSession } from "@/features/pomodoro/types";
@@ -54,15 +54,6 @@ vi.mock("../components/PomodoroButton", () => ({
 
 vi.mock("@/features/pomodoro/actions/startPomodoroAction");
 vi.mock("@/features/pomodoro/actions/stopPomodoroAction");
-
-const WORK_DURATION_SECONDS = 25 * 60;
-
-const INITIAL_TIMER_STATE = {
-  isRunning: false,
-  timerMode: "idle" as const,
-  remainingSeconds: WORK_DURATION_SECONDS,
-  session: null,
-};
 
 const MOCK_TASK: Task = {
   id: "test-task-1",
