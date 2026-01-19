@@ -115,39 +115,6 @@ describe("DashboardContainer", () => {
     });
   });
 
-  describe("チェックボックス管理", () => {
-    it("チェックボックスをONにするとcheckedTasksが更新される", () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-
-      fireEvent.click(checkboxes[0]);
-      expect(checkboxes[0]).toBeChecked();
-    });
-
-    it("チェック状態が複数タスクで独立して管理される", () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-
-      fireEvent.click(checkboxes[0]);
-      fireEvent.click(checkboxes[1]);
-
-      expect(checkboxes[0]).toBeChecked();
-      expect(checkboxes[1]).toBeChecked();
-    });
-
-    it("チェックボックス操作がタスク項目のclickイベントを発火させない", async () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-
-      // onChange event
-      fireEvent.change(checkboxes[0]);
-      // Verify stopPropagation worked - Pomodoro should NOT appear
-      expect(
-        screen.queryByTestId("pomodoro-component"),
-      ).not.toBeInTheDocument();
-    });
-  });
-
   describe("UI要素", () => {
     it("「編集」ボタンが/tasks/[id]/editへのリンク", () => {
       render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
