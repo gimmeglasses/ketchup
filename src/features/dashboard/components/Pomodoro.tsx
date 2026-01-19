@@ -153,11 +153,13 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
             session: result.session,
           });
         } else {
+          setTimerState(INITIAL_TIMER_STATE);
           toast.error(
             extractErrorMessage(result.errors, "セッションの開始に失敗しました")
           );
         }
       } catch (error) {
+        setTimerState(INITIAL_TIMER_STATE);
         console.error("Failed to start pomodoro session:", error);
         toast.error("セッションの開始に失敗しました");
       }
