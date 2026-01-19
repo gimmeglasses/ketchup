@@ -160,6 +160,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
       } catch (error) {
         console.error("Failed to start pomodoro session:", error);
         toast.error("セッションの開始に失敗しました");
+        setTimerState(INITIAL_TIMER_STATE);
       }
     });
   }
@@ -196,6 +197,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
         setTimerState(INITIAL_TIMER_STATE);
       } catch (error) {
         console.error("Failed to stop pomodoro session:", error);
+        setTimerState(INITIAL_TIMER_STATE);
         toast.error("セッションの停止に失敗しました");
       }
     });
