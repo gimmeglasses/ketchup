@@ -4,24 +4,12 @@
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { type SupabaseClient } from "@supabase/supabase-js";
-import {
-  completeTaskAction,
-  type CompleteTaskResult,
-} from "../actions/completeTaskAction";
+import { completeTaskAction } from "../actions/completeTaskAction";
 import * as service from "../services/completeTask";
 import * as supabaseServer from "@/lib/supabase/server";
 
-// モックデータを作成
-const mockCreatedTask = {
-  id: "10000000-0000-0000-0000-000000000001",
-  profileId: "test-user-id",
-  title: "新しいタスク",
-  completedAt: null,
-  createdAt: null,
-};
-
 // completeTaskサービスをスパイ化
-vi.spyOn(service, "completeTask").mockResolvedValue(mockCreatedTask);
+vi.spyOn(service, "completeTask").mockResolvedValue(undefined);
 
 // Supabase クライアントをモック化
 vi.mock("@/lib/supabase/server", () => ({
@@ -36,11 +24,6 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-const initialState: CompleteTaskResult = {
-  success: false,
-  errors: {},
-};
-
 /**
  * 認証済みユーザーのモックを設定するヘルパー関数
  */
@@ -52,7 +35,7 @@ function setupAuthenticatedUser(userId = "test-user-id") {
     } as Partial<SupabaseClient["auth"]> as SupabaseClient["auth"],
   };
   vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
-    mockSupabase as SupabaseClient
+    mockSupabase as SupabaseClient,
   );
 }
 
@@ -66,22 +49,20 @@ function setupUnauthenticatedUser() {
     } as Partial<SupabaseClient["auth"]> as SupabaseClient["auth"],
   };
   vi.mocked(supabaseServer.createSupabaseServerClient).mockResolvedValue(
-    mockSupabase as SupabaseClient
+    mockSupabase as SupabaseClient,
   );
 }
 
 describe("completeTaskAction", () => {
+  const taskId = "10000000-0000-0000-0000-000000000001";
+
   describe("正常系", () => {
     it("タスク完了に成功すること", async () => {
       setupAuthenticatedUser();
-      const taskId = "10000000-0000-0000-0000-000000000001";
       const result = await completeTaskAction(taskId);
 
       expect(result.success).toBe(true);
-      expect(service.completeTask).toHaveBeenCalledWith(
-        taskId,
-        expect.any(String)
-      );
+      expect(service.completeTask).toHaveBeenCalledWith(taskId);
     });
   });
 
@@ -93,8 +74,8 @@ describe("completeTaskAction", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain(
-          "タスクを完了するにはログインが必要です。"
+        expect(result.errors?._form).toContain(
+          "タスクを完了するにはログインが必要です。",
         );
       }
       expect(service.completeTask).not.toHaveBeenCalled();
@@ -105,15 +86,15 @@ describe("completeTaskAction", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
       vi.mocked(supabaseServer.createSupabaseServerClient).mockRejectedValue(
-        new Error("supabase down")
+        new Error("supabase down"),
       );
 
       const result = await completeTaskAction(taskId);
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain(
-          "タスクの完了に失敗しました。時間をおいて再度お試しください。"
+        expect(result.errors?._form).toContain(
+          "タスクの完了に失敗しました。時間をおいて再度お試しください。",
         );
       }
       expect(service.completeTask).not.toHaveBeenCalled();
@@ -128,15 +109,15 @@ describe("completeTaskAction", () => {
         .mockImplementation(() => {});
       setupAuthenticatedUser();
       vi.mocked(service.completeTask).mockRejectedValue(
-        new Error("Database error")
+        new Error("Database error"),
       );
 
       const result = await completeTaskAction(taskId);
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors._form).toContain(
-          "タスクの完了に失敗しました。時間をおいて再度お試しください。"
+        expect(result.errors?._form).toContain(
+          "タスクの完了に失敗しました。時間をおいて再度お試しください。",
         );
       }
       expect(service.completeTask).toHaveBeenCalledTimes(1);

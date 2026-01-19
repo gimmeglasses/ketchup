@@ -1,20 +1,14 @@
 import { db } from "@/app/db/client";
 import { tasks } from "@/app/db/schema";
-import { eq } from "drizzle-orm";
-import { type Task } from "@/features/tasks/types";
+import { eq, and, sql, isNull } from "drizzle-orm";
 
-export async function completeTask(
-  taskId: string,
-  completedAt: string
-): Promise<Task> {
-  const [completed] = await db
+export async function completeTask(taskId: string): Promise<Void> {
+  const result = await db
     .update(tasks)
-    .set({ completedAt: completedAt })
-    .where(eq(tasks.id, taskId))
-    .returning();
+    .set({ completedAt: sql`now()` })
+    .where(and(eq(tasks.id, taskId), isNull(tasks.completedAt)));
 
-  if (!completed) {
-    throw new Error("Failed to complete task");
+  if (result.count === 0) {
+    throw new Error("Task not found or already completed");
   }
-  return completed;
 }
