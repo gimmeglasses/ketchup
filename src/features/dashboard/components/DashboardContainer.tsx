@@ -127,15 +127,26 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
               {/* 完了ボタン */}
               <div className="flex-none" onClick={(e) => e.stopPropagation()}>
                 <button
+                  disabled={isTimerRunning} // ★ ここで制御 (タイマー実行中は押せない)
                   title="完了"
                   aria-label="タスクを完了する"
-                  className="flex items-center justify-center hover:text-green-500 transition-colors"
+                  className={`flex items-center justify-center transition-colors
+                                ${
+                                  isTimerRunning
+                                    ? "text-gray-300 cursor-not-allowed" // ポモドーロタイマー起動中は無効にする
+                                    : "text-gray-400 hover:text-green-500 cursor-pointer" // ポモドーロタイマー停止中は有効にする
+                                }
+                              `}
                   onClick={async () => {
                     const result = await completeTaskAction(task.id);
                     if (!result.success && result.errors?._form) {
                       setCompleteError(result.errors._form[0]);
                     } else {
                       setCompleteError(null);
+                      // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
+                      if (selectedTask?.id === task.id) {
+                        setSelectedTask(null);
+                      }
                     }
                   }}
                 >
