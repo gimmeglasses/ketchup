@@ -12,7 +12,13 @@ import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
 import { dayjs } from "@/lib/dayjs";
 
-const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
+const DashboardContainer = ({
+  tasks,
+  pomodoroMinutes,
+}: {
+  tasks: Task[];
+  pomodoroMinutes: Record<string, number>;
+}) => {
   const formatDueDate = (dueAt: string | null): string => {
     if (!dueAt) return "-";
     return dayjs(dueAt).format("YYYY/MM/DD");
@@ -107,6 +113,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
         <Pomodoro
           ref={pomodoroRef}
           task={selectedTask}
+          actualMinutes={pomodoroMinutes[selectedTask.id] ?? 0}
           onTimerStateChange={setIsTimerRunning}
         />
       )}
@@ -153,7 +160,7 @@ const DashboardContainer = ({ tasks }: { tasks: Task[] }) => {
               <div className="flex flex-col ml-6 text-sm text-gray-600">
                 <span>期限: {formatDueDate(task.dueAt)}</span>
                 <span>
-                  予定: {formatEstimatedMinutes(task.estimatedMinutes)} / 実績: XX 分
+                  予定: {formatEstimatedMinutes(task.estimatedMinutes)} / 実績: {pomodoroMinutes[task.id] ?? 0} 分
                 </span>
               </div>
               {/* 編集ボタン */}

@@ -61,7 +61,7 @@ describe("DashboardContainer", () => {
 
   describe("初期状態", () => {
     it("空のタスク配列のときリストが表示されない", () => {
-      render(<DashboardContainer tasks={[]} />);
+      render(<DashboardContainer tasks={[]} pomodoroMinutes={{}} />);
       expect(screen.queryByText("タスク1")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク2")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
@@ -69,7 +69,7 @@ describe("DashboardContainer", () => {
     });
 
     it("tasksのみ表示される", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       expect(screen.getByText("タスク1")).toBeInTheDocument();
       expect(screen.getByText("タスク2")).toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
@@ -77,7 +77,7 @@ describe("DashboardContainer", () => {
     });
 
     it("selectedTaskの初期値がnullでPomodoroが表示されない", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       expect(
         screen.queryByTestId("pomodoro-component")
       ).not.toBeInTheDocument();
@@ -86,7 +86,7 @@ describe("DashboardContainer", () => {
 
   describe("タスク選択機能", () => {
     it("タスク項目をクリックするとPomodoroコンポーネントが表示される", async () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       const taskItem = screen.getByText("タスク1").closest("div");
 
       if (taskItem) {
@@ -100,7 +100,7 @@ describe("DashboardContainer", () => {
     });
 
     it("別のタスクをクリックすると、選択タスクが切り替わる", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
 
       const task1Item = screen.getByText("タスク1").closest("div");
       const task2Item = screen.getByText("タスク2").closest("div");
@@ -119,7 +119,7 @@ describe("DashboardContainer", () => {
 
   describe("チェックボックス管理", () => {
     it("チェックボックスをONにするとcheckedTasksが更新される", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       const checkboxes = screen.getAllByRole("checkbox");
 
       fireEvent.click(checkboxes[0]);
@@ -127,7 +127,7 @@ describe("DashboardContainer", () => {
     });
 
     it("チェック状態が複数タスクで独立して管理される", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       const checkboxes = screen.getAllByRole("checkbox");
 
       fireEvent.click(checkboxes[0]);
@@ -138,7 +138,7 @@ describe("DashboardContainer", () => {
     });
 
     it("チェックボックス操作がタスク項目のclickイベントを発火させない", async () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       const checkboxes = screen.getAllByRole("checkbox");
 
       // onChange event
@@ -152,7 +152,7 @@ describe("DashboardContainer", () => {
 
   describe("UI要素", () => {
     it("「編集」ボタンが/tasks/[id]/editへのリンク", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       const editButtons = screen.getAllByText("編集");
 
       // Use task IDs instead of indices
@@ -165,7 +165,7 @@ describe("DashboardContainer", () => {
     });
 
     it("編集ボタンのclickイベントが親要素を発火させない", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       const editButtons = screen.getAllByText("編集");
 
       // onClick event
@@ -177,16 +177,52 @@ describe("DashboardContainer", () => {
     });
 
     it("複数タスクがあるとき、すべてリストで表示される", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
 
       expect(screen.getByText("タスク1")).toBeInTheDocument();
       expect(screen.getByText("タスク2")).toBeInTheDocument();
     });
   });
 
+  describe("ポモドーロ実績表示", () => {
+    it("実績がある場合、正しい分数が表示されること", () => {
+      const pomodoroMinutes = {
+        "ID0000000001TASK": 50,
+        "ID0000000002TASK": 125,
+      };
+      render(
+        <DashboardContainer tasks={mockTasks} pomodoroMinutes={pomodoroMinutes} />
+      );
+
+      expect(screen.getByText(/実績: 50 分/)).toBeInTheDocument();
+      expect(screen.getByText(/実績: 125 分/)).toBeInTheDocument();
+    });
+
+    it("実績がない場合、0分が表示されること", () => {
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
+
+      // 実績が0のタスクは「実績: 0 分」と表示される
+      const actualTexts = screen.getAllByText(/実績: 0 分/);
+      expect(actualTexts.length).toBeGreaterThan(0);
+    });
+
+    it("一部のタスクのみ実績がある場合、正しく表示されること", () => {
+      const pomodoroMinutes = {
+        "ID0000000001TASK": 30,
+        // ID0000000002TASKは実績なし
+      };
+      render(
+        <DashboardContainer tasks={mockTasks} pomodoroMinutes={pomodoroMinutes} />
+      );
+
+      expect(screen.getByText(/実績: 30 分/)).toBeInTheDocument();
+      expect(screen.getByText(/実績: 0 分/)).toBeInTheDocument();
+    });
+  });
+
   describe("日付と時間の表示フォーマット", () => {
     it("期限が設定されている場合、YYYY/MM/DD形式で表示される", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       expect(screen.getByText("期限: 2030/01/10")).toBeInTheDocument();
       expect(screen.getByText("期限: 2030/01/15")).toBeInTheDocument();
     });
@@ -204,12 +240,12 @@ describe("DashboardContainer", () => {
           createdAt: "2030-01-01T00:00:00Z",
         },
       ];
-      render(<DashboardContainer tasks={tasksWithNullDueAt} />);
+      render(<DashboardContainer tasks={tasksWithNullDueAt} pomodoroMinutes={{}} />);
       expect(screen.getByText("期限: -")).toBeInTheDocument();
     });
 
     it("予定時間が設定されている場合、'XX 分'形式で表示される", () => {
-      render(<DashboardContainer tasks={mockTasks} />);
+      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       expect(screen.getByText(/予定: 120 分/)).toBeInTheDocument();
       expect(screen.getByText(/予定: 45 分/)).toBeInTheDocument();
     });
@@ -227,7 +263,7 @@ describe("DashboardContainer", () => {
           createdAt: "2030-01-01T00:00:00Z",
         },
       ];
-      render(<DashboardContainer tasks={tasksWithNullEstimatedMinutes} />);
+      render(<DashboardContainer tasks={tasksWithNullEstimatedMinutes} pomodoroMinutes={{}} />);
       expect(screen.getByText(/予定: -/)).toBeInTheDocument();
     });
   });
