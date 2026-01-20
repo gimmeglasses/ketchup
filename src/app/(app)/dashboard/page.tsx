@@ -3,6 +3,8 @@ import { listTasksAction } from "@/features/tasks/actions/listTasksAction";
 import { getAllTasksPomodoroMinutesAction } from "@/features/pomodoro/actions/getAllTasksPomodoroMinutesAction";
 import DashboardContainer from "@/features/dashboard/components/DashboardContainer";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "ダッシュボード",
   description: "タスク一覧を表示します。",
