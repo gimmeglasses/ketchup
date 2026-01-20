@@ -154,9 +154,9 @@ describe("Pomodoro", () => {
     it("デモモード：環境変数がtrueの時にデモ作業時間が表示される", async () => {
       vi.stubEnv("NEXT_PUBLIC_DEMO_MODE", "true");
       vi.resetModules();
-      const { default: PomodoroComponent, formatTime: formatTimeFunc } = await import("../components/Pomodoro");
+      const { default: PomodoroComponent } = await import("../components/Pomodoro");
       render(<PomodoroComponent task={MOCK_TASK} />);
-      expect(screen.getByText(formatTimeFunc(DEMO_WORK_DURATION_SECONDS))).toBeInTheDocument();
+      expect(screen.getByText(formatTime(DEMO_WORK_DURATION_SECONDS))).toBeInTheDocument();
     });
   });
 
