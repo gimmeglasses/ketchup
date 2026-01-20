@@ -11,6 +11,8 @@ import { type Task } from "@/features/tasks/types";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
 import { dayjs } from "@/lib/dayjs";
+import { FaCheckCircle } from "react-icons/fa";
+import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction";
 
 const DashboardContainer = ({
   tasks,
@@ -30,6 +32,7 @@ const DashboardContainer = ({
   };
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [pendingTask, setPendingTask] = useState<Task | null>(null);
@@ -59,20 +62,6 @@ const DashboardContainer = ({
   const handleCancelSwitch = () => {
     setPendingTask(null);
     setShowConfirm(false);
-  };
-
-  // チェックボックスがONになったタスクを格納。
-  const [checkedTasks, setCheckedTasks] = useState<{ [id: string]: boolean }>(
-    {}
-  );
-  const handleChecked = (
-    taskId: string,
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setCheckedTasks((prev) => ({
-      ...prev,
-      [taskId]: event.target.checked,
-    }));
   };
 
   // モーダルの開閉状態を管理
@@ -126,6 +115,23 @@ const DashboardContainer = ({
         onCancel={handleCancelSwitch}
       />
 
+      {/* エラーメッセージの表示 */}
+      {completeError && (
+        <div
+          className="mt-4 p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg flex justify-between items-center"
+          role="alert"
+        >
+          <span>{completeError}</span>
+          <button
+            onClick={() => setCompleteError(null)}
+            className="text-red-500 hover:text-red-700 font-bold px-2"
+            aria-label="エラーメッセージを閉じる"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Display task list */}
       <div className="flex flex-col gap-4 mt-4 text-gray-600">
         <h1 className="text-xl sm:text-2xl font-bold">今日のタスク</h1>
@@ -137,15 +143,34 @@ const DashboardContainer = ({
             onClick={() => handleClick(task)}
           >
             <div className="flex items-center w-full">
-              {/* チェックボックス*/}
-              {/* 今後、削除機能またはタスク完了処理で利用（仮） */}
+              {/* 完了ボタン */}
               <div className="flex-none" onClick={(e) => e.stopPropagation()}>
-                <input
-                  className="text-red-600 rounded focus:ring-red-500"
-                  type="checkbox"
-                  checked={checkedTasks[task.id] || false}
-                  onChange={(event) => handleChecked(task.id, event)}
-                />
+                <button
+                  disabled={isTimerRunning} // ★ ここで制御 (タイマー実行中は押せない)
+                  title="完了"
+                  aria-label="タスクを完了する"
+                  className={`flex items-center justify-center transition-colors
+                                ${
+                                  isTimerRunning
+                                    ? "text-gray-300 cursor-not-allowed" // ポモドーロタイマー起動中は無効にする
+                                    : "text-gray-400 hover:text-green-500 cursor-pointer" // ポモドーロタイマー停止中は有効にする
+                                }
+                              `}
+                  onClick={async () => {
+                    const result = await completeTaskAction(task.id);
+                    if (!result.success && result.errors?._form) {
+                      setCompleteError(result.errors._form[0]);
+                    } else {
+                      setCompleteError(null);
+                      // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
+                      if (selectedTask?.id === task.id) {
+                        setSelectedTask(null);
+                      }
+                    }
+                  }}
+                >
+                  <FaCheckCircle size={25} />
+                </button>
               </div>
 
               {/* タスク名 */}
@@ -160,7 +185,8 @@ const DashboardContainer = ({
               <div className="flex flex-col ml-6 text-sm text-gray-600">
                 <span>期限: {formatDueDate(task.dueAt)}</span>
                 <span>
-                  予定: {formatEstimatedMinutes(task.estimatedMinutes)} / 実績: {pomodoroMinutes[task.id] ?? 0} 分
+                  予定: {formatEstimatedMinutes(task.estimatedMinutes)} / 実績:{" "}
+                  {pomodoroMinutes[task.id] ?? 0} 分
                 </span>
               </div>
               {/* 編集ボタン */}

@@ -9,8 +9,10 @@ export const metadata: Metadata = {
 };
 
 const DashboardHome = async () => {
+  // 未完了タスクのみ取得
+  const status = "todo";
   const [tasks, pomodoroMinutes] = await Promise.all([
-    listTasksAction(),
+    listTasksAction({ status }),
     getAllTasksPomodoroMinutesAction().catch((error) => {
       console.error("Failed to load pomodoro minutes:", error);
       return {} as Record<string, number>;

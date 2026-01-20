@@ -65,7 +65,6 @@ describe("DashboardContainer", () => {
       expect(screen.queryByText("タスク1")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク2")).not.toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
-      expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
     });
 
     it("tasksのみ表示される", () => {
@@ -73,13 +72,12 @@ describe("DashboardContainer", () => {
       expect(screen.getByText("タスク1")).toBeInTheDocument();
       expect(screen.getByText("タスク2")).toBeInTheDocument();
       expect(screen.queryByText("タスク3")).not.toBeInTheDocument();
-      expect(screen.getAllByRole("checkbox")).toHaveLength(2);
     });
 
     it("selectedTaskの初期値がnullでPomodoroが表示されない", () => {
       render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
       expect(
-        screen.queryByTestId("pomodoro-component")
+        screen.queryByTestId("pomodoro-component"),
       ).not.toBeInTheDocument();
     });
   });
@@ -117,39 +115,6 @@ describe("DashboardContainer", () => {
     });
   });
 
-  describe("チェックボックス管理", () => {
-    it("チェックボックスをONにするとcheckedTasksが更新される", () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-
-      fireEvent.click(checkboxes[0]);
-      expect(checkboxes[0]).toBeChecked();
-    });
-
-    it("チェック状態が複数タスクで独立して管理される", () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-
-      fireEvent.click(checkboxes[0]);
-      fireEvent.click(checkboxes[1]);
-
-      expect(checkboxes[0]).toBeChecked();
-      expect(checkboxes[1]).toBeChecked();
-    });
-
-    it("チェックボックス操作がタスク項目のclickイベントを発火させない", async () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const checkboxes = screen.getAllByRole("checkbox");
-
-      // onChange event
-      fireEvent.change(checkboxes[0]);
-      // Verify stopPropagation worked - Pomodoro should NOT appear
-      expect(
-        screen.queryByTestId("pomodoro-component")
-      ).not.toBeInTheDocument();
-    });
-  });
-
   describe("UI要素", () => {
     it("「編集」ボタンが/tasks/[id]/editへのリンク", () => {
       render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
@@ -157,10 +122,10 @@ describe("DashboardContainer", () => {
 
       // Use task IDs instead of indices
       expect(editButtons[0].getAttribute("href")).toBe(
-        "/tasks/ID0000000001TASK/edit"
+        "/tasks/ID0000000001TASK/edit",
       );
       expect(editButtons[1].getAttribute("href")).toBe(
-        "/tasks/ID0000000002TASK/edit"
+        "/tasks/ID0000000002TASK/edit",
       );
     });
 
@@ -172,7 +137,7 @@ describe("DashboardContainer", () => {
       fireEvent.click(editButtons[0]);
       // Pomodoroが表示されていない = タスク項目のclickが発火していない
       expect(
-        screen.queryByTestId("pomodoro-component")
+        screen.queryByTestId("pomodoro-component"),
       ).not.toBeInTheDocument();
     });
 
@@ -187,11 +152,14 @@ describe("DashboardContainer", () => {
   describe("ポモドーロ実績表示", () => {
     it("実績がある場合、正しい分数が表示されること", () => {
       const pomodoroMinutes = {
-        "ID0000000001TASK": 50,
-        "ID0000000002TASK": 125,
+        ID0000000001TASK: 50,
+        ID0000000002TASK: 125,
       };
       render(
-        <DashboardContainer tasks={mockTasks} pomodoroMinutes={pomodoroMinutes} />
+        <DashboardContainer
+          tasks={mockTasks}
+          pomodoroMinutes={pomodoroMinutes}
+        />,
       );
 
       expect(screen.getByText(/実績: 50 分/)).toBeInTheDocument();
@@ -208,11 +176,14 @@ describe("DashboardContainer", () => {
 
     it("一部のタスクのみ実績がある場合、正しく表示されること", () => {
       const pomodoroMinutes = {
-        "ID0000000001TASK": 30,
+        ID0000000001TASK: 30,
         // ID0000000002TASKは実績なし
       };
       render(
-        <DashboardContainer tasks={mockTasks} pomodoroMinutes={pomodoroMinutes} />
+        <DashboardContainer
+          tasks={mockTasks}
+          pomodoroMinutes={pomodoroMinutes}
+        />,
       );
 
       expect(screen.getByText(/実績: 30 分/)).toBeInTheDocument();
@@ -240,7 +211,9 @@ describe("DashboardContainer", () => {
           createdAt: "2030-01-01T00:00:00Z",
         },
       ];
-      render(<DashboardContainer tasks={tasksWithNullDueAt} pomodoroMinutes={{}} />);
+      render(
+        <DashboardContainer tasks={tasksWithNullDueAt} pomodoroMinutes={{}} />,
+      );
       expect(screen.getByText("期限: -")).toBeInTheDocument();
     });
 
@@ -263,7 +236,12 @@ describe("DashboardContainer", () => {
           createdAt: "2030-01-01T00:00:00Z",
         },
       ];
-      render(<DashboardContainer tasks={tasksWithNullEstimatedMinutes} pomodoroMinutes={{}} />);
+      render(
+        <DashboardContainer
+          tasks={tasksWithNullEstimatedMinutes}
+          pomodoroMinutes={{}}
+        />,
+      );
       expect(screen.getByText(/予定: -/)).toBeInTheDocument();
     });
   });
