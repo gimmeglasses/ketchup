@@ -17,8 +17,19 @@ import { type PomodoroSession } from "@/features/pomodoro/types";
 import { type Task } from "@/features/tasks/types";
 import PomodoroButton from "./PomodoroButton";
 
-const WORK_DURATION_SECONDS = 25 * 60;
-const BREAK_DURATION_SECONDS = 5 * 60;
+export const WORK_DURATION_SECONDS = 25 * 60;
+export const BREAK_DURATION_SECONDS = 5 * 60;
+export const DEMO_WORK_DURATION_SECONDS = 10;
+export const DEMO_BREAK_DURATION_SECONDS = 10;
+
+const IS_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
+const ACTIVE_WORK_DURATION = IS_DEMO_MODE
+  ? DEMO_WORK_DURATION_SECONDS
+  : WORK_DURATION_SECONDS;
+const ACTIVE_BREAK_DURATION = IS_DEMO_MODE
+  ? DEMO_BREAK_DURATION_SECONDS
+  : BREAK_DURATION_SECONDS;
 
 type TimerMode = "idle" | "work" | "break";
 
@@ -32,7 +43,7 @@ type TimerState = {
 const INITIAL_TIMER_STATE: TimerState = {
   isRunning: false,
   timerMode: "idle",
-  remainingSeconds: WORK_DURATION_SECONDS,
+  remainingSeconds: ACTIVE_WORK_DURATION,
   session: null,
 };
 
@@ -61,7 +72,7 @@ const TIMER_MODE_CONFIG = {
   },
 } as const;
 
-function formatTime(seconds: number): string {
+export function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
@@ -116,7 +127,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
       setTimerState((prev) => ({
         ...prev,
         timerMode: "break",
-        remainingSeconds: BREAK_DURATION_SECONDS,
+        remainingSeconds: ACTIVE_BREAK_DURATION,
         session: null,
       }));
     } else if (optimisticTimerState.timerMode === "break") {
@@ -133,7 +144,7 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
     const optimisticWorkState: TimerState = {
       isRunning: true,
       timerMode: "work",
-      remainingSeconds: WORK_DURATION_SECONDS,
+      remainingSeconds: ACTIVE_WORK_DURATION,
       session: null,
     };
 
