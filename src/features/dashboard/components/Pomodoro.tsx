@@ -5,8 +5,10 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useOptimistic,
   useRef,
   useState,
+  useTransition,
 } from "react";
 import { toast } from "sonner";
 import { startPomodoroAction } from "@/features/pomodoro/actions/startPomodoroAction";
@@ -19,6 +21,27 @@ const WORK_DURATION_SECONDS = 25 * 60;
 const BREAK_DURATION_SECONDS = 5 * 60;
 
 type TimerMode = "idle" | "work" | "break";
+
+type TimerState = {
+  isRunning: boolean;
+  timerMode: TimerMode;
+  remainingSeconds: number;
+  session: PomodoroSession | null;
+};
+
+const INITIAL_TIMER_STATE: TimerState = {
+  isRunning: false,
+  timerMode: "idle",
+  remainingSeconds: WORK_DURATION_SECONDS,
+  session: null,
+};
+
+function extractErrorMessage(
+  errors: Record<string, string[] | undefined>,
+  fallback: string
+): string {
+  return errors._form?.[0] || Object.values(errors).flat()[0] || fallback;
+}
 
 const TIMER_MODE_CONFIG = {
   idle: {
@@ -51,27 +74,20 @@ type PomodoroProps = {
 };
 
 export type PomodoroHandle = {
-  stopTimer: () => Promise<void>;
+  stopTimer: () => void;
 };
 
 const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
   { task, actualMinutes = 0, onTimerStateChange },
   ref
 ) {
-  const [session, setSession] = useState<PomodoroSession | null>(null);
-  const [remainingSeconds, setRemainingSeconds] = useState(
-    WORK_DURATION_SECONDS
+  const [timerState, setTimerState] = useState<TimerState>(INITIAL_TIMER_STATE);
+  const [optimisticTimerState, setOptimisticTimerState] = useOptimistic(
+    timerState,
+    (_state: TimerState, newState: TimerState) => newState
   );
-  const [isRunning, setIsRunning] = useState(false);
-  const [timerMode, setTimerMode] = useState<TimerMode>("idle");
+  const [isPending, startTransition] = useTransition();
   const isCompletingRef = useRef(false);
-
-  function extractErrorMessage(
-    errors: Record<string, string[] | undefined>,
-    fallback: string
-  ): string {
-    return errors._form?.[0] || Object.values(errors).flat()[0] || fallback;
-  }
 
   const handleTimerComplete = useCallback(async () => {
     if (isCompletingRef.current) return;
@@ -88,77 +104,102 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
       setTimeout(() => resolve(), 500);
     });
 
-    if (timerMode === "work") {
-      // 作業タイマー完了 → 休憩開始
+    if (optimisticTimerState.timerMode === "work") {
       toast.success("お疲れ様！5分休憩スタート 🎉");
 
-      // セッションをDBに記録
-      if (session) {
+      if (optimisticTimerState.session) {
         const formData = new FormData();
-        formData.append("sessionId", session.id);
+        formData.append("sessionId", optimisticTimerState.session.id);
         await stopPomodoroAction({ success: false, errors: {} }, formData);
-        setSession(null);
       }
 
-      // 休憩タイマーに切り替え
-      setTimerMode("break");
-      setRemainingSeconds(BREAK_DURATION_SECONDS);
-      // isRunningはtrueのまま
-    } else if (timerMode === "break") {
-      // 休憩タイマー完了 → 停止
+      setTimerState((prev) => ({
+        ...prev,
+        timerMode: "break",
+        remainingSeconds: BREAK_DURATION_SECONDS,
+        session: null,
+      }));
+    } else if (optimisticTimerState.timerMode === "break") {
       toast.success("休憩終了！次のポモドーロへ 💪");
-
-      setTimerMode("idle");
-      setIsRunning(false);
-      setRemainingSeconds(WORK_DURATION_SECONDS);
+      setTimerState(INITIAL_TIMER_STATE);
     }
 
     isCompletingRef.current = false;
-  }, [timerMode, session]);
+  }, [optimisticTimerState]);
 
-  async function handleStartButton(): Promise<void> {
-    const formData = new FormData();
-    formData.append("taskId", task.id);
-    const result = await startPomodoroAction(
-      { success: false, errors: {} },
-      formData
-    );
+  function handleStartButton(): void {
+    if (isPending || optimisticTimerState.isRunning) return;
 
-    if (result.success) {
-      setSession(result.session);
-      setTimerMode("work");
-      setRemainingSeconds(WORK_DURATION_SECONDS);
-      setIsRunning(true);
-    } else {
-      toast.error(
-        extractErrorMessage(result.errors, "セッションの開始に失敗しました")
-      );
-    }
+    const optimisticWorkState: TimerState = {
+      isRunning: true,
+      timerMode: "work",
+      remainingSeconds: WORK_DURATION_SECONDS,
+      session: null,
+    };
+
+    startTransition(async () => {
+      setOptimisticTimerState(optimisticWorkState);
+
+      try {
+        const formData = new FormData();
+        formData.append("taskId", task.id);
+        const result = await startPomodoroAction(
+          { success: false, errors: {} },
+          formData
+        );
+
+        if (result.success) {
+          setTimerState({
+            ...optimisticWorkState,
+            session: result.session,
+          });
+        } else {
+          toast.error(
+            extractErrorMessage(result.errors, "セッションの開始に失敗しました")
+          );
+        }
+      } catch (error) {
+        console.error("Failed to start pomodoro session:", error);
+        toast.error("セッションの開始に失敗しました");
+      }
+    });
   }
 
-  async function handleStopButton(): Promise<void> {
-    // 作業中の場合のみDBに記録
-    if (timerMode === "work" && session) {
-      const formData = new FormData();
-      formData.append("sessionId", session.id);
-      const result = await stopPomodoroAction(
-        { success: false, errors: {} },
-        formData
-      );
+  function handleStopButton(): void {
+    if (isPending || !optimisticTimerState.isRunning) return;
 
-      if (!result.success) {
-        toast.error(
-          extractErrorMessage(result.errors, "セッションの停止に失敗しました")
-        );
-        return;
+    const currentSession = optimisticTimerState.session;
+    const currentMode = optimisticTimerState.timerMode;
+
+    startTransition(async () => {
+      setOptimisticTimerState(INITIAL_TIMER_STATE);
+
+      try {
+        if (currentMode === "work" && currentSession) {
+          const formData = new FormData();
+          formData.append("sessionId", currentSession.id);
+          const result = await stopPomodoroAction(
+            { success: false, errors: {} },
+            formData
+          );
+
+          if (!result.success) {
+            toast.error(
+              extractErrorMessage(
+                result.errors,
+                "セッションの停止に失敗しました"
+              )
+            );
+            return;
+          }
+        }
+
+        setTimerState(INITIAL_TIMER_STATE);
+      } catch (error) {
+        console.error("Failed to stop pomodoro session:", error);
+        toast.error("セッションの停止に失敗しました");
       }
-    }
-
-    // 状態をリセット
-    setSession(null);
-    setTimerMode("idle");
-    setRemainingSeconds(WORK_DURATION_SECONDS);
-    setIsRunning(false);
+    });
   }
 
   useImperativeHandle(ref, () => ({
@@ -166,30 +207,40 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
   }));
 
   useEffect(() => {
-    if (!isRunning) return;
+    if (!optimisticTimerState.isRunning) return;
 
     const interval = setInterval(() => {
-      setRemainingSeconds((prev) => Math.max(0, prev - 1));
+      setTimerState((prev) => ({
+        ...prev,
+        remainingSeconds: Math.max(0, prev.remainingSeconds - 1),
+      }));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning]);
+  }, [optimisticTimerState.isRunning]);
 
   useEffect(() => {
-    if (isRunning && remainingSeconds === 0) {
+    if (
+      optimisticTimerState.isRunning &&
+      optimisticTimerState.remainingSeconds === 0
+    ) {
       handleTimerComplete();
     }
-  }, [isRunning, remainingSeconds, handleTimerComplete]);
+  }, [
+    optimisticTimerState.isRunning,
+    optimisticTimerState.remainingSeconds,
+    handleTimerComplete,
+  ]);
 
   useEffect(() => {
-    onTimerStateChange?.(isRunning);
-  }, [isRunning, onTimerStateChange]);
+    onTimerStateChange?.(optimisticTimerState.isRunning);
+  }, [optimisticTimerState.isRunning, onTimerStateChange]);
 
   if (!task?.id) {
     return null;
   }
 
-  const modeConfig = TIMER_MODE_CONFIG[timerMode];
+  const modeConfig = TIMER_MODE_CONFIG[optimisticTimerState.timerMode];
   const estimatedDisplay = task.estimatedMinutes
     ? `${task.estimatedMinutes} 分`
     : "None";
@@ -221,13 +272,19 @@ const Pomodoro = forwardRef<PomodoroHandle, PomodoroProps>(function Pomodoro(
           <div
             className={`flex mx-auto text-5xl font-extralight ${modeConfig.textClass}`}
           >
-            {formatTime(remainingSeconds)}
+            {formatTime(optimisticTimerState.remainingSeconds)}
           </div>
           <div className="flex mx-auto gap-3 sm:gap-6">
-            <PomodoroButton onClick={handleStartButton} disabled={isRunning}>
+            <PomodoroButton
+              onClick={handleStartButton}
+              disabled={optimisticTimerState.isRunning || isPending}
+            >
               START
             </PomodoroButton>
-            <PomodoroButton onClick={handleStopButton} disabled={!isRunning}>
+            <PomodoroButton
+              onClick={handleStopButton}
+              disabled={!optimisticTimerState.isRunning || isPending}
+            >
               STOP
             </PomodoroButton>
           </div>
