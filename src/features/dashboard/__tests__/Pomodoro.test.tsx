@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Pomodoro from "../components/Pomodoro";
+import Pomodoro, {
+  WORK_DURATION_SECONDS,
+  DEMO_WORK_DURATION_SECONDS,
+  formatTime,
+} from "../components/Pomodoro";
 import type { PomodoroButtonProps } from "../components/PomodoroButton";
 import { Task } from "@/features/tasks/types";
 import { PomodoroSession } from "@/features/pomodoro/types";
@@ -9,12 +13,13 @@ import "@testing-library/jest-dom/vitest";
 import * as startPomodoroActionModule from "@/features/pomodoro/actions/startPomodoroAction";
 import * as stopPomodoroActionModule from "@/features/pomodoro/actions/stopPomodoroAction";
 
-let mockUseOptimisticSetter: (value: unknown) => void = vi.fn();
-let mockStartTransition: (callback: () => void | Promise<void>) => void = vi.fn(
-  (callback) => {
-    void Promise.resolve(callback());
-  }
-);
+type SetterFn = (value: unknown) => void;
+type TransitionFn = (callback: () => void | Promise<void>) => void;
+
+let mockUseOptimisticSetter: SetterFn = vi.fn();
+let mockStartTransition: TransitionFn = vi.fn((callback) => {
+  void Promise.resolve(callback());
+});
 let mockIsPending = false;
 
 vi.mock("react", async () => {
@@ -127,10 +132,31 @@ describe("Pomodoro", () => {
       render(<Pomodoro task={MOCK_TASK} actualMinutes={50} />);
       expect(screen.getByText(/実績: 50 分/)).toBeInTheDocument();
     });
+  });
 
-    it("常に『25:00』と表示される", () => {
-      render(<Pomodoro task={MOCK_TASK} />);
-      expect(screen.getByText("25:00")).toBeInTheDocument();
+  describe("タイマーの初期表示", () => {
+    it("通常モード：環境変数未設定時に作業時間が表示される", async () => {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+      const { default: PomodoroComponent } = await import("../components/Pomodoro");
+      render(<PomodoroComponent task={MOCK_TASK} />);
+      expect(screen.getByText(formatTime(WORK_DURATION_SECONDS))).toBeInTheDocument();
+    });
+
+    it("通常モード：環境変数がfalseの時に作業時間が表示される", async () => {
+      vi.stubEnv("NEXT_PUBLIC_DEMO_MODE", "false");
+      vi.resetModules();
+      const { default: PomodoroComponent } = await import("../components/Pomodoro");
+      render(<PomodoroComponent task={MOCK_TASK} />);
+      expect(screen.getByText(formatTime(WORK_DURATION_SECONDS))).toBeInTheDocument();
+    });
+
+    it("デモモード：環境変数がtrueの時にデモ作業時間が表示される", async () => {
+      vi.stubEnv("NEXT_PUBLIC_DEMO_MODE", "true");
+      vi.resetModules();
+      const { default: PomodoroComponent, formatTime: formatTimeFunc } = await import("../components/Pomodoro");
+      render(<PomodoroComponent task={MOCK_TASK} />);
+      expect(screen.getByText(formatTimeFunc(DEMO_WORK_DURATION_SECONDS))).toBeInTheDocument();
     });
   });
 
