@@ -45,7 +45,11 @@ export function TaskListFilter({
                   : (e.target.value as TaskStatusFilter),
               )
             }
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2
+              text-gray-900
+              bg-white
+              appearance-none
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">すべて</option>
             <option value="todo">未完了</option>
