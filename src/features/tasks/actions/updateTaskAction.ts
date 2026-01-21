@@ -1,8 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { toFieldErrors } from "@/lib/zodError";
-import { updateTaskSchema } from "../validations/tasks/updateTaskSchema";
+import { updateTaskSchema } from "../validations/updateTaskSchema";
 import { updateTask } from "../services/updateTask";
 import { type Task } from "../types";
 import { z } from "zod";
