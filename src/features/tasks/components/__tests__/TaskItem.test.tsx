@@ -54,7 +54,7 @@ describe("TaskItem", () => {
     it("applies line-through style when task is completed", () => {
       const completedTask = {
         ...MOCK_TASK,
-        completedAt: "2026-01-10T00:00:00Z",
+        completedAt: dayjs().subtract(10, "days").toISOString(),
       };
       render(<TaskItem task={completedTask} />);
       const title = screen.getByText("Test Task");
@@ -64,7 +64,7 @@ describe("TaskItem", () => {
     it("applies opacity style when task is completed", () => {
       const completedTask = {
         ...MOCK_TASK,
-        completedAt: "2026-01-10T00:00:00Z",
+        completedAt: dayjs().subtract(10, "days").toISOString(),
       };
       const { container } = render(<TaskItem task={completedTask} />);
       const taskDiv = container.querySelector("div.opacity-60");
