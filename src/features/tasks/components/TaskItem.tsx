@@ -92,9 +92,9 @@ export function TaskItem({ task, actualMinutes = 0 }: TaskItemProps) {
                   <div
                     className="w-full bg-gray-200 rounded-full h-2"
                     role="progressbar"
-                    aria-valuenow={Math.min(progress, 100)}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
+                    aria-valuenow={Math.min(progress, 100).toString()}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
                     aria-label={`タスク進捗: ${actualMinutes}分 / ${task.estimatedMinutes}分 (${progress}%)`}
                   >
                     <div
