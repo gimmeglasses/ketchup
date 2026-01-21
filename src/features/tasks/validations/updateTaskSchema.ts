@@ -42,6 +42,7 @@ const dueAtSchema = z.preprocess(
 const noteSchema = z.preprocess(emptyToNull, z.string().nullable());
 
 export const updateTaskSchema = z.object({
+  id: z.string().uuid(),
   title: z
     .string()
     .trim()
