@@ -40,7 +40,7 @@ export function TaskList() {
             sortBy,
             order,
           }),
-          getAllTasksPomodoroMinutesAction(),
+          getAllTasksPomodoroMinutesAction().catch(() => ({})),
         ]);
         setTasks(result);
         setPomodoroMinutes(minutes);
