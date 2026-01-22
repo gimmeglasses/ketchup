@@ -45,7 +45,11 @@ export function TaskListFilter({
                   : (e.target.value as TaskStatusFilter),
               )
             }
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2
+              text-gray-900
+              bg-white
+              appearance-none
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">すべて</option>
             <option value="todo">未完了</option>
@@ -61,7 +65,11 @@ export function TaskListFilter({
           <select
             value={due}
             onChange={(e) => onDueChange(e.target.value as TaskDueFilter)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2
+              text-gray-900
+              bg-white
+              appearance-none
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">すべて</option>
             <option value="withDue">期限あり</option>
@@ -79,7 +87,11 @@ export function TaskListFilter({
           <select
             value={sortBy}
             onChange={(e) => onSortByChange(e.target.value as TaskSortBy)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2
+              text-gray-900
+              bg-white
+              appearance-none
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="dueAt">期限</option>
             <option value="createdAt">作成日時</option>
@@ -95,7 +107,11 @@ export function TaskListFilter({
           <select
             value={order}
             onChange={(e) => onOrderChange(e.target.value as SortOrder)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2
+              text-gray-900
+              bg-white
+              appearance-none
+              focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="asc">昇順</option>
             <option value="desc">降順</option>
