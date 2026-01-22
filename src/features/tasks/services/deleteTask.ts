@@ -1,23 +1,15 @@
 import { db } from "@/app/db/client";
 import { tasks } from "@/app/db/schema";
 import { eq } from "drizzle-orm";
-import { type Task } from "@/features/tasks/types";
 
 /**
  * 既存タスクを削除します。
- *
  * @param taskId タスクID
- * @returns 削除されたタスク
  */
-export async function deleteTask(taskId: string): Promise<Task> {
-  const [deletedTask] = await db
-    .delete(tasks)
-    .where(eq(tasks.id, taskId))
-    .returning();
+export async function deleteTask(taskId: string): Promise<void> {
+  const result = await db.delete(tasks).where(eq(tasks.id, taskId));
 
-  if (!deletedTask) {
+  if (result.count === 0) {
     throw new Error("Failed to delete task");
   }
-
-  return deletedTask;
 }

@@ -29,7 +29,7 @@ const dueAtSchema = z.preprocess(
     .nullable()
     .refine(
       (val) => {
-        if (val === null) return null;
+        if (val === null) return true;
         const date = new Date(val);
         return !isNaN(date.getTime());
       },

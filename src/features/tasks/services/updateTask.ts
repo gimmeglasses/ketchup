@@ -7,14 +7,10 @@ import { type UpdateTaskInput } from "../validations/updateTaskSchema";
 /**
  * 既存タスクを更新します。
  *
- * @param taskId タスクID
  * @param input タスク更新データ
  * @returns 更新されたタスク
  */
-export async function updateTask(
-  taskId: string,
-  input: UpdateTaskInput,
-): Promise<Task> {
+export async function updateTask(input: UpdateTaskInput): Promise<Task> {
   const [updatedTask] = await db
     .update(tasks)
     .set({
@@ -23,7 +19,7 @@ export async function updateTask(
       dueAt: input.dueAt,
       note: input.note,
     })
-    .where(eq(tasks.id, taskId))
+    .where(eq(tasks.id, input.id))
     .returning();
 
   if (!updatedTask) {
