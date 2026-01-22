@@ -70,10 +70,13 @@ function setupUnauthenticatedUser() {
 describe("updateTaskAction", () => {
   const mockUpdatedTask = {
     id: "10000000-0000-4000-8000-000000000001",
+    profileId: "test-user-id",
     title: "更新後のタスク",
-    estimatedMinutes: "50",
+    estimatedMinutes: 50, // Changed from "50" to 50 (number)
     dueAt: "2026-02-03",
+    completedAt: null,
     note: "説明の更新",
+    createdAt: "2026-01-01T00:00:00.000Z",
   };
   vi.mocked(service.updateTask).mockResolvedValue(mockUpdatedTask);
 
@@ -105,9 +108,9 @@ describe("updateTaskAction", () => {
       setupAuthenticatedUser();
       const mockUpdatedTaskNull = {
         ...mockUpdatedTask,
-        estimatedMinutes: "",
-        dueAt: "",
-        note: "",
+        estimatedMinutes: null,
+        dueAt: null,
+        note: null,
       };
       vi.mocked(service.updateTask).mockResolvedValue(mockUpdatedTaskNull);
 
