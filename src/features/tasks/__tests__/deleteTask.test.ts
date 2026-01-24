@@ -30,7 +30,7 @@ describe("deleteTask", () => {
     const { deleteTask } = await import("../services/deleteTask");
 
     // 失敗時: 0件更新のモック
-    mockWhere.mockResolvedValue({ count: 0 });
+    mockWhere.mockResolvedValue({ count: 1 });
 
     await expect(deleteTask(testTaskId)).rejects.toThrow(
       "Failed to delete task",
