@@ -34,8 +34,15 @@ function translateSupabaseResetError(message: string) {
 export async function resetPassword(input: ResetPasswordInput) {
   const supabase = await createSupabaseServerClient();
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) {
+    throw new Error(
+      "環境変数 NEXT_PUBLIC_SITE_URL が設定されていません。パスワードリセット用のリダイレクトURLを構成できません。"
+    );
+  }
+
   const { error } = await supabase.auth.resetPasswordForEmail(input.email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`,
+    redirectTo: `${siteUrl}/auth/update-password`,
   });
 
   if (error) {

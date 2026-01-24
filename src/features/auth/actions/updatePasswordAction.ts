@@ -35,7 +35,7 @@ export type UpdatePasswordActionResult = {
  * フォームデータをバリデーションし、ユーザーのパスワードを更新します。
  * パスワード更新成功時はログイン画面にリダイレクトします。
  *
- * @param {UpdatePasswordActionResult} prevState - 前の状態 (useFormStateで使用)
+ * @param {UpdatePasswordActionResult} prevState - 前の状態 (useActionStateで使用)
  * @param {FormData} formData - パスワード更新フォームのデータ (password, passwordConfirmation)
  * @returns {Promise<UpdatePasswordActionResult>} エラー情報を含む結果 (成功時はリダイレクト)
  * @throws リダイレクト時は例外が発生します

@@ -40,7 +40,7 @@ export type ResetPasswordActionResult =
  * フォームデータをバリデーションし、パスワードリセット用のメールを送信します。
  * セキュリティ上の理由から、未登録のメールアドレスでも同じ成功メッセージを返します。
  *
- * @param {ResetPasswordActionResult} prevState - 前の状態 (useFormStateで使用)
+ * @param {ResetPasswordActionResult} prevState - 前の状態 (useActionStateで使用)
  * @param {FormData} formData - パスワードリセットフォームのデータ (email)
  * @returns {Promise<ResetPasswordActionResult>} 成功メッセージまたはエラー情報を含む結果
  */
