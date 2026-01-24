@@ -77,6 +77,16 @@ export function LoginForm() {
           )}
         </div>
 
+        {/* パスワードリセットリンク */}
+        <div className="text-right">
+          <Link
+            href="/auth/reset-password"
+            className="text-xs text-red-700 underline-offset-2 hover:underline"
+          >
+            パスワードをお忘れですか？
+          </Link>
+        </div>
+
         {/* ログインボタン */}
         <button
           type="submit"
