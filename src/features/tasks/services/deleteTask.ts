@@ -7,9 +7,11 @@ import { eq } from "drizzle-orm";
  * @param taskId タスクID
  */
 export async function deleteTask(taskId: string): Promise<void> {
-  const result = await db.delete(tasks).where(eq(tasks.id, taskId));
-
-  if (result.count !== 0) {
-    throw new Error("Failed to delete task");
+  const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId));
+  console.log(task);
+  if (!task) {
+    throw new Error("Task not found");
   }
+
+  await db.delete(tasks).where(eq(tasks.id, taskId));
 }

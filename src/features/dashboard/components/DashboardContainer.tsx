@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+// import Link from "next/link";
 import Pomodoro, {
   type PomodoroHandle,
 } from "@/features/dashboard/components/Pomodoro";
@@ -10,9 +10,12 @@ import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { type Task } from "@/features/tasks/types";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
+import { EditTaskForm } from "@/features/tasks/components/EditTaskForm";
 import { dayjs } from "@/lib/dayjs";
 import { FaCheckCircle } from "react-icons/fa";
+import { FcEditImage } from "react-icons/fc";
 import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction";
+import { toast } from "sonner";
 
 const DashboardContainer = ({
   tasks,
@@ -38,6 +41,9 @@ const DashboardContainer = ({
   const [pendingTask, setPendingTask] = useState<Task | null>(null);
   const pomodoroRef = useRef<PomodoroHandle>(null);
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<string | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const handleClick = (task: Task) => {
     if (isTimerRunning && selectedTask?.id !== task.id) {
@@ -64,18 +70,19 @@ const DashboardContainer = ({
     setShowConfirm(false);
   };
 
-  // モーダルの開閉状態を管理
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   // タスク登録後にモーダルを閉じて画面を更新
-  const handleNewTaskCreated = () => {
+  const handleTaskActionSuccess = () => {
     setIsModalOpen(false);
+    setEditingTask(null);
+    setModalType(null);
     router.refresh();
   };
 
   // モーダルを閉じる処理
   const handleClose = () => {
     setIsModalOpen(false);
+    setEditingTask(null);
+    setModalType(null);
   };
 
   return (
@@ -83,7 +90,10 @@ const DashboardContainer = ({
       {/* Display "New task entry" button */}
       <div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            setModalType("new");
+          }}
           className="flex w-full justify-center rounded-lg bg-red-600
               font-semibold text-white shadow-md shadow-gray-400
               transition hover:-translate-y-0.5 hover:bg-gray-700 mb-4"
@@ -93,9 +103,24 @@ const DashboardContainer = ({
       </div>
 
       {/* モーダルの配置 */}
-      <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
-        <NewTaskForm onSuccess={handleNewTaskCreated} onClose={handleClose} />
-      </ModalContainer>
+      {isModalOpen && modalType === "new" && (
+        <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
+          <NewTaskForm
+            onSuccess={handleTaskActionSuccess}
+            onClose={handleClose}
+          />
+        </ModalContainer>
+      )}
+
+      {isModalOpen && modalType === "edit" && editingTask && (
+        <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
+          <EditTaskForm
+            onSuccess={handleTaskActionSuccess}
+            onClose={handleClose}
+            task={editingTask}
+          />
+        </ModalContainer>
+      )}
 
       {/* Dynamically display a selected task for using Pomodoro timer */}
       {selectedTask && (
@@ -191,15 +216,20 @@ const DashboardContainer = ({
               </div>
               {/* 編集ボタン */}
               <div className="flex-none ml-auto mt-1">
-                <Link
-                  href={`/tasks/${task.id}/edit`}
-                  className="font-bold text-xs text-white px-2 py-4 bg-red-600 hover:underline border rounded p-1"
+                <button
+                  disabled={isTimerRunning}
+                  title="編集"
+                  aria-label="タスクを編集する"
+                  className="flex items-center justify-center transition-colors hover:underline rounded p-1"
                   onClick={(event) => {
                     event.stopPropagation();
+                    setEditingTask(task);
+                    setIsModalOpen(true);
+                    setModalType("edit");
                   }}
                 >
-                  編集
-                </Link>
+                  <FcEditImage size={40} />
+                </button>
               </div>
             </div>
           </div>

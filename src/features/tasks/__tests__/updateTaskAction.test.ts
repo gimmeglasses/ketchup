@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { type SupabaseClient } from "@supabase/supabase-js";
 import {
   updateTaskAction,
-  type UpdatedTaskActionResult,
+  type UpdateTaskActionResult,
 } from "../actions/updateTaskAction";
 import * as service from "../services/updateTask";
 import * as supabaseServer from "@/lib/supabase/server";
@@ -28,7 +28,7 @@ afterEach(() => {
 });
 
 // 初期化
-const initialState: UpdatedTaskActionResult = {
+const initialState: UpdateTaskActionResult = {
   success: false,
   errors: {},
 };

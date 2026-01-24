@@ -1,21 +1,34 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-const mockWhere = vi.fn();
+const mockSelectWhere = vi.fn();
+const mockDeleteWhere = vi.fn();
 
 vi.mock("@/app/db/client", () => ({
   db: {
+    select: () => ({
+      from: () => ({
+        where: mockSelectWhere,
+      }),
+    }),
     delete: () => ({
-      where: (cond: unknown) => mockWhere(cond),
+      where: mockDeleteWhere,
     }),
   },
 }));
 
 describe("deleteTask", () => {
   const testTaskId = "10000000-0000-0000-0000-000000000001";
+  const mockTask = {
+    id: testTaskId,
+    title: "Test Task",
+    profileId: "profile-1",
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockWhere.mockResolvedValue({ count: 1 });
+    // デフォルト: タスクが存在する
+    mockSelectWhere.mockResolvedValue([mockTask]);
+    mockDeleteWhere.mockResolvedValue(undefined);
   });
 
   it("指定された値で削除が実行されること", async () => {
@@ -23,17 +36,17 @@ describe("deleteTask", () => {
 
     await deleteTask(testTaskId);
 
-    expect(mockWhere).toHaveBeenCalledTimes(1);
+    expect(mockSelectWhere).toHaveBeenCalledTimes(1);
+    expect(mockDeleteWhere).toHaveBeenCalledTimes(1);
   });
 
-  it("タスクが存在しない、または既に完了している場合にエラーを投げること", async () => {
+  it("タスクが存在しない場合にエラーを投げること", async () => {
     const { deleteTask } = await import("../services/deleteTask");
 
-    // 失敗時: 0件更新のモック
-    mockWhere.mockResolvedValue({ count: 1 });
+    // タスクが存在しない
+    mockSelectWhere.mockResolvedValue([]);
 
-    await expect(deleteTask(testTaskId)).rejects.toThrow(
-      "Failed to delete task",
-    );
+    await expect(deleteTask(testTaskId)).rejects.toThrow("Task not found");
+    expect(mockDeleteWhere).not.toHaveBeenCalled();
   });
 });

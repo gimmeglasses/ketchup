@@ -22,7 +22,7 @@ type FormValues = {
   note: string;
 };
 
-export type UpdatedTaskActionResult =
+export type UpdateTaskActionResult =
   | {
       success: true;
       task?: Task;
@@ -42,9 +42,9 @@ export type UpdatedTaskActionResult =
  * @returns 成功時は更新されたタスク、失敗時はエラーマップ
  */
 export async function updateTaskAction(
-  prevState: UpdatedTaskActionResult,
+  prevState: UpdateTaskActionResult,
   formData: FormData,
-): Promise<UpdatedTaskActionResult> {
+): Promise<UpdateTaskActionResult> {
   const values: FormValues = {
     id: formData.get("id") as string,
     title: formData.get("title") as string,
@@ -52,19 +52,15 @@ export async function updateTaskAction(
     dueAt: formData.get("dueAt") as string,
     note: formData.get("note") as string,
   };
-
   const parsed = updateTaskSchema.safeParse(values);
-
   if (!parsed.success) {
     return { success: false, errors: toFieldErrors(parsed.error), values };
   }
-
   try {
     const supabase = await createSupabaseServerClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
     if (!user) {
       return {
         success: false,

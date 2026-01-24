@@ -5,6 +5,7 @@ import {
   createTaskAction,
   type CreateTaskActionResult,
 } from "@/features/tasks/actions/createTaskAction";
+import { FormButton } from "@/features/tasks/components/FormButton";
 
 const initialState: CreateTaskActionResult = {
   success: false,
@@ -140,13 +141,11 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
         </div>
 
         {/* 登録ボタン */}
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-2 w-full rounded-full bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-red-700/40 transition hover:-translate-y-0.5 hover:bg-red-700 disabled:opacity-60"
-        >
-          {pending ? "登録中..." : "登録する"}
-        </button>
+        <div className="flex w-full gap-3 pt-2 justify-center">
+          <FormButton disabled={pending} type="submit" variant="red">
+            {pending ? "登録中..." : "登録する"}
+          </FormButton>
+        </div>
       </form>
     </div>
   );
