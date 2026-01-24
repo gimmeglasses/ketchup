@@ -16,5 +16,12 @@ export default defineConfig({
       "**/.{idea,git,cache,output,temp}/**",
       "**/{e2e,playwright}/**",
     ],
+    reporters: process.env.GITHUB_ACTIONS ? ["dot", "github-actions"] : ["dot"],
+    coverage: {
+      enabled: true,
+      reporter: ["text-summary", "json-summary", "json"],
+      reportOnFailure: true,
+      exclude: ["**/*.d.ts", "**/index.ts", "**/main.tsx", "**/vite.config.*"],
+    },
   },
 });
