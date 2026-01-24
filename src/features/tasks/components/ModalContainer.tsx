@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useEffect } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -9,6 +10,23 @@ interface ModalProps {
 }
 
 export const ModalContainer = ({ isOpen, onClose, children }: ModalProps) => {
+  // Close a modal once "ESC" key is pressed
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -23,7 +41,7 @@ export const ModalContainer = ({ isOpen, onClose, children }: ModalProps) => {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="add aa new task"
+        aria-labelledby="add a new task or edit a task"
       >
         {children}
       </div>
