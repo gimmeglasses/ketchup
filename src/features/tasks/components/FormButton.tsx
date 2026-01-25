@@ -23,7 +23,7 @@ export const FormButton = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-30 sm:w-35 flex items-center justify-center group h-10 sm:h-11 select-none rounded-2xl
+      className={`w-32 sm:w-36 flex items-center justify-center group h-10 sm:h-11 select-none rounded-2xl
        bg-gray-200 font-bold text-gray-500 ${variantStyles[variant]}
          disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-200 disabled:hover:text-gray-500`}
     >

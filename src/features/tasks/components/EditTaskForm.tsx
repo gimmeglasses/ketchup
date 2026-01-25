@@ -49,10 +49,6 @@ export const EditTaskForm = ({
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
   // モーダルを閉じる処理
   const handleClose = () => {
     setIsModalOpen(false);
@@ -141,7 +137,7 @@ export const EditTaskForm = ({
             id="dueAt"
             name="dueAt"
             type="date"
-            defaultValue={formatDueDate(task.dueAt) ?? undefined}
+            defaultValue={formatDueDate(task.dueAt)}
             className="mt-1 w-full rounded-xl border border-teal-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-teal-400/70 placeholder:text-teal-300 focus:border-teal-400 focus:ring-2"
             placeholder="yyyy-mm-dd"
           />
@@ -194,7 +190,7 @@ export const EditTaskForm = ({
         <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
           <DeleteTaskForm
             onSuccess={onSuccess}
-            onClose={handleCloseModal}
+            onClose={handleClose}
             task={task}
           />
         </ModalContainer>

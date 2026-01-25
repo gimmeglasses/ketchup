@@ -6,7 +6,7 @@ import { Task } from "@/features/tasks/types";
 import { FormButton } from "@/features/tasks/components/FormButton";
 import { TiDelete } from "react-icons/ti";
 
-interface EditTaskFormProps {
+interface DeleteTaskFormProps {
   onSuccess: (type: "update" | "delete") => void;
   onClose: () => void;
   task: Task;
@@ -16,7 +16,7 @@ export const DeleteTaskForm = ({
   onSuccess,
   onClose,
   task,
-}: EditTaskFormProps) => {
+}: DeleteTaskFormProps) => {
   const [pendingDelete, setPendingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const handleDelete = async () => {
@@ -41,8 +41,6 @@ export const DeleteTaskForm = ({
         <TiDelete size={40} className="text-red-700 font-bold" />
       </div>
       <div className="mt-3 text-center">
-        {" "}
-        {/* コンテナで囲んで中央寄せと余白を制御 */}
         <p className="font-semibold text-gray-900">
           「{task.title}」を削除します。
         </p>
