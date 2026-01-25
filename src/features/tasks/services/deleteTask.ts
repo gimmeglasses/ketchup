@@ -7,10 +7,5 @@ import { eq } from "drizzle-orm";
  * @param taskId タスクID
  */
 export async function deleteTask(taskId: string): Promise<void> {
-  const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId));
-  if (!task) {
-    throw new Error("Task not found");
-  }
-
   await db.delete(tasks).where(eq(tasks.id, taskId));
 }

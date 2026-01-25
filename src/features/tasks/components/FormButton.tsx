@@ -3,7 +3,7 @@ export type FormButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
   type: "button" | "submit";
-  variant?: "red" | "teal";
+  variant?: "red" | "teal" | "gray";
 };
 
 export const FormButton = ({
@@ -16,6 +16,7 @@ export const FormButton = ({
   const variantStyles = {
     red: "hover:bg-red-500 hover:text-red-100",
     teal: "hover:bg-teal-500 hover:text-teal-100",
+    gray: "hover:bg-gray-500 hover:text-gray-100",
   };
   return (
     <button

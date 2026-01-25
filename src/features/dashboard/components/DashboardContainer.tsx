@@ -249,7 +249,16 @@ const DashboardContainer = ({
                     setModalType("edit");
                   }}
                 >
-                  <FiEdit2 size={30} className="hover:text-green-500" />
+                  <FiEdit2
+                    size={30}
+                    className={`
+                                ${
+                                  isTimerRunning
+                                    ? "text-gray-600"
+                                    : "hover:text-green-500"
+                                }
+                              `}
+                  />
                 </button>
               </div>
             </div>

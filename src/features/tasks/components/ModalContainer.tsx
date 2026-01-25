@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -41,7 +40,7 @@ export const ModalContainer = ({ isOpen, onClose, children }: ModalProps) => {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="add a new task or edit a task"
+        aria-label="タスクフォーム"
       >
         {children}
       </div>

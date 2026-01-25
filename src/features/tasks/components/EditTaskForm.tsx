@@ -10,6 +10,8 @@ import { Task } from "@/features/tasks/types";
 import { FormButton } from "@/features/tasks/components/FormButton";
 import { dayjs } from "@/lib/dayjs";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { ModalContainer } from "@/features/tasks/components/ModalContainer";
+import { DeleteTaskForm } from "@/features/tasks/components/DeleteTaskForm.tsx";
 
 const initialUpdateState: UpdateTaskActionResult = {
   success: false,
@@ -42,6 +44,22 @@ export const EditTaskForm = ({
     }
   }, [state.success, onSuccess]);
 
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // 編集フォーム内での削除ボタンは確認モーダルを開くだけにする
+  const openDeleteConfirm = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // モーダルを閉じる処理
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setEditingTask(null);
+  };
+
   const [pendingDelete, setPendingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const handleDelete = async () => {
@@ -73,7 +91,7 @@ export const EditTaskForm = ({
         タスク編集
       </h1>
       <p className="mt-2 text-center text-sm text-teal-900/70">
-        新しいタスクを入力してください
+        タスク情報を編集してください
       </p>
       <form className="mt-6 space-y-4" action={formAction}>
         <input type="hidden" name="id" value={task.id} />
@@ -193,24 +211,36 @@ export const EditTaskForm = ({
             </p>
           )}
         </div>
-        <div className="flex gap-3 pt-2 justify-center">
-          {/* 更新ボタン - ティール系 */}
-          <FormButton disabled={pending} type="submit" variant="teal">
-            {pending ? "更新中..." : "更新する"}
-          </FormButton>
-
-          {/* 削除ボタン - ティール系 */}
-          <FormButton
-            disabled={pendingDelete}
-            type="button"
-            onClick={handleDelete}
-            variant="teal"
-          >
-            <RiDeleteBin5Line size={25} />
-            {pendingDelete ? "削除中..." : "削除する"}
-          </FormButton>
+        <div className="mt-10 flex gap-6 justify-center">
+          <div className="w-32">
+            {/* 更新ボタン */}
+            <FormButton disabled={pending} type="submit" variant="teal">
+              {pending ? "更新中..." : "更新する"}
+            </FormButton>
+          </div>
+          <div className="w-32">
+            {/* 削除ボタン */}
+            <FormButton
+              disabled={pendingDelete}
+              type="button"
+              onClick={openDeleteConfirm}
+              variant="red"
+            >
+              <RiDeleteBin5Line size={25} />
+              {pendingDelete ? "削除中..." : "削除する"}
+            </FormButton>
+          </div>
         </div>
       </form>
+      {isModalOpen && task && (
+        <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
+          <DeleteTaskForm
+            onSuccess={onSuccess}
+            onClose={handleCloseModal}
+            task={task}
+          />
+        </ModalContainer>
+      )}
     </div>
   );
 };
