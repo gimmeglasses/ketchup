@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-// import Link from "next/link";
 import Pomodoro, {
   type PomodoroHandle,
 } from "@/features/dashboard/components/Pomodoro";
@@ -13,9 +12,11 @@ import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
 import { EditTaskForm } from "@/features/tasks/components/EditTaskForm";
 import { dayjs } from "@/lib/dayjs";
 import { FaCheckCircle } from "react-icons/fa";
-import { FcEditImage } from "react-icons/fc";
+import { FiEdit2 } from "react-icons/fi";
 import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction";
 import { toast } from "sonner";
+
+type TaskActionType = "create" | "update" | "delete" | "complete";
 
 const DashboardContainer = ({
   tasks,
@@ -71,10 +72,22 @@ const DashboardContainer = ({
   };
 
   // タスク登録後にモーダルを閉じて画面を更新
-  const handleTaskActionSuccess = () => {
+  const handleTaskActionSuccess = (
+    type: TaskActionType,
+    taskTitle?: string,
+  ) => {
     setIsModalOpen(false);
     setEditingTask(null);
     setModalType(null);
+
+    const message: Record<TaskActionType, string> = {
+      create: "🍅 タスクを登録しました",
+      update: "✏️ タスクを更新しました！",
+      delete: "🗑️ タスクを削除しました",
+      complete: `🎯 ${taskTitle}を完了しました！`,
+    };
+
+    toast.success(message[type]);
     router.refresh();
   };
 
@@ -94,9 +107,10 @@ const DashboardContainer = ({
             setIsModalOpen(true);
             setModalType("new");
           }}
-          className="flex w-full justify-center rounded-lg bg-red-600
+          className="flex w-full justify-center rounded-lg
               font-semibold text-white shadow-md shadow-gray-400
-              transition hover:-translate-y-0.5 hover:bg-gray-700 mb-4"
+             bg-[#e8948c] hover:bg-[#8db3d1]
+              transition hover:-translate-y-0.5 mb-4"
         >
           タスク追加
         </button>
@@ -106,7 +120,7 @@ const DashboardContainer = ({
       {isModalOpen && modalType === "new" && (
         <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
           <NewTaskForm
-            onSuccess={handleTaskActionSuccess}
+            onSuccess={() => handleTaskActionSuccess("create")}
             onClose={handleClose}
           />
         </ModalContainer>
@@ -163,8 +177,8 @@ const DashboardContainer = ({
         {tasks.map((task) => (
           <div
             key={task.id}
-            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-300
-              flex flex-col gap-3 bg-white"
+            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-sky-50
+              flex flex-col gap-3 bg-white transition hover:-translate-y-0.5"
             onClick={() => handleClick(task)}
           >
             <div className="flex items-center w-full">
@@ -187,6 +201,7 @@ const DashboardContainer = ({
                       setCompleteError(result.errors._form[0]);
                     } else {
                       setCompleteError(null);
+                      handleTaskActionSuccess("complete", task.title);
                       // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
                       if (selectedTask?.id === task.id) {
                         setSelectedTask(null);
@@ -208,10 +223,10 @@ const DashboardContainer = ({
             <div className="flex">
               {/* 残りの項目を縦に表示 */}
               <div className="flex flex-col ml-6 text-sm text-gray-600">
-                <span>期限: {formatDueDate(task.dueAt)}</span>
+                <span>📅 期限: {formatDueDate(task.dueAt)}</span>
                 <span>
-                  予定: {formatEstimatedMinutes(task.estimatedMinutes)} / 実績:{" "}
-                  {pomodoroMinutes[task.id] ?? 0} 分
+                  ⏱️ 予定: {formatEstimatedMinutes(task.estimatedMinutes)} /
+                  実績: {pomodoroMinutes[task.id] ?? 0} 分
                 </span>
               </div>
               {/* 編集ボタン */}
@@ -220,7 +235,13 @@ const DashboardContainer = ({
                   disabled={isTimerRunning}
                   title="編集"
                   aria-label="タスクを編集する"
-                  className="flex items-center justify-center transition-colors hover:underline rounded p-1"
+                  className={`flex items-center justify-center transition-colors
+                                ${
+                                  isTimerRunning
+                                    ? "cursor-not-allowed" // ポモドーロタイマー起動中は無効にする
+                                    : "cursor-pointer" // ポモドーロタイマー停止中は有効にする
+                                }
+                              `}
                   onClick={(event) => {
                     event.stopPropagation();
                     setEditingTask(task);
@@ -228,7 +249,7 @@ const DashboardContainer = ({
                     setModalType("edit");
                   }}
                 >
-                  <FcEditImage size={40} />
+                  <FiEdit2 size={30} className="hover:text-green-500" />
                 </button>
               </div>
             </div>

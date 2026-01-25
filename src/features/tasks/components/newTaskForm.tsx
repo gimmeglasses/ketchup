@@ -83,7 +83,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
             htmlFor="note"
             className="block text-sm font-semibold text-red-900"
           >
-            タスクの説明
+            📝 タスクの説明
           </label>
           <textarea
             id="note"
@@ -102,7 +102,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
             htmlFor="dueAt"
             className="block text-sm font-semibold text-red-900"
           >
-            期限
+            📅 期限
           </label>
           <input
             id="dueAt"
@@ -122,7 +122,7 @@ export const NewTaskForm = ({ onSuccess, onClose }: NewTaskFormProps) => {
             htmlFor="estimatedMinutes"
             className="block text-sm font-semibold text-red-900"
           >
-            予定（分）
+            ⏱️ 予定（分）
           </label>
           <input
             id="estimatedMinutes"

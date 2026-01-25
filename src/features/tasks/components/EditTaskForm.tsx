@@ -16,7 +16,7 @@ const initialUpdateState: UpdateTaskActionResult = {
 };
 
 interface EditTaskFormProps {
-  onSuccess: () => void;
+  onSuccess: (type: "update" | "delete") => void;
   onClose: () => void;
   task: Task;
 }
@@ -33,10 +33,9 @@ export const EditTaskForm = ({
 
   useEffect(() => {
     if (state.success) {
-      onSuccess();
-    } else {
+      onSuccess("update");
     }
-  }, [state, onSuccess]);
+  }, [state.success, onSuccess]);
 
   const [pendingDelete, setPendingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -45,7 +44,7 @@ export const EditTaskForm = ({
     try {
       const result = await deleteTaskAction(task.id);
       if (result.success) {
-        onSuccess();
+        onSuccess("delete");
       } else {
         setDeleteError(result.errors?._form?.[0] || "削除に失敗しました。");
       }
@@ -130,7 +129,7 @@ export const EditTaskForm = ({
             htmlFor="note"
             className="block text-sm font-semibold text-teal-900"
           >
-            タスクの説明
+            📝 タスクの説明
           </label>
           <textarea
             id="note"
@@ -150,7 +149,7 @@ export const EditTaskForm = ({
             htmlFor="dueAt"
             className="block text-sm font-semibold text-teal-900"
           >
-            期限
+            📅 期限
           </label>
           <input
             id="dueAt"
@@ -171,7 +170,7 @@ export const EditTaskForm = ({
             htmlFor="estimatedMinutes"
             className="block text-sm font-semibold text-teal-900"
           >
-            予定（分）
+            ⏱️ 予定（分）
           </label>
           <input
             id="estimatedMinutes"
