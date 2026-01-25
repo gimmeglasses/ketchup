@@ -74,6 +74,7 @@ const DashboardContainer = ({
   // タスク登録後にモーダルを閉じて画面を更新
   const handleTaskActionSuccess = (
     type: TaskActionType,
+    taskId?: string,
     taskTitle?: string,
   ) => {
     setIsModalOpen(false);
@@ -86,9 +87,12 @@ const DashboardContainer = ({
       delete: "🗑️ タスクを削除しました",
       complete: `🎯 ${taskTitle}を完了しました！`,
     };
-
-    toast.success(message[type]);
     router.refresh();
+    // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
+    if (selectedTask?.id === taskId) {
+      setSelectedTask(null);
+    }
+    toast.success(message[type]);
   };
 
   // モーダルを閉じる処理
@@ -109,7 +113,7 @@ const DashboardContainer = ({
           }}
           className="flex w-full justify-center rounded-lg
               font-semibold text-white shadow-md shadow-gray-400
-             bg-[#e8948c] hover:bg-[#8db3d1]
+             bg-red-600 hover:bg-red-600/90
               transition hover:-translate-y-0.5 mb-4"
         >
           タスク追加
@@ -177,7 +181,7 @@ const DashboardContainer = ({
         {tasks.map((task) => (
           <div
             key={task.id}
-            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-sky-50
+            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-50
               flex flex-col gap-3 bg-white transition hover:-translate-y-0.5"
             onClick={() => handleClick(task)}
           >
@@ -192,7 +196,7 @@ const DashboardContainer = ({
                                 ${
                                   isTimerRunning
                                     ? "text-gray-300 cursor-not-allowed" // ポモドーロタイマー起動中は無効にする
-                                    : "text-gray-400 hover:text-green-500 cursor-pointer" // ポモドーロタイマー停止中は有効にする
+                                    : "text-gray-400 hover:text-red-500 cursor-pointer" // ポモドーロタイマー停止中は有効にする
                                 }
                               `}
                   onClick={async () => {
@@ -201,11 +205,11 @@ const DashboardContainer = ({
                       setCompleteError(result.errors._form[0]);
                     } else {
                       setCompleteError(null);
-                      handleTaskActionSuccess("complete", task.title);
-                      // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
-                      if (selectedTask?.id === task.id) {
-                        setSelectedTask(null);
-                      }
+                      handleTaskActionSuccess("complete", task.id, task.title);
+                      // // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
+                      // if (selectedTask?.id === task.id) {
+                      //   setSelectedTask(null);
+                      // }
                     }
                   }}
                 >
@@ -255,7 +259,7 @@ const DashboardContainer = ({
                                 ${
                                   isTimerRunning
                                     ? "text-gray-600"
-                                    : "hover:text-green-500"
+                                    : "hover:text-red-500"
                                 }
                               `}
                   />

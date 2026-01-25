@@ -7,7 +7,11 @@ import { FormButton } from "@/features/tasks/components/FormButton";
 import { TiDelete } from "react-icons/ti";
 
 interface DeleteTaskFormProps {
-  onSuccess: (type: "update" | "delete") => void;
+  onSuccess: (
+    type: "update" | "delete",
+    taskId?: string,
+    taskTitle?: string,
+  ) => void;
   onClose: () => void;
   task: Task;
 }
@@ -19,12 +23,13 @@ export const DeleteTaskForm = ({
 }: DeleteTaskFormProps) => {
   const [pendingDelete, setPendingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const taskId = task.id;
   const handleDelete = async () => {
     setPendingDelete(true);
     try {
-      const result = await deleteTaskAction(task.id);
+      const result = await deleteTaskAction(taskId);
       if (result.success) {
-        onSuccess("delete");
+        onSuccess("delete", taskId);
       } else {
         setDeleteError(result.errors?._form?.[0] || "削除に失敗しました。");
       }

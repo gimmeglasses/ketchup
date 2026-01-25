@@ -18,7 +18,11 @@ const initialUpdateState: UpdateTaskActionResult = {
 };
 
 interface EditTaskFormProps {
-  onSuccess: (type: "update" | "delete") => void;
+  onSuccess: (
+    type: "update" | "delete",
+    taskId?: string,
+    taskTitle?: string,
+  ) => void;
   onClose: () => void;
   task: Task;
 }
@@ -36,12 +40,12 @@ export const EditTaskForm = ({
     UpdateTaskActionResult,
     FormData
   >(updateTaskAction, initialUpdateState);
-
+  const taskId = task.id;
   useEffect(() => {
     if (state.success) {
-      onSuccess("update");
+      onSuccess("update", taskId);
     }
-  }, [state.success, onSuccess]);
+  }, [state.success, onSuccess, taskId]);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // 編集フォーム内での削除ボタンは確認モーダルを開くだけにする
@@ -58,15 +62,15 @@ export const EditTaskForm = ({
     <div className="relative w-full max-w-md rounded-2xl bg-white/90 p-6 ">
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-2xl text-teal-400 transition-colors hover:bg-teal-50 hover:text-teal-600"
+        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-2xl text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
         aria-label="閉じる"
       >
         ×
       </button>
-      <h1 className="text-center text-2xl font-bold text-teal-800">
+      <h1 className="text-center text-2xl font-bold text-red-800">
         タスク編集
       </h1>
-      <p className="mt-2 text-center text-sm text-teal-900/70">
+      <p className="mt-2 text-center text-sm text-red-900/70">
         タスク情報を編集してください
       </p>
       <form className="mt-6 space-y-4" action={formAction}>
@@ -83,11 +87,11 @@ export const EditTaskForm = ({
           <div className="flex gap-1">
             <label
               htmlFor="title"
-              className="block text-sm font-semibold text-teal-900"
+              className="block text-sm font-semibold text-red-900"
             >
               タスク名
             </label>
-            <span className="px-1 py-0.5 rounded text-xs bg-teal-600 text-teal-100">
+            <span className="px-1 py-0.5 rounded text-xs bg-red-600 text-red-100">
               必須
             </span>
           </div>
@@ -97,7 +101,7 @@ export const EditTaskForm = ({
             type="text"
             defaultValue={task.title}
             required
-            className="mt-1 w-full rounded-xl border border-teal-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-teal-400/70 placeholder:text-teal-300 focus:border-teal-400 focus:ring-2"
+            className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
             placeholder="次にやる行動は？"
           />
           {state.success === false && state.errors.title && (
@@ -109,7 +113,7 @@ export const EditTaskForm = ({
         <div>
           <label
             htmlFor="note"
-            className="block text-sm font-semibold text-teal-900"
+            className="block text-sm font-semibold text-red-900"
           >
             📝 タスクの説明
           </label>
@@ -117,7 +121,7 @@ export const EditTaskForm = ({
             id="note"
             name="note"
             defaultValue={task.note ?? undefined}
-            className="mt-1 w-full rounded-xl border border-teal-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-teal-400/70 placeholder:text-teal-300 focus:border-teal-400 focus:ring-2"
+            className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
             placeholder="いつ・どこで・何を？"
           />
           {state.success === false && state.errors.note && (
@@ -129,7 +133,7 @@ export const EditTaskForm = ({
         <div>
           <label
             htmlFor="dueAt"
-            className="block text-sm font-semibold text-teal-900"
+            className="block text-sm font-semibold text-red-900"
           >
             📅 期限
           </label>
@@ -138,7 +142,7 @@ export const EditTaskForm = ({
             name="dueAt"
             type="date"
             defaultValue={formatDueDate(task.dueAt)}
-            className="mt-1 w-full rounded-xl border border-teal-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-teal-400/70 placeholder:text-teal-300 focus:border-teal-400 focus:ring-2"
+            className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
             placeholder="yyyy-mm-dd"
           />
           {state.success === false && state.errors.dueAt && (
@@ -150,7 +154,7 @@ export const EditTaskForm = ({
         <div>
           <label
             htmlFor="estimatedMinutes"
-            className="block text-sm font-semibold text-teal-900"
+            className="block text-sm font-semibold text-red-900"
           >
             ⏱️ 予定（分）
           </label>
@@ -161,7 +165,7 @@ export const EditTaskForm = ({
             defaultValue={task.estimatedMinutes ?? undefined}
             min="1"
             step="1"
-            className="mt-1 w-full rounded-xl border border-teal-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-teal-400/70 placeholder:text-teal-300 focus:border-teal-400 focus:ring-2"
+            className="mt-1 w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-red-400/70 placeholder:text-red-300 focus:border-red-400 focus:ring-2"
             placeholder=""
           />
           {state.success === false && state.errors.estimatedMinutes && (
@@ -173,7 +177,7 @@ export const EditTaskForm = ({
         <div className="mt-10 flex gap-6 justify-center">
           <div className="w-32">
             {/* 更新ボタン */}
-            <FormButton disabled={pending} type="submit" variant="teal">
+            <FormButton disabled={pending} type="submit" variant="red">
               {pending ? "更新中..." : "更新する"}
             </FormButton>
           </div>
