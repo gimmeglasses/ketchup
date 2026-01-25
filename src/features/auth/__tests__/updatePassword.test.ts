@@ -22,18 +22,18 @@ describe("updatePassword", () => {
   });
 
   // ✅ 正常系
-  it("正常な入力で updateUser が成功した場合、dataを返すこと", async () => {
-    const mockData = {
-      user: { id: "user-123", email: "test@example.com" },
-    };
-    mockUpdateUser.mockResolvedValue({ data: mockData, error: null });
-
-    const result = await updatePassword({
-      password: "newPassword123",
-      passwordConfirmation: "newPassword123",
+  it("正常な入力で updateUser が成功した場合、エラーなく完了すること", async () => {
+    mockUpdateUser.mockResolvedValue({
+      data: { user: { id: "user-123", email: "test@example.com" } },
+      error: null,
     });
 
-    expect(result).toEqual(mockData);
+    await expect(
+      updatePassword({
+        password: "newPassword123",
+        passwordConfirmation: "newPassword123",
+      })
+    ).resolves.toBeUndefined();
     expect(mockUpdateUser).toHaveBeenCalledWith({
       password: "newPassword123",
     });

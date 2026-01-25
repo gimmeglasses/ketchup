@@ -34,19 +34,17 @@ function translateSupabaseUpdateError(message: string) {
  * Supabase Auth 経由でユーザーのパスワードを更新します
  *
  * @param {UpdatePasswordInput} input - パスワード更新入力（password, passwordConfirmation）
- * @returns {Promise<Object>} Supabaseの認証データ
+ * @returns {Promise<void>} エラーがなければundefinedを返す
  * @throws {Error} Supabaseからエラーが返った場合、日本語に変換したメッセージ付きでエラーを投げます
  */
 export async function updatePassword(input: UpdatePasswordInput) {
   const supabase = await createSupabaseServerClient();
 
-  const { data, error } = await supabase.auth.updateUser({
+  const { error } = await supabase.auth.updateUser({
     password: input.password,
   });
 
   if (error) {
     throw new Error(translateSupabaseUpdateError(error.message));
   }
-
-  return data;
 }

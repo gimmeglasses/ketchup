@@ -48,6 +48,4 @@ export async function resetPassword(input: ResetPasswordInput) {
   if (error) {
     throw new Error(translateSupabaseResetError(error.message));
   }
-
-  return;
 }
