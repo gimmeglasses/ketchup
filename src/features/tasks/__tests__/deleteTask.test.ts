@@ -12,11 +12,6 @@ vi.mock("@/app/db/client", () => ({
 
 describe("deleteTask", () => {
   const testTaskId = "10000000-0000-0000-0000-000000000001";
-  const mockTask = {
-    id: testTaskId,
-    title: "Test Task",
-    profileId: "profile-1",
-  };
 
   beforeEach(() => {
     vi.clearAllMocks();

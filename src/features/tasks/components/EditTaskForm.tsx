@@ -5,13 +5,12 @@ import {
   updateTaskAction,
   type UpdateTaskActionResult,
 } from "@/features/tasks/actions/updateTaskAction";
-import { deleteTaskAction } from "@/features/tasks/actions/deleteTaskAction";
 import { Task } from "@/features/tasks/types";
 import { FormButton } from "@/features/tasks/components/FormButton";
 import { dayjs } from "@/lib/dayjs";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
-import { DeleteTaskForm } from "@/features/tasks/components/DeleteTaskForm.tsx";
+import { DeleteTaskForm } from "@/features/tasks/components/DeleteTaskForm";
 
 const initialUpdateState: UpdateTaskActionResult = {
   success: false,
@@ -57,25 +56,6 @@ export const EditTaskForm = ({
   // モーダルを閉じる処理
   const handleClose = () => {
     setIsModalOpen(false);
-    setEditingTask(null);
-  };
-
-  const [pendingDelete, setPendingDelete] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const handleDelete = async () => {
-    setPendingDelete(true);
-    try {
-      const result = await deleteTaskAction(task.id);
-      if (result.success) {
-        onSuccess("delete");
-      } else {
-        setDeleteError(result.errors?._form?.[0] || "削除に失敗しました。");
-      }
-    } catch {
-      setDeleteError("通信エラーが発生しました。");
-    } finally {
-      setPendingDelete(false);
-    }
   };
 
   return (
@@ -100,23 +80,6 @@ export const EditTaskForm = ({
           <p className="mt-3 text-center text-sm text-red-500">
             {state.errors._form[0]}
           </p>
-        )}
-
-        {/* エラーメッセージの表示 */}
-        {deleteError && (
-          <div
-            className="mt-4 p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg flex justify-between items-center"
-            role="alert"
-          >
-            <span>{deleteError}</span>
-            <button
-              onClick={() => setDeleteError(null)}
-              className="text-red-500 hover:text-red-700 font-bold px-2"
-              aria-label="エラーメッセージを閉じる"
-            >
-              ×
-            </button>
-          </div>
         )}
 
         {/* タスク名 */}
@@ -220,14 +183,9 @@ export const EditTaskForm = ({
           </div>
           <div className="w-32">
             {/* 削除ボタン */}
-            <FormButton
-              disabled={pendingDelete}
-              type="button"
-              onClick={openDeleteConfirm}
-              variant="red"
-            >
+            <FormButton type="button" onClick={openDeleteConfirm} variant="red">
               <RiDeleteBin5Line size={25} />
-              {pendingDelete ? "削除中..." : "削除する"}
+              削除する
             </FormButton>
           </div>
         </div>
