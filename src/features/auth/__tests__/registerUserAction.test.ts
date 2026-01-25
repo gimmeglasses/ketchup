@@ -37,7 +37,13 @@ vi.mock("@/lib/supabase/server", () => {
 
 // registerUserサービスをスパイ化してモック動作を設定
 vi.spyOn(service, "registerUser").mockResolvedValue({
-  user: { id: "fake-user-id", email: "test@example.com" },
+  user: {
+    id: "fake-user-id", email: "test@example.com",
+    app_metadata: {},
+    user_metadata: {},
+    aud: "",
+    created_at: ""
+  },
   session: null,
 });
 
