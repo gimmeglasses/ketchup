@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { listTasksAction } from "@/features/tasks/actions/listTasksAction";
+import { getAllTasksPomodoroMinutesAction } from "@/features/pomodoro/actions/getAllTasksPomodoroMinutesAction";
 import { TaskListFilter } from "./TaskListFilter";
 import { TaskItem } from "./TaskItem";
 import type {
@@ -17,6 +18,9 @@ export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pomodoroMinutes, setPomodoroMinutes] = useState<
+    Record<string, number>
+  >({});
 
   // フィルター・ソート状態
   const [status, setStatus] = useState<TaskStatusFilter | undefined>();
@@ -29,13 +33,17 @@ export function TaskList() {
       try {
         setLoading(true);
         setError(null);
-        const result = await listTasksAction({
-          status,
-          due: due === "all" ? undefined : due,
-          sortBy,
-          order,
-        });
+        const [result, minutes] = await Promise.all([
+          listTasksAction({
+            status,
+            due: due === "all" ? undefined : due,
+            sortBy,
+            order,
+          }),
+          getAllTasksPomodoroMinutesAction().catch(() => ({})),
+        ]);
         setTasks(result);
+        setPomodoroMinutes(minutes);
       } catch (err) {
         setError(err instanceof Error ? err.message : "エラーが発生しました");
       } finally {
@@ -78,7 +86,11 @@ export function TaskList() {
       ) : (
         <div className="space-y-2">
           {tasks.map((task) => (
-            <TaskItem key={task.id} task={task} />
+            <TaskItem
+              key={task.id}
+              task={task}
+              actualMinutes={pomodoroMinutes[task.id] ?? 0}
+            />
           ))}
         </div>
       )}
