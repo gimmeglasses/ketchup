@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type GoogleAuthState = {
   isLoading: boolean;
@@ -23,10 +23,7 @@ export function useGoogleAuth(): UseGoogleAuthReturn {
   async function signInWithGoogle(): Promise<void> {
     setState({ isLoading: true, error: null });
 
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = createSupabaseBrowserClient();
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",

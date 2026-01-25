@@ -5,13 +5,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
-import { createBrowserClient } from "@supabase/ssr";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 // Supabase クライアントのモック
 const mockSignInWithOAuth = vi.fn();
 
-vi.mock("@supabase/ssr", () => ({
-  createBrowserClient: vi.fn(() => ({
+vi.mock("@/lib/supabase/browser", () => ({
+  createSupabaseBrowserClient: vi.fn(() => ({
     auth: {
       signInWithOAuth: mockSignInWithOAuth,
     },
@@ -56,10 +56,7 @@ describe("useGoogleAuth", () => {
 
     // Supabaseクライアントが正しく呼び出される
     await waitFor(() => {
-      expect(createBrowserClient).toHaveBeenCalledWith(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      );
+      expect(createSupabaseBrowserClient).toHaveBeenCalled();
     });
   });
 
@@ -75,7 +72,7 @@ describe("useGoogleAuth", () => {
     expect(mockSignInWithOAuth).toHaveBeenCalledWith({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:3000/dashboard",
+        redirectTo: "http://localhost:3000/auth/callback",
       },
     });
   });
@@ -135,9 +132,6 @@ describe("useGoogleAuth", () => {
       await result.current.signInWithGoogle();
     });
 
-    expect(createBrowserClient).toHaveBeenCalledWith(
-      "https://test.supabase.co",
-      "test-anon-key"
-    );
+    expect(createSupabaseBrowserClient).toHaveBeenCalled();
   });
 });
