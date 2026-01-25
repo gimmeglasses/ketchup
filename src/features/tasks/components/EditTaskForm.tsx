@@ -8,6 +8,7 @@ import {
 import { deleteTaskAction } from "@/features/tasks/actions/deleteTaskAction";
 import { Task } from "@/features/tasks/types";
 import { FormButton } from "@/features/tasks/components/FormButton";
+import { dayjs } from "@/lib/dayjs";
 import { RiDeleteBin5Line } from "react-icons/ri";
 
 const initialUpdateState: UpdateTaskActionResult = {
@@ -26,6 +27,10 @@ export const EditTaskForm = ({
   onClose,
   task,
 }: EditTaskFormProps) => {
+  const formatDueDate = (dueAt: string | null): string => {
+    if (!dueAt) return "-";
+    return dayjs(dueAt).format("YYYY-MM-DD");
+  };
   const [state, formAction, pending] = useActionState<
     UpdateTaskActionResult,
     FormData
@@ -155,7 +160,7 @@ export const EditTaskForm = ({
             id="dueAt"
             name="dueAt"
             type="date"
-            defaultValue={task.dueAt ?? undefined}
+            defaultValue={formatDueDate(task.dueAt) ?? undefined}
             className="mt-1 w-full rounded-xl border border-teal-200 bg-white px-3 py-2 text-sm text-red-950 shadow-sm outline-none ring-teal-400/70 placeholder:text-teal-300 focus:border-teal-400 focus:ring-2"
             placeholder="yyyy-mm-dd"
           />
