@@ -136,7 +136,7 @@ export class MailpitHelper {
         url.includes("token=")
     );
     let fixedLink = confirmLink?.replace(/\\u0026/g, "&");
-    fixedLink = fixedLink?.replace("127.0.0.1", "host.docker.internal");
+    fixedLink = fixedLink?.replace("127.0.0.1", "localhost");
     return fixedLink || null;
   }
 

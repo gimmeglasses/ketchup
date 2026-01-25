@@ -71,9 +71,6 @@ jobs:
       - name: output service logs
         if: failure()
         run: |
-          echo "=== Supabase Logs ==="
-          supabase logs --tail 100
-          echo ""
           echo "=== Docker Containers ==="
           docker ps -a
 
