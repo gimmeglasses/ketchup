@@ -1,0 +1,90 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: install dependencies
+        run: npm ci
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: start Supabase local environment
+        run: supabase start
+
+      - name: Drizzle migration
+        run: |
+          if [ -d "drizzle/migrations" ] && [ "$(ls -A drizzle/migrations 2>/dev/null)" ]; then
+            echo "マイグレーションファイルが見つかりました。実行します..."
+            npx drizzle-kit migrate
+          else
+            echo "マイグレーションファイルがありません。スキーマを直接pushします..."
+            npx drizzle-kit push
+          fi
+
+      - name: build application
+        run: npm run build
+
+      - name: start application
+        run: |
+          npm run start &
+          echo "アプリケーション起動中..."
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Service Health Check
+        run: |
+          echo "=== Supabase Status ==="
+          supabase status
+          echo ""
+          echo "=== App Health Check ==="
+          curl -f http://localhost:3000 || exit 1
+          echo ""
+          echo "=== Mailpit Health Check ==="
+          curl -f http://localhost:54324/api/v1/messages || exit 1
+
+      - name: install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: execute E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: output service logs
+        if: failure()
+        run: |
+          echo "=== Supabase Logs ==="
+          supabase logs --tail 100
+          echo ""
+          echo "=== Docker Containers ==="
+          docker ps -a
+
+      - name: upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: stop Supabase local environment
+        if: always()
+        run: supabase stop
