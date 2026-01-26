@@ -206,10 +206,6 @@ const DashboardContainer = ({
                     } else {
                       setCompleteError(null);
                       handleTaskActionSuccess("complete", task.id, task.title);
-                      // // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
-                      // if (selectedTask?.id === task.id) {
-                      //   setSelectedTask(null);
-                      // }
                     }
                   }}
                 >
