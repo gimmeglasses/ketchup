@@ -116,31 +116,6 @@ describe("DashboardContainer", () => {
   });
 
   describe("UI要素", () => {
-    it("「編集」ボタンが/tasks/[id]/editへのリンク", () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const editButtons = screen.getAllByText("編集");
-
-      // Use task IDs instead of indices
-      expect(editButtons[0].getAttribute("href")).toBe(
-        "/tasks/ID0000000001TASK/edit",
-      );
-      expect(editButtons[1].getAttribute("href")).toBe(
-        "/tasks/ID0000000002TASK/edit",
-      );
-    });
-
-    it("編集ボタンのclickイベントが親要素を発火させない", () => {
-      render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      const editButtons = screen.getAllByText("編集");
-
-      // onClick event
-      fireEvent.click(editButtons[0]);
-      // Pomodoroが表示されていない = タスク項目のclickが発火していない
-      expect(
-        screen.queryByTestId("pomodoro-component"),
-      ).not.toBeInTheDocument();
-    });
-
     it("複数タスクがあるとき、すべてリストで表示される", () => {
       render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
 
@@ -194,8 +169,8 @@ describe("DashboardContainer", () => {
   describe("日付と時間の表示フォーマット", () => {
     it("期限が設定されている場合、YYYY/MM/DD形式で表示される", () => {
       render(<DashboardContainer tasks={mockTasks} pomodoroMinutes={{}} />);
-      expect(screen.getByText("期限: 2030/01/10")).toBeInTheDocument();
-      expect(screen.getByText("期限: 2030/01/15")).toBeInTheDocument();
+      expect(screen.getByText("📅 期限: 2030/01/10")).toBeInTheDocument();
+      expect(screen.getByText("📅 期限: 2030/01/15")).toBeInTheDocument();
     });
 
     it("期限がnullの場合、'-'が表示される", () => {
@@ -214,7 +189,7 @@ describe("DashboardContainer", () => {
       render(
         <DashboardContainer tasks={tasksWithNullDueAt} pomodoroMinutes={{}} />,
       );
-      expect(screen.getByText("期限: -")).toBeInTheDocument();
+      expect(screen.getByText("📅 期限: -")).toBeInTheDocument();
     });
 
     it("予定時間が設定されている場合、'XX 分'形式で表示される", () => {

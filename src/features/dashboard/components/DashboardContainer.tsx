@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Pomodoro, {
   type PomodoroHandle,
 } from "@/features/dashboard/components/Pomodoro";
@@ -10,9 +9,14 @@ import { ConfirmDialog } from "@/features/pomodoro/components/ConfirmDialog";
 import { type Task } from "@/features/tasks/types";
 import { ModalContainer } from "@/features/tasks/components/ModalContainer";
 import { NewTaskForm } from "@/features/tasks/components/newTaskForm";
+import { EditTaskForm } from "@/features/tasks/components/EditTaskForm";
 import { dayjs } from "@/lib/dayjs";
 import { FaCheckCircle } from "react-icons/fa";
+import { FiEdit2 } from "react-icons/fi";
 import { completeTaskAction } from "@/features/tasks/actions/completeTaskAction";
+import { toast } from "sonner";
+
+type TaskActionType = "create" | "update" | "delete" | "complete";
 
 const DashboardContainer = ({
   tasks,
@@ -38,6 +42,9 @@ const DashboardContainer = ({
   const [pendingTask, setPendingTask] = useState<Task | null>(null);
   const pomodoroRef = useRef<PomodoroHandle>(null);
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<string | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const handleClick = (task: Task) => {
     if (isTimerRunning && selectedTask?.id !== task.id) {
@@ -64,18 +71,35 @@ const DashboardContainer = ({
     setShowConfirm(false);
   };
 
-  // モーダルの開閉状態を管理
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   // タスク登録後にモーダルを閉じて画面を更新
-  const handleNewTaskCreated = () => {
+  const handleTaskActionSuccess = (
+    type: TaskActionType,
+    taskId?: string,
+    taskTitle?: string,
+  ) => {
     setIsModalOpen(false);
+    setEditingTask(null);
+    setModalType(null);
+
+    const message: Record<TaskActionType, string> = {
+      create: "🍅 タスクを登録しました",
+      update: "✏️ タスクを更新しました！",
+      delete: "🗑️ タスクを削除しました",
+      complete: `🎯 ${taskTitle}を完了しました！`,
+    };
     router.refresh();
+    // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
+    if (selectedTask?.id === taskId) {
+      setSelectedTask(null);
+    }
+    toast.success(message[type]);
   };
 
   // モーダルを閉じる処理
   const handleClose = () => {
     setIsModalOpen(false);
+    setEditingTask(null);
+    setModalType(null);
   };
 
   return (
@@ -83,19 +107,38 @@ const DashboardContainer = ({
       {/* Display "New task entry" button */}
       <div>
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex w-full justify-center rounded-lg bg-red-600
+          onClick={() => {
+            setIsModalOpen(true);
+            setModalType("new");
+          }}
+          className="flex w-full justify-center rounded-lg
               font-semibold text-white shadow-md shadow-gray-400
-              transition hover:-translate-y-0.5 hover:bg-gray-700 mb-4"
+             bg-red-600 hover:bg-red-600/90
+              transition hover:-translate-y-0.5 mb-4"
         >
           タスク追加
         </button>
       </div>
 
       {/* モーダルの配置 */}
-      <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
-        <NewTaskForm onSuccess={handleNewTaskCreated} onClose={handleClose} />
-      </ModalContainer>
+      {isModalOpen && modalType === "new" && (
+        <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
+          <NewTaskForm
+            onSuccess={() => handleTaskActionSuccess("create")}
+            onClose={handleClose}
+          />
+        </ModalContainer>
+      )}
+
+      {isModalOpen && modalType === "edit" && editingTask && (
+        <ModalContainer isOpen={isModalOpen} onClose={handleClose}>
+          <EditTaskForm
+            onSuccess={handleTaskActionSuccess}
+            onClose={handleClose}
+            task={editingTask}
+          />
+        </ModalContainer>
+      )}
 
       {/* Dynamically display a selected task for using Pomodoro timer */}
       {selectedTask && (
@@ -138,8 +181,8 @@ const DashboardContainer = ({
         {tasks.map((task) => (
           <div
             key={task.id}
-            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-300
-              flex flex-col gap-3 bg-white"
+            className="p-3 border rounded-lg border-white shadow-md shadow-gray-400 hover:bg-gray-50
+              flex flex-col gap-3 bg-white transition hover:-translate-y-0.5"
             onClick={() => handleClick(task)}
           >
             <div className="flex items-center w-full">
@@ -153,7 +196,7 @@ const DashboardContainer = ({
                                 ${
                                   isTimerRunning
                                     ? "text-gray-300 cursor-not-allowed" // ポモドーロタイマー起動中は無効にする
-                                    : "text-gray-400 hover:text-green-500 cursor-pointer" // ポモドーロタイマー停止中は有効にする
+                                    : "text-gray-400 hover:text-red-500 cursor-pointer" // ポモドーロタイマー停止中は有効にする
                                 }
                               `}
                   onClick={async () => {
@@ -162,10 +205,7 @@ const DashboardContainer = ({
                       setCompleteError(result.errors._form[0]);
                     } else {
                       setCompleteError(null);
-                      // ポモドーロコンポーネントに表示されているタスクの場合、コンポーネントを閉じる
-                      if (selectedTask?.id === task.id) {
-                        setSelectedTask(null);
-                      }
+                      handleTaskActionSuccess("complete", task.id, task.title);
                     }
                   }}
                 >
@@ -183,23 +223,43 @@ const DashboardContainer = ({
             <div className="flex">
               {/* 残りの項目を縦に表示 */}
               <div className="flex flex-col ml-6 text-sm text-gray-600">
-                <span>期限: {formatDueDate(task.dueAt)}</span>
+                <span>📅 期限: {formatDueDate(task.dueAt)}</span>
                 <span>
-                  予定: {formatEstimatedMinutes(task.estimatedMinutes)} / 実績:{" "}
-                  {pomodoroMinutes[task.id] ?? 0} 分
+                  ⏱️ 予定: {formatEstimatedMinutes(task.estimatedMinutes)} /
+                  実績: {pomodoroMinutes[task.id] ?? 0} 分
                 </span>
               </div>
               {/* 編集ボタン */}
               <div className="flex-none ml-auto mt-1">
-                <Link
-                  href={`/tasks/${task.id}/edit`}
-                  className="font-bold text-xs text-white px-2 py-4 bg-red-600 hover:underline border rounded p-1"
+                <button
+                  disabled={isTimerRunning}
+                  title="編集"
+                  aria-label="タスクを編集する"
+                  className={`flex items-center justify-center transition-colors
+                                ${
+                                  isTimerRunning
+                                    ? "cursor-not-allowed" // ポモドーロタイマー起動中は無効にする
+                                    : "cursor-pointer" // ポモドーロタイマー停止中は有効にする
+                                }
+                              `}
                   onClick={(event) => {
                     event.stopPropagation();
+                    setEditingTask(task);
+                    setIsModalOpen(true);
+                    setModalType("edit");
                   }}
                 >
-                  編集
-                </Link>
+                  <FiEdit2
+                    size={30}
+                    className={`
+                                ${
+                                  isTimerRunning
+                                    ? "text-gray-600"
+                                    : "hover:text-red-500"
+                                }
+                              `}
+                  />
+                </button>
               </div>
             </div>
           </div>
