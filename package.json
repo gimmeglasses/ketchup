@@ -14,10 +14,10 @@
     "@supabase/ssr": "^0.8.0",
     "dayjs": "^1.11.19",
     "drizzle-orm": "^0.45.1",
-    "next": "15.5.9",
+    "next": "^15.5.10",
     "postgres": "^3.4.7",
-    "react": "19.2.1",
-    "react-dom": "19.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-icons": "^5.5.0",
     "sonner": "^2.0.7",
     "zod": "^4.2.1"
