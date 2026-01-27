@@ -6,13 +6,15 @@ import {
   loginUserAction,
   type LoginActionResult,
 } from "@/features/auth/actions/loginUserAction";
+import { AuthDivider } from "@/features/auth/components/AuthDivider";
+import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 
 const initialState: LoginActionResult = {
   success: false,
   errors: {},
 };
 
-export function LoginForm() {
+export function LoginForm(): React.ReactElement {
   const [state, formAction, pending] = useActionState<
     LoginActionResult,
     FormData
@@ -24,6 +26,9 @@ export function LoginForm() {
       <p className="mt-2 text-center text-sm text-red-900/70">
         登録済みのメールアドレスとパスワードで Ketchup にログインします。
       </p>
+
+      <GoogleAuthButton label="Googleでログイン" />
+      <AuthDivider />
 
       <form className="mt-6 space-y-4" action={formAction}>
         {/* フォーム共通エラー */}

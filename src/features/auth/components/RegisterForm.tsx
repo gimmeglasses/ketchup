@@ -6,13 +6,15 @@ import {
   registerUserAction,
   type RegisterActionResult,
 } from "@/features/auth/actions/registerUserAction";
+import { AuthDivider } from "@/features/auth/components/AuthDivider";
+import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 
 const initialState: RegisterActionResult = {
   success: false,
   errors: {},
 };
 
-export function RegisterForm() {
+export function RegisterForm(): React.ReactElement {
   const [state, formAction, pending] = useActionState<
     RegisterActionResult,
     FormData
@@ -25,12 +27,16 @@ export function RegisterForm() {
         Ketchup アカウントを作成して、ポモドーロとタスク管理をはじめましょう。
       </p>
 
+      <GoogleAuthButton label="Googleで登録" />
+      <AuthDivider />
+
       <form className="mt-6 space-y-4" action={formAction}>
         {state.success === false && state.errors._form && (
           <p className="mt-3 text-center text-sm text-red-500">
             {state.errors._form[0]}
           </p>
         )}
+
         {/* 名前（ニックネーム） */}
         <div>
           <label

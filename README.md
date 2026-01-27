@@ -19,12 +19,32 @@ VS Code でこのプロジェクトを開くと、Dev Container で再度開く�
 - **Next.js** - React フレームワーク
 - **TypeScript** - 型安全な開発
 - **Tailwind CSS** - ユーティリティファーストの CSS フレームワーク
-- **Supabase** - DB（ローカルは docker-compose で起動）
+- **Supabase** - DB・認証（ローカルは docker-compose で起動）
 - **Drizzle ORM** - TypeScript フレンドリーな ORM
+
+## 認証機能
+
+このプロジェクトでは、Supabase Authを使用した認証機能を提供しています。
+
+### サポートしている認証方式
+
+1. **メール/パスワード認証**
+   - 標準的なメール/パスワードによるサインアップ・ログイン
+
+2. **Google OAuth認証**
+   - Googleアカウントでのワンクリックログイン
+   - 初回ログイン時に自動的にアカウント作成
+
+### Google OAuth設定（開発環境）
+
+1. `.env.local.example`を`.env.local`にコピー
+2. Google Cloud Consoleで開発環境用のOAuthクライアントを作成
+3. Client IDとClient Secretを`.env.local`に設定
+4. Supabaseを再起動：`npx supabase stop && npx supabase start`
 
 ## Supabase（Docker in Docker + Supabase CLI）
 
-本プロジェクトでは、ローカル Supabase を  
+本プロジェクトでは、ローカル Supabase を
 **Docker in Docker（DinD）環境上で Supabase CLI により起動**します。
 
 ### Docker in Docker（DinD）とは
