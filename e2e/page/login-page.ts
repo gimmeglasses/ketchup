@@ -26,7 +26,10 @@ export class LoginPage extends BasePage {
     // フォーム要素
     this.emailInput = this.page.getByRole("textbox", { name: /メール/ });
     this.passwordInput = this.page.getByLabel(/^パスワード$/);
-    this.loginButton = this.page.getByRole("button", { name: /ログイン/ });
+    this.loginButton = this.page.getByRole("button", {
+      name: "ログイン",
+      exact: true,
+    });
 
     // リンク
     this.registerLink = this.page
