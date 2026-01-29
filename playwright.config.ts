@@ -34,6 +34,8 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // setup project
+    { name: "setup", testMatch: /setup\/.*\.setup\.ts/ },
     // {
     //   name: "chromium",
     //   use: { ...devices["Desktop Chrome"] },
@@ -58,7 +60,6 @@ export default defineConfig({
       name: "Mobile Safari",
       use: { ...devices["iPhone 12"] },
     },
-
     /* Test against branded browsers. */
     // {
     //   name: 'Microsoft Edge',
