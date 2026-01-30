@@ -1,6 +1,6 @@
-import { test as setup } from "@playwright/test";
+import { test as reset } from "@playwright/test";
 import { resetDataBase } from "@/app/db/reset";
 
-setup("reset database", async () => {
+reset("reset database", async () => {
   await resetDataBase();
 });
