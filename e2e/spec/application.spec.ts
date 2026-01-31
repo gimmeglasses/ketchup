@@ -16,9 +16,6 @@ let newTaskFormPage: NewTaskFormPage;
 let editTaskFormPage: EditTaskFormPage;
 let deleteTaskFormPage: DeleteTaskFormPage;
 
-// ログイン情報を保管
-const authFile = "e2e/.auth/user.json";
-
 // サンプルタスク
 const taskName1 = "読書";
 const note1 = "Scrum Boot Camp を読む";
@@ -111,17 +108,10 @@ test.describe("アプリケーション統合シナリオ", () => {
       await loginPage.clickLoginButton();
     });
 
-    await page.context().storageState({ path: authFile });
-
     await test.step("ダッシュボード表示確認", async () => {
       await expect(page).toHaveURL(/\/dashboard/);
     });
   });
-});
-
-// --- ダッシュボードシナリオ（会員登録で保存した storageState を使用） ---
-test.describe("ダッシュボードシナリオ", () => {
-  test.use({ storageState: authFile });
 
   // --- タスク登録 ---
   test.describe("タスク登録", () => {
@@ -201,7 +191,7 @@ test.describe("ダッシュボードシナリオ", () => {
         await dashboardPage.verifyTaskVisible(afterEditTask);
       });
       // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
     });
   });
 
@@ -245,7 +235,7 @@ test.describe("ダッシュボードシナリオ", () => {
         ).not.toBeVisible();
       });
       // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(2000);
     });
   });
 
@@ -376,6 +366,9 @@ test.describe("ダッシュボードシナリオ", () => {
       await test.step("タスク一覧ページに遷移していること", async () => {
         await dashboardPage.expectUrlContains("/tasks");
       });
+
+      // ブラウザ上で結果を確認するために設定
+      await page.waitForTimeout(2000);
     });
 
     test("タスク一覧ページからダッシュボードに戻れること", async ({ page }) => {
