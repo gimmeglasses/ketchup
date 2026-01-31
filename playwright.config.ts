@@ -30,21 +30,29 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
+
+    // ブラウザのUI、日付、通貨などを日本語化
+    locale: "ja-JP",
+
+    // HTTPリクエストの言語指定を日本語に
+    extraHTTPHeaders: {
+      "Accept-Language": "ja-JP,ja;q=0.9",
+    },
   },
 
   /* Configure projects for major browsers */
   projects: [
     // auth setup project
     { name: "setup", testMatch: /setup\/.*\.setup\.ts/ },
-    {
-      name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        // Use the storage state from the auth setup
-        storageState: "e2e/.auth/user.json",
-      },
-      dependencies: ["setup"],
-    },
+    // {
+    //   name: "chromium",
+    //   use: {
+    //     ...devices["Desktop Chrome"],
+    //     // Use the storage state from the auth setup
+    //     storageState: "e2e/.auth/user.json",
+    //   },
+    //   dependencies: ["setup"],
+    // },
 
     // {
     //   name: "firefox",
@@ -59,11 +67,21 @@ export default defineConfig({
     /* Test against mobile viewports. */
     {
       name: "Mobile Chrome",
-      use: { ...devices["Pixel 5"] },
+      use: {
+        ...devices["Pixel 5"],
+        // Use the storage state from the auth setup
+        storageState: "e2e/.auth/user.json",
+      },
+      dependencies: ["setup"],
     },
     {
       name: "Mobile Safari",
-      use: { ...devices["iPhone 12"] },
+      use: {
+        ...devices["iPhone 12"],
+        // Use the storage state from the auth setup
+        storageState: "e2e/.auth/user.json",
+      },
+      dependencies: ["setup"],
     },
     /* Test against branded browsers. */
     // {

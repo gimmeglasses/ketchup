@@ -25,6 +25,5 @@ setup("authenticate", async ({ page }) => {
   await expect(page.getByText("今日のタスク")).toBeVisible();
 
   // End of authentication steps.
-
   await page.context().storageState({ path: authFile });
 });
