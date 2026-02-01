@@ -13,7 +13,7 @@ setup("authenticate", async ({ page }) => {
 
   loginPage = new LoginPage(page);
   // Perform authentication steps. Replace these actions with your own.
-  await page.goto("http://localhost:3000/auth/login");
+  await page.goto("/auth/login");
   await loginPage.fillLoginForm(testEmail, testPassword);
   await loginPage.clickLoginButton();
   // Wait until the page receives the cookies.
