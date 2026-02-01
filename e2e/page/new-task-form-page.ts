@@ -132,7 +132,7 @@ export class NewTaskFormPage extends BasePage {
    * モーダルが閉じたことを検証します
    */
   async verifyFormClosed() {
-    await expect(this.modal).not.toBeVisible({ timeout: 10000 });
+    await expect(this.modal).toHaveCount(0, { timeout: 10000 });
   }
 
   /**
