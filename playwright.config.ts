@@ -31,6 +31,9 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
 
+    // 失敗時のスクリーンショットを保存
+    screenshot: "only-on-failure",
+
     // ブラウザのUI、日付、通貨などを日本語化
     locale: "ja-JP",
 

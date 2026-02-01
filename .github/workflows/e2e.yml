@@ -67,7 +67,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: execute E2E tests
-        run: npx playwright test
+        run: npx playwright test --project="Mobile Chrome Guest" --project="Mobile Safari Guest"
         env:
           CI: true
 

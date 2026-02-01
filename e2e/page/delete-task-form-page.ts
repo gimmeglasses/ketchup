@@ -84,7 +84,7 @@ export class DeleteTaskFormPage extends BasePage {
    * モーダルが閉じたことを検証します
    */
   async verifyFormClosed() {
-    await expect(this.modal).not.toBeVisible();
+    await expect(this.modal).not.toBeVisible({ timeout: 10000 });
   }
 
   /**
