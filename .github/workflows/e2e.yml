@@ -31,17 +31,7 @@ jobs:
         run: supabase start
 
       - name: Drizzle migration
-        run: |
-          if [ -d "drizzle/migrations" ] && [ "$(ls -A drizzle/migrations 2>/dev/null)" ]; then
-            echo "マイグレーションファイルが見つかりました。実行します..."
-            npx drizzle-kit migrate
-          else
-            echo "マイグレーションファイルがありません。スキーマを直接pushします..."
-            npx drizzle-kit push
-          fi
-
-      - name: Seed E2E test user
-        run: bash e2e/db/seed.sh
+        run: npx drizzle-kit migrate
 
       - name: build application
         run: npm run build
