@@ -39,10 +39,8 @@ export class DashboardPage extends BasePage {
     super(page);
 
     // ナビゲーション
-    this.nav = this.page.locator("nav").filter({ visible: true });
-    this.navLogo = this.nav
-      .getByAltText("Ketchup Logo")
-      .filter({ visible: true });
+    this.nav = this.page.locator("nav:visible");
+    this.navLogo = this.nav.getByAltText("Ketchup Logo");
     this.dashboardNavLink = this.nav.getByRole("link", {
       name: "ダッシュボード",
     });
@@ -192,7 +190,8 @@ export class DashboardPage extends BasePage {
    * @param expected - 期待するタスク名（例: "読書"）
    */
   async verifyPomodoroTask(expected: string) {
-    await this.page.getByText(expected).first();
+    const taskLocator = this.page.getByText(expected).first();
+    await expect(taskLocator).toBeVisible();
   }
 
   /**
