@@ -15,6 +15,8 @@ let dashboardPage: DashboardPage;
 let newTaskFormPage: NewTaskFormPage;
 let editTaskFormPage: EditTaskFormPage;
 let deleteTaskFormPage: DeleteTaskFormPage;
+// Path for authentication file
+const authFile = "e2e/.auth/user.json";
 
 // サンプルタスク
 const taskName1 = "読書";
@@ -113,12 +115,12 @@ test.describe("アプリケーション統合シナリオ", () => {
     });
 
     // 認証済みの状態を保存して後続テストで再利用する
-    await page.context().storageState({ path: "state.json" });
+    await page.context().storageState({ path: authFile });
   });
 
   // --- 認証済みテスト（storageState を使用） ---
   test.describe("ダッシュボードシナリオ", () => {
-    test.use({ storageState: "state.json" });
+    test.use({ storageState: authFile });
     test.beforeEach(async () => {
       await resetDataBase();
     });

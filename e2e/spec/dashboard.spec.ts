@@ -252,7 +252,7 @@ test.describe("タスク編集", () => {
     await test.step("タスクを登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await editTaskFormPage.fillTitle(beforeEditTask);
+      await newTaskFormPage.fillTitle(beforeEditTask);
       await newTaskFormPage.clickSubmit();
       await dashboardPage.verifyTaskVisible(beforeEditTask);
     });
