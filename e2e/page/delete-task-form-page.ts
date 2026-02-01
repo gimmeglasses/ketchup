@@ -6,6 +6,9 @@ import { BasePage } from "./base-page";
  * 削除確認ダイアログの要素と操作をカプセル化します
  */
 export class DeleteTaskFormPage extends BasePage {
+  // モーダル
+  private readonly modal: Locator;
+
   // 確認メッセージ
   private readonly warningMessage: Locator;
 
@@ -22,6 +25,9 @@ export class DeleteTaskFormPage extends BasePage {
    */
   constructor(page: Page) {
     super(page);
+
+    // モーダルダイアログ
+    this.modal = this.page.getByRole("dialog", { name: "タスクフォーム" });
 
     // 確認メッセージ
     this.warningMessage = this.page.getByText("この操作は取り消せません。");
@@ -64,6 +70,7 @@ export class DeleteTaskFormPage extends BasePage {
    */
   async clickDelete() {
     await this.deleteButton.click();
+    await this.verifyFormClosed();
   }
 
   /**
@@ -71,6 +78,13 @@ export class DeleteTaskFormPage extends BasePage {
    */
   async clickCancel() {
     await this.cancelButton.click();
+  }
+
+  /**
+   * モーダルが閉じたことを検証します
+   */
+  async verifyFormClosed() {
+    await expect(this.modal).not.toBeVisible();
   }
 
   /**

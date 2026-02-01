@@ -118,6 +118,7 @@ export class NewTaskFormPage extends BasePage {
    */
   async clickSubmit() {
     await this.submitButton.click();
+    await this.verifyFormClosed();
   }
 
   /**

@@ -135,6 +135,7 @@ export class EditTaskFormPage extends BasePage {
    */
   async clickUpdate() {
     await this.updateButton.click();
+    await this.verifyFormClosed();
   }
 
   /**
@@ -149,6 +150,7 @@ export class EditTaskFormPage extends BasePage {
    */
   async clickClose() {
     await this.closeButton.click();
+    await this.verifyFormClosed();
   }
 
   /**
@@ -171,7 +173,7 @@ export class EditTaskFormPage extends BasePage {
    */
   async verifyUpdating() {
     await expect(
-      this.modal.getByRole("button", { name: "更新中..." })
+      this.modal.getByRole("button", { name: "更新中..." }),
     ).toBeVisible();
   }
 
