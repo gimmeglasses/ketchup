@@ -41,8 +41,7 @@ jobs:
           fi
 
       - name: Seed E2E test user
-        run: |
-          PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f e2e/db/seed.sql
+        run: bash e2e/db/seed.sh
 
       - name: build application
         run: npm run build

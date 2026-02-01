@@ -130,6 +130,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     }) => {
       await test.step("タスク1を登録する", async () => {
         await page.goto("/dashboard");
+        await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
         await newTaskFormPage.fillTitle(taskName1);
         await newTaskFormPage.fillNote(note1);
@@ -171,6 +172,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     }) => {
       await test.step("タスクを登録する", async () => {
         await page.goto("/dashboard");
+        await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
         await newTaskFormPage.fillTitle(beforeEditTask);
         await newTaskFormPage.clickSubmit();
@@ -202,6 +204,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     }) => {
       await test.step("タスクを登録する", async () => {
         await page.goto("/dashboard");
+        await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
         await newTaskFormPage.fillTitle(deleteTargetTask);
         await newTaskFormPage.clickSubmit();
@@ -240,6 +243,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     }) => {
       await test.step("タスクを登録する", async () => {
         await page.goto("/dashboard");
+        await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
         await newTaskFormPage.fillTitle(completeTargetTask);
         await newTaskFormPage.clickSubmit();
@@ -268,6 +272,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     }) => {
       await test.step("タスク1を登録する", async () => {
         await page.goto("/dashboard");
+        await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
         await newTaskFormPage.fillTitle(pomodoroTargetTask1);
         await newTaskFormPage.clickSubmit();
@@ -301,6 +306,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     }) => {
       await test.step("タスク1を登録する", async () => {
         await page.goto("/dashboard");
+        await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
         await newTaskFormPage.fillTitle(pomodoroTargetTask1);
         await newTaskFormPage.clickSubmit();
@@ -309,6 +315,7 @@ test.describe("アプリケーション統合シナリオ", () => {
 
       await test.step("タスク2を登録する", async () => {
         await page.goto("/dashboard");
+        await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
         await newTaskFormPage.fillTitle(pomodoroTargetTask2);
         await newTaskFormPage.clickSubmit();
