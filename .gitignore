@@ -58,4 +58,4 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 # Authentication for playwright
-/e2e/.auth
+/e2e/.auth/

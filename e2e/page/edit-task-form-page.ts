@@ -184,6 +184,22 @@ export class EditTaskFormPage extends BasePage {
     return this.titleInput;
   }
 
+  getNoteTextarea(): Locator {
+    return this.noteTextarea;
+  }
+
+  getDueAtInput(): Locator {
+    return this.dueAtInput;
+  }
+
+  getEstimatedMinutesInput(): Locator {
+    return this.estimatedMinutesInput;
+  }
+
+  getCloseButton(): Locator {
+    return this.closeButton;
+  }
+
   getUpdateButton(): Locator {
     return this.updateButton;
   }

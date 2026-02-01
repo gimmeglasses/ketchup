@@ -32,18 +32,18 @@ const estimatedMinutes2 = "180";
 // ファイル全体をシリアル実行にして、会員登録 → ダッシュボードの順序を保証する
 test.describe.configure({ mode: "serial" });
 
-test.beforeEach(async ({ page }) => {
-  topPage = new TopPage(page);
-  registerPage = new RegisterPage(page);
-  loginPage = new LoginPage(page);
-  dashboardPage = new DashboardPage(page);
-  newTaskFormPage = new NewTaskFormPage(page);
-  editTaskFormPage = new EditTaskFormPage(page);
-  deleteTaskFormPage = new DeleteTaskFormPage(page);
-});
-
-// --- 会員登録・ログイン（storageState なしで実行） ---
 test.describe("アプリケーション統合シナリオ", () => {
+  test.beforeEach(async ({ page }) => {
+    topPage = new TopPage(page);
+    registerPage = new RegisterPage(page);
+    loginPage = new LoginPage(page);
+    dashboardPage = new DashboardPage(page);
+    newTaskFormPage = new NewTaskFormPage(page);
+    editTaskFormPage = new EditTaskFormPage(page);
+    deleteTaskFormPage = new DeleteTaskFormPage(page);
+  });
+
+  // --- 会員登録・ログイン（storageState なしで実行） ---
   test("会員登録からログインしてダッシュボードに遷移できること", async ({
     page,
   }) => {
@@ -111,14 +111,18 @@ test.describe("アプリケーション統合シナリオ", () => {
     await test.step("ダッシュボード表示確認", async () => {
       await expect(page).toHaveURL(/\/dashboard/);
     });
+
+    // 認証済みの状態を保存して後続テストで再利用する
+    await page.context().storageState({ path: "state.json" });
   });
 
-  // --- タスク登録 ---
-  test.describe("タスク登録", () => {
+  // --- 認証済みテスト（storageState を使用） ---
+  test.describe("ダッシュボードシナリオ", () => {
+    test.use({ storageState: "state.json" });
     test.beforeEach(async () => {
       await resetDataBase();
     });
-
+    // --- タスク登録 ---
     test("タスク登録の後、ダッシュボード画面にタスクが一覧表示されていること", async ({
       page,
     }) => {
@@ -153,18 +157,12 @@ test.describe("アプリケーション統合シナリオ", () => {
         expect(await dashboardPage.getTaskCount()).toBe(2);
       });
       // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(1000);
+      await dashboardPage.verifyPageLoaded();
     });
-  });
 
-  // --- タスク編集 ---
-  test.describe("タスク編集", () => {
+    // --- タスク編集 ---
     const beforeEditTask = "編集テスト用タスク（Before）";
     const afterEditTask = "編集テスト用タスク（After）";
-
-    test.beforeEach(async () => {
-      await resetDataBase();
-    });
 
     test("タスク編集の後、ダッシュボード画面に変更後のタスクが表示されていること", async ({
       page,
@@ -191,17 +189,11 @@ test.describe("アプリケーション統合シナリオ", () => {
         await dashboardPage.verifyTaskVisible(afterEditTask);
       });
       // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(2000);
+      await dashboardPage.verifyPageLoaded();
     });
-  });
 
-  // --- タスク削除 ---
-  test.describe("タスク削除", () => {
+    // --- タスク削除 ---
     const deleteTargetTask = "削除テスト用タスク";
-
-    test.beforeEach(async () => {
-      await resetDataBase();
-    });
 
     test("タスク削除の後、ダッシュボード画面からタスクが消えていること", async ({
       page,
@@ -235,17 +227,11 @@ test.describe("アプリケーション統合シナリオ", () => {
         ).not.toBeVisible();
       });
       // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(2000);
+      await dashboardPage.verifyPageLoaded();
     });
-  });
 
-  // --- タスク完了 ---
-  test.describe("タスク完了", () => {
+    // --- タスク完了 ---
     const completeTargetTask = "完了テスト用タスク";
-
-    test.beforeEach(async () => {
-      await resetDataBase();
-    });
 
     test("タスクを完了すると、ダッシュボード画面から消えること", async ({
       page,
@@ -268,18 +254,12 @@ test.describe("アプリケーション統合シナリオ", () => {
         ).not.toBeVisible();
       });
       // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(2000);
+      await dashboardPage.verifyPageLoaded();
     });
-  });
 
-  // --- ポモドーロタイマー実行 ---
-  test.describe("ポモドーロタイマー実行", () => {
+    // --- ポモドーロタイマー実行 ---
     const pomodoroTargetTask1 = "ポモドーロテスト用タスク１";
     const pomodoroTargetTask2 = "ポモドーロテスト用タスク２";
-
-    test.beforeEach(async () => {
-      await resetDataBase();
-    });
 
     test("タスク登録の後、ポモドーロタイマーが表示し、開始・終了すること", async ({
       page,
@@ -345,12 +325,10 @@ test.describe("アプリケーション統合シナリオ", () => {
         await dashboardPage.verifyPomodoroTask(pomodoroTargetTask2);
       });
       // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(2000);
+      await dashboardPage.verifyPomodoroVisible();
     });
-  });
 
-  // --- ナビゲーション ---
-  test.describe("ナビゲーション", () => {
+    // --- ナビゲーション ---
     test("ダッシュボードからタスク一覧ページに遷移できること", async ({
       page,
     }) => {
@@ -366,9 +344,6 @@ test.describe("アプリケーション統合シナリオ", () => {
       await test.step("タスク一覧ページに遷移していること", async () => {
         await dashboardPage.expectUrlContains("/tasks");
       });
-
-      // ブラウザ上で結果を確認するために設定
-      await page.waitForTimeout(2000);
     });
 
     test("タスク一覧ページからダッシュボードに戻れること", async ({ page }) => {

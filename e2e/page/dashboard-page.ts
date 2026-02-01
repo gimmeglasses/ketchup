@@ -39,8 +39,10 @@ export class DashboardPage extends BasePage {
     super(page);
 
     // ナビゲーション
-    this.nav = this.page.locator("nav");
-    this.navLogo = this.nav.getByAltText("Ketchup Logo");
+    this.nav = this.page.locator("nav").filter({ visible: true });
+    this.navLogo = this.nav
+      .getByAltText("Ketchup Logo")
+      .filter({ visible: true });
     this.dashboardNavLink = this.nav.getByRole("link", {
       name: "ダッシュボード",
     });
@@ -255,6 +257,14 @@ export class DashboardPage extends BasePage {
   }
 
   // --- Getter メソッド ---
+
+  getNav(): Locator {
+    return this.nav;
+  }
+
+  getNavLogo(): Locator {
+    return this.navLogo;
+  }
 
   getAddTaskButton(): Locator {
     return this.addTaskButton;

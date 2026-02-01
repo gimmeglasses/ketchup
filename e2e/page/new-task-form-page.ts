@@ -160,6 +160,22 @@ export class NewTaskFormPage extends BasePage {
     return this.titleInput;
   }
 
+  getNoteTextarea(): Locator {
+    return this.noteTextarea;
+  }
+
+  getDueAtInput(): Locator {
+    return this.dueAtInput;
+  }
+
+  getEstimatedMinutesInput(): Locator {
+    return this.estimatedMinutesInput;
+  }
+
+  getCloseButton(): Locator {
+    return this.closeButton;
+  }
+
   getSubmitButton(): Locator {
     return this.submitButton;
   }

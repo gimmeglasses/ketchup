@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { resetDataBase } from "@/app/db/reset";
-import { reset } from "@/app/db/setup";
 import { DashboardPage } from "../page/dashboard-page";
 import { NewTaskFormPage } from "../page/new-task-form-page";
 import { EditTaskFormPage } from "../page/edit-task-form-page";
@@ -35,6 +34,39 @@ test.beforeEach(async ({ page }) => {
   deleteTaskFormPage = new DeleteTaskFormPage(page);
 });
 
+// --- ページ表示 ---
+test.describe("ページ表示", () => {
+  test("ページが正しく読み込まれること", async ({ page }) => {
+    await page.goto("/dashboard");
+    await dashboardPage.verifyPageLoaded();
+  });
+
+  test("「今日のタスク」見出しが表示されること", async ({ page }) => {
+    await page.goto("/dashboard");
+    await dashboardPage.waitForVisible(dashboardPage.getTodayTasksHeading());
+  });
+
+  test("タスク追加ボタンが表示されること", async ({ page }) => {
+    await page.goto("/dashboard");
+    await dashboardPage.waitForVisible(dashboardPage.getAddTaskButton());
+  });
+
+  test("ナビゲーションが表示されること", async ({ page }) => {
+    await page.goto("/dashboard");
+    await dashboardPage.waitForVisible(dashboardPage.getNav());
+  });
+
+  test("ダッシュボードリンクが表示されること", async ({ page }) => {
+    await page.goto("/dashboard");
+    await dashboardPage.waitForVisible(dashboardPage.getDashboardNavLink());
+  });
+
+  test("タスク一覧リンクが表示されること", async ({ page }) => {
+    await page.goto("/dashboard");
+    await dashboardPage.waitForVisible(dashboardPage.getTasksNavLink());
+  });
+});
+
 // --- タスク登録 ---
 test.describe("タスク登録", () => {
   test("タスク登録フォームの開閉ができること", async ({ page }) => {
@@ -47,6 +79,78 @@ test.describe("タスク登録", () => {
     await test.step("タスク追加フォームを閉じる", async () => {
       await newTaskFormPage.clickClose();
       await newTaskFormPage.verifyFormClosed();
+    });
+  });
+
+  test.describe("フォーム表示", () => {
+    test("タスク名入力欄が表示されること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.waitForVisible(newTaskFormPage.getTitleInput());
+    });
+
+    test("タスクの説明入力欄が表示されること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.waitForVisible(newTaskFormPage.getNoteTextarea());
+    });
+
+    test("期限入力欄が表示されること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.waitForVisible(newTaskFormPage.getDueAtInput());
+    });
+
+    test("予定（分）入力欄が表示されること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.waitForVisible(
+        newTaskFormPage.getEstimatedMinutesInput(),
+      );
+    });
+
+    test("登録するボタンが表示されること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.waitForVisible(newTaskFormPage.getSubmitButton());
+    });
+
+    test("閉じるボタンが表示されること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.waitForVisible(newTaskFormPage.getCloseButton());
+    });
+  });
+
+  test.describe("フォーム入力", () => {
+    test("タスク名を入力できること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.fillTitle(taskName1);
+      await expect(newTaskFormPage.getTitleInput()).toHaveValue(taskName1);
+    });
+
+    test("タスクの説明を入力できること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.fillNote(note1);
+      await expect(newTaskFormPage.getNoteTextarea()).toHaveValue(note1);
+    });
+
+    test("期限を入力できること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.fillDueAt(dueAt1);
+      await expect(newTaskFormPage.getDueAtInput()).toHaveValue(dueAt1);
+    });
+
+    test("予定（分）を入力できること", async ({ page }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.fillEstimatedMinutes(estimatedMinutes1);
+      await expect(newTaskFormPage.getEstimatedMinutesInput()).toHaveValue(
+        estimatedMinutes1,
+      );
     });
   });
 
@@ -122,6 +226,26 @@ test.describe("タスク編集", () => {
     });
   });
 
+  test.describe("フォーム表示", () => {
+    test("編集フォーム表示確認：タスク名、更新するボタン、削除するボタン、閉じるボタンが設定されていること", async ({
+      page,
+    }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.fillTitle(beforeEditTask);
+      await newTaskFormPage.clickSubmit();
+      await dashboardPage.verifyTaskVisible(beforeEditTask);
+      await dashboardPage.clickEditButton(0);
+      await editTaskFormPage.verifyFormVisible();
+      await expect(editTaskFormPage.getTitleInput()).toHaveValue(
+        beforeEditTask,
+      );
+      await editTaskFormPage.waitForVisible(editTaskFormPage.getUpdateButton());
+      await editTaskFormPage.waitForVisible(editTaskFormPage.getDeleteButton());
+      await editTaskFormPage.waitForVisible(editTaskFormPage.getCloseButton());
+    });
+  });
+
   test("タスク編集の後、ダッシュボード画面に変更後のタスクが表示されていること", async ({
     page,
   }) => {
@@ -152,6 +276,29 @@ test.describe("タスク編集", () => {
 // --- タスク削除 ---
 test.describe("タスク削除", () => {
   const deleteTargetTask = "削除テスト用タスク";
+
+  test.describe("フォーム表示", () => {
+    test("タスク削除画面表示確認：削除確認メッセージ、削除対象のタスク名、削除ボタン、キャンセルボタンが表示されること/", async ({
+      page,
+    }) => {
+      await page.goto("/dashboard");
+      await dashboardPage.clickAddTaskButton();
+      await newTaskFormPage.fillTitle(deleteTargetTask);
+      await newTaskFormPage.clickSubmit();
+      await dashboardPage.verifyTaskVisible(deleteTargetTask);
+      await dashboardPage.clickEditButton(0);
+      await editTaskFormPage.verifyFormVisible();
+      await editTaskFormPage.clickDelete();
+      await deleteTaskFormPage.verifyFormVisible();
+      await deleteTaskFormPage.verifyTaskTitle(deleteTargetTask);
+      await deleteTaskFormPage.waitForVisible(
+        deleteTaskFormPage.getDeleteButton(),
+      );
+      await deleteTaskFormPage.waitForVisible(
+        deleteTaskFormPage.getCancelButton(),
+      );
+    });
+  });
 
   test("タスク削除の後、ダッシュボード画面からタスクが消えていること", async ({
     page,

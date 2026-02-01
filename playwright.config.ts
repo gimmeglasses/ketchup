@@ -42,16 +42,13 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // auth setup project
+    // auth setup project：認証済み状態、テーブルデータクリアのために実行
     { name: "setup", testMatch: /setup\/.*\.setup\.ts/ },
     // {
     //   name: "chromium",
     //   use: {
     //     ...devices["Desktop Chrome"],
-    //     // Use the storage state from the auth setup
-    //     storageState: "e2e/.auth/user.json",
     //   },
-    //   dependencies: ["setup"],
     // },
 
     // {
@@ -65,23 +62,62 @@ export default defineConfig({
     // },
 
     /* Test against mobile viewports. */
+    // Mobile Chrome（ゲスト用）：ゲスト状態（会員登録・ログイン〜ダッシュボード・タスク操作等）
+    {
+      name: "Mobile Chrome Guest",
+      use: {
+        ...devices["Pixel 5"],
+      },
+      // 以下のテストシナリオのみ実施する
+      testMatch: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
+    },
+
+    // Mobile Chrome (非ゲスト用)：認証済み状態（ダッシュボード・タスク操作等）
     {
       name: "Mobile Chrome",
       use: {
         ...devices["Pixel 5"],
-        // Use the storage state from the auth setup
+        // storageStateを使ってログイン済み状態からテスト実行
         storageState: "e2e/.auth/user.json",
       },
       dependencies: ["setup"],
+      // 以下のテストシナリオは除外する
+      testIgnore: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
     },
+    // Mobile Safari（ゲスト用）：ゲスト状態（会員登録・ログイン〜ダッシュボード・タスク操作等）
+    {
+      name: "Mobile Safari Guest",
+      use: { ...devices["iPhone 12"] },
+      // 以下のテストシナリオは実施する
+      testMatch: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
+    },
+    // Mobile Safari (非ゲスト用)：認証済み状態（ダッシュボード・タスク操作等）
     {
       name: "Mobile Safari",
       use: {
         ...devices["iPhone 12"],
-        // Use the storage state from the auth setup
+        // storageStateを使ってログイン済み状態からテスト実行
         storageState: "e2e/.auth/user.json",
       },
       dependencies: ["setup"],
+      // 以下のテストシナリオは除外する
+      testIgnore: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
     },
     /* Test against branded browsers. */
     // {
