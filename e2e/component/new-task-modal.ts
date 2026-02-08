@@ -154,37 +154,7 @@ export class NewTaskModal extends BaseModal {
    */
   async verifySubmitting() {
     await expect(
-      this.modal.getByRole("button", { name: "登録中..." })
+      this.modal.getByRole("button", { name: "登録中..." }),
     ).toBeVisible();
-  }
-
-  // --- Getter メソッド ---
-
-  getModal(): Locator {
-    return this.modal;
-  }
-
-  getTitleInput(): Locator {
-    return this.formFields.titleInput;
-  }
-
-  getNoteTextarea(): Locator {
-    return this.formFields.noteTextarea;
-  }
-
-  getDueAtInput(): Locator {
-    return this.formFields.dueAtInput;
-  }
-
-  getEstimatedMinutesInput(): Locator {
-    return this.formFields.estimatedMinutesInput;
-  }
-
-  getCloseButton(): Locator {
-    return this.closeButton;
-  }
-
-  getSubmitButton(): Locator {
-    return this.submitButton;
   }
 }

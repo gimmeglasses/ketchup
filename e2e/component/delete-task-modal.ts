@@ -70,7 +70,7 @@ export class DeleteTaskModal extends BaseModal {
    */
   async verifyTaskTitle(taskTitle: string) {
     await expect(
-      this.page.getByText(`「${taskTitle}」を削除します。`)
+      this.page.getByText(`「${taskTitle}」を削除します。`),
     ).toBeVisible();
   }
 
@@ -98,7 +98,7 @@ export class DeleteTaskModal extends BaseModal {
    */
   async verifyDeleting() {
     await expect(
-      this.page.getByRole("button", { name: "削除しています..." })
+      this.page.getByRole("button", { name: "削除しています..." }),
     ).toBeVisible();
   }
 
@@ -115,15 +115,5 @@ export class DeleteTaskModal extends BaseModal {
    */
   async dismissError() {
     await this.errorDismissButton.click();
-  }
-
-  // --- Getter メソッド ---
-
-  getCancelButton(): Locator {
-    return this.cancelButton;
-  }
-
-  getDeleteButton(): Locator {
-    return this.deleteButton;
   }
 }

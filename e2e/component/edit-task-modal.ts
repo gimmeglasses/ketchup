@@ -182,41 +182,7 @@ export class EditTaskModal extends BaseModal {
    */
   async verifyUpdating() {
     await expect(
-      this.modal.getByRole("button", { name: "更新中..." })
+      this.modal.getByRole("button", { name: "更新中..." }),
     ).toBeVisible();
-  }
-
-  // --- Getter メソッド ---
-
-  getModal(): Locator {
-    return this.modal;
-  }
-
-  getTitleInput(): Locator {
-    return this.formFields.titleInput;
-  }
-
-  getNoteTextarea(): Locator {
-    return this.formFields.noteTextarea;
-  }
-
-  getDueAtInput(): Locator {
-    return this.formFields.dueAtInput;
-  }
-
-  getEstimatedMinutesInput(): Locator {
-    return this.formFields.estimatedMinutesInput;
-  }
-
-  getCloseButton(): Locator {
-    return this.closeButton;
-  }
-
-  getUpdateButton(): Locator {
-    return this.updateButton;
-  }
-
-  getDeleteButton(): Locator {
-    return this.deleteButton;
   }
 }
