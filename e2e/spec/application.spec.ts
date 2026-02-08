@@ -7,7 +7,7 @@ import { DashboardPage } from "../page/dashboard-page";
 import { NewTaskModal } from "../component/new-task-modal";
 import { EditTaskModal } from "../component/edit-task-modal";
 import { DeleteTaskModal } from "../component/delete-task-modal";
-import { getUserId } from "../helper/supabase";
+import { getUserId } from "../helper/supabaseGetUserId";
 
 // サンプルタスク
 const taskName1 = "読書";
