@@ -43,8 +43,8 @@ export abstract class BaseModal extends BaseComponent {
    */
   async closeByBackdropClick(position: { x: number; y: number } = { x: 5, y: 5 }) {
     // モーダルの外側（背景オーバーレイ）をクリック
-    // ModalContainer.tsx: <div className="fixed inset-0 ..." onClick={onClose}>
-    await this.page.locator(".fixed.inset-0").click({ position });
+    // ModalContainer.tsx: <div className="fixed inset-0 bg-black/50 ..." onClick={onClose}>
+    await this.page.locator(".fixed.inset-0.bg-black\\/50").click({ position });
   }
 
   /**
