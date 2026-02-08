@@ -171,7 +171,7 @@ test.describe("アプリケーション統合シナリオ", () => {
 
     // --- タスク削除 ---
     await test.step("タスク削除の後、ダッシュボード画面からタスクが消えていること", async () => {
-      await resetTaskData();
+      await resetTaskData(userId);
       await page.goto("/dashboard");
       await dashboardPage.verifyPageLoaded();
 
@@ -197,7 +197,7 @@ test.describe("アプリケーション統合シナリオ", () => {
 
     // --- タスク完了 ---
     await test.step("タスクを完了すると、ダッシュボード画面から消えること", async () => {
-      await resetTaskData();
+      await resetTaskData(userId);
       await page.goto("/dashboard");
       await dashboardPage.verifyPageLoaded();
 
@@ -216,7 +216,7 @@ test.describe("アプリケーション統合シナリオ", () => {
 
     // --- ポモドーロタイマー実行 ---
     await test.step("タスク登録の後、ポモドーロタイマーが表示し、開始・終了すること", async () => {
-      await resetTaskData();
+      await resetTaskData(userId);
       await page.goto("/dashboard");
       await dashboardPage.verifyPageLoaded();
 
@@ -242,7 +242,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     });
 
     await test.step("ポモドーロタイマー実行中に別のタスクを選択すると、確認画面が表示し、タスクを切り替えられること", async () => {
-      await resetTaskData();
+      await resetTaskData(userId);
       await page.goto("/dashboard");
       await dashboardPage.verifyPageLoaded();
 

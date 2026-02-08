@@ -41,8 +41,9 @@ export abstract class BaseModal extends BaseComponent {
    * ModalContainer.tsx の外側div onClick をテストします
    * @param position - クリック位置（デフォルトは左上隅）
    */
-  async closeByBackdropClick(position: { x: number; y: number } = { x: 5, y: 5 }) {
-    // モーダルの外側（背景オーバーレイ）をクリック
+  async closeByBackdropClick(
+    position: { x: number; y: number } = { x: 5, y: 5 },
+  ) {
     // ModalContainer.tsx: <div className="fixed inset-0 bg-black/50 ..." onClick={onClose}>
     await this.page.locator(".fixed.inset-0.bg-black\\/50").click({ position });
   }
