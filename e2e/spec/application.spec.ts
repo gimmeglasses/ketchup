@@ -1,20 +1,20 @@
 import { test, expect } from "@playwright/test";
-import { resetDataBase } from "@/app/db/reset";
+import { resetTaskData } from "../db/task-data.reset";
 import { TopPage } from "../page/top-page";
 import { RegisterPage } from "../page/register-page";
 import { LoginPage } from "../page/login-page";
 import { DashboardPage } from "../page/dashboard-page";
-import { NewTaskFormPage } from "../page/new-task-form-page";
-import { EditTaskFormPage } from "../page/edit-task-form-page";
-import { DeleteTaskFormPage } from "../page/delete-task-form-page";
+import { NewTaskModal } from "../component/new-task-modal";
+import { EditTaskModal } from "../component/edit-task-modal";
+import { DeleteTaskModal } from "../component/delete-task-modal";
 
 let topPage: TopPage;
 let registerPage: RegisterPage;
 let loginPage: LoginPage;
 let dashboardPage: DashboardPage;
-let newTaskFormPage: NewTaskFormPage;
-let editTaskFormPage: EditTaskFormPage;
-let deleteTaskFormPage: DeleteTaskFormPage;
+let newTaskModal: NewTaskModal;
+let editTaskModal: EditTaskModal;
+let deleteTaskModal: DeleteTaskModal;
 // Path for authentication file
 const authFile = "e2e/.auth/user.json";
 
@@ -40,9 +40,9 @@ test.describe("アプリケーション統合シナリオ", () => {
     registerPage = new RegisterPage(page);
     loginPage = new LoginPage(page);
     dashboardPage = new DashboardPage(page);
-    newTaskFormPage = new NewTaskFormPage(page);
-    editTaskFormPage = new EditTaskFormPage(page);
-    deleteTaskFormPage = new DeleteTaskFormPage(page);
+    newTaskModal = new NewTaskModal(page);
+    editTaskModal = new EditTaskModal(page);
+    deleteTaskModal = new DeleteTaskModal(page);
   });
 
   // --- 会員登録・ログイン（storageState なしで実行） ---
@@ -122,7 +122,7 @@ test.describe("アプリケーション統合シナリオ", () => {
   test.describe("ダッシュボードシナリオ", () => {
     test.use({ storageState: authFile });
     test.beforeEach(async () => {
-      await resetDataBase();
+      await resetTaskData();
     });
     // --- タスク登録 ---
     test("タスク登録の後、ダッシュボード画面にタスクが一覧表示されていること", async ({
@@ -132,11 +132,11 @@ test.describe("アプリケーション統合シナリオ", () => {
         await page.goto("/dashboard");
         await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(taskName1);
-        await newTaskFormPage.fillNote(note1);
-        await newTaskFormPage.fillDueAt(dueAt1);
-        await newTaskFormPage.fillEstimatedMinutes(estimatedMinutes1);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(taskName1);
+        await newTaskModal.fillNote(note1);
+        await newTaskModal.fillDueAt(dueAt1);
+        await newTaskModal.fillEstimatedMinutes(estimatedMinutes1);
+        await newTaskModal.clickSubmit();
       });
 
       await test.step("タスク1が一覧表示されていること", async () => {
@@ -145,11 +145,11 @@ test.describe("アプリケーション統合シナリオ", () => {
 
       await test.step("タスク2を登録する", async () => {
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(taskName2);
-        await newTaskFormPage.fillNote(note2);
-        await newTaskFormPage.fillDueAt(dueAt2);
-        await newTaskFormPage.fillEstimatedMinutes(estimatedMinutes2);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(taskName2);
+        await newTaskModal.fillNote(note2);
+        await newTaskModal.fillDueAt(dueAt2);
+        await newTaskModal.fillEstimatedMinutes(estimatedMinutes2);
+        await newTaskModal.clickSubmit();
       });
 
       await test.step("タスク2が一覧表示されていること", async () => {
@@ -174,19 +174,19 @@ test.describe("アプリケーション統合シナリオ", () => {
         await page.goto("/dashboard");
         await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(beforeEditTask);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(beforeEditTask);
+        await newTaskModal.clickSubmit();
         await dashboardPage.verifyTaskVisible(beforeEditTask);
       });
 
       await test.step("編集フォームを開く", async () => {
         await dashboardPage.clickEditButton(0);
-        await editTaskFormPage.verifyFormVisible();
+        await editTaskModal.verifyFormVisible();
       });
 
       await test.step("タスク名を変更して更新する", async () => {
-        await editTaskFormPage.fillTitle(afterEditTask);
-        await editTaskFormPage.clickUpdate();
+        await editTaskModal.fillTitle(afterEditTask);
+        await editTaskModal.clickUpdate();
       });
 
       await test.step("変更後のタスクが一覧に表示されていること", async () => {
@@ -206,24 +206,24 @@ test.describe("アプリケーション統合シナリオ", () => {
         await page.goto("/dashboard");
         await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(deleteTargetTask);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(deleteTargetTask);
+        await newTaskModal.clickSubmit();
         await dashboardPage.verifyTaskVisible(deleteTargetTask);
       });
 
       await test.step("編集フォームから削除ボタンを押す", async () => {
         await dashboardPage.clickEditButton(0);
-        await editTaskFormPage.verifyFormVisible();
-        await editTaskFormPage.clickDelete();
+        await editTaskModal.verifyFormVisible();
+        await editTaskModal.clickDelete();
       });
 
       await test.step("削除確認ダイアログが表示されること", async () => {
-        await deleteTaskFormPage.verifyFormVisible();
-        await deleteTaskFormPage.verifyTaskTitle(deleteTargetTask);
+        await deleteTaskModal.verifyFormVisible();
+        await deleteTaskModal.verifyTaskTitle(deleteTargetTask);
       });
 
       await test.step("削除を実行する", async () => {
-        await deleteTaskFormPage.clickDelete();
+        await deleteTaskModal.clickDelete();
       });
 
       await test.step("タスクが一覧から消えていること", async () => {
@@ -245,8 +245,8 @@ test.describe("アプリケーション統合シナリオ", () => {
         await page.goto("/dashboard");
         await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(completeTargetTask);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(completeTargetTask);
+        await newTaskModal.clickSubmit();
         await dashboardPage.verifyTaskVisible(completeTargetTask);
       });
 
@@ -274,8 +274,8 @@ test.describe("アプリケーション統合シナリオ", () => {
         await page.goto("/dashboard");
         await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(pomodoroTargetTask1);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(pomodoroTargetTask1);
+        await newTaskModal.clickSubmit();
         await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
       });
 
@@ -308,8 +308,8 @@ test.describe("アプリケーション統合シナリオ", () => {
         await page.goto("/dashboard");
         await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(pomodoroTargetTask1);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(pomodoroTargetTask1);
+        await newTaskModal.clickSubmit();
         await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
       });
 
@@ -317,8 +317,8 @@ test.describe("アプリケーション統合シナリオ", () => {
         await page.goto("/dashboard");
         await dashboardPage.verifyPageLoaded();
         await dashboardPage.clickAddTaskButton();
-        await newTaskFormPage.fillTitle(pomodoroTargetTask2);
-        await newTaskFormPage.clickSubmit();
+        await newTaskModal.fillTitle(pomodoroTargetTask2);
+        await newTaskModal.clickSubmit();
         await dashboardPage.verifyTaskVisible(pomodoroTargetTask2);
       });
 
