@@ -24,15 +24,24 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  timeout: 10 * 60 * 1000, // testのtimeoutの時間を変更
+
+  expect: {
+    timeout: 10 * 1000, // expectのtimeoutの時間を変更
+  },
+
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: "http://localhost:3000",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    // trace: "on-first-retry",
+    trace: "retain-on-failure",
+    screenshot: { mode: "only-on-failure", fullPage: true },
+    video: "retain-on-failure",
 
     // 失敗時のスクリーンショットを保存
-    screenshot: "only-on-failure",
+    // screenshot: "only-on-failure",
 
     // ブラウザのUI、日付、通貨などを日本語化
     locale: "ja-JP",
@@ -45,8 +54,6 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // auth setup project：認証済み状態、テーブルデータクリアのために実行
-    { name: "setup", testMatch: /setup\/.*\.setup\.ts/ },
     // {
     //   name: "chromium",
     //   use: {
@@ -80,14 +87,22 @@ export default defineConfig({
     },
 
     // Mobile Chrome (非ゲスト用)：認証済み状態（ダッシュボード・タスク操作等）
+    // auth setup project：認証済み状態、テーブルデータクリアのために実行
+    {
+      name: "setup-mobile-chrome",
+      metadata: {
+        authFileName: "user-mobile-chrome.json",
+      },
+      testMatch: /setup\/user-login\.setup\.ts/,
+    },
     {
       name: "Mobile Chrome",
       use: {
         ...devices["Pixel 5"],
         // storageStateを使ってログイン済み状態からテスト実行
-        storageState: "e2e/.auth/user.json",
+        storageState: "e2e/.auth/user-mobile-chrome.json",
       },
-      dependencies: ["setup"],
+      dependencies: ["setup-mobile-chrome"],
       // 以下のテストシナリオは除外する
       testIgnore: [
         "**/application.spec.ts",
@@ -107,14 +122,22 @@ export default defineConfig({
       ],
     },
     // Mobile Safari (非ゲスト用)：認証済み状態（ダッシュボード・タスク操作等）
+    // auth setup project：認証済み状態、テーブルデータクリアのために実行
+    {
+      name: "setup-mobile-safari",
+      metadata: {
+        authFileName: "user-mobile-safari.json",
+      },
+      testMatch: /setup\/user-login\.setup\.ts/,
+    },
     {
       name: "Mobile Safari",
       use: {
         ...devices["iPhone 12"],
         // storageStateを使ってログイン済み状態からテスト実行
-        storageState: "e2e/.auth/user.json",
+        storageState: "e2e/.auth/user-mobile-safari.json",
       },
-      dependencies: ["setup"],
+      dependencies: ["setup-mobile-safari"],
       // 以下のテストシナリオは除外する
       testIgnore: [
         "**/application.spec.ts",

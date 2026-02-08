@@ -1,15 +1,16 @@
 import { test as setup, expect } from "@playwright/test";
 import { LoginPage } from "../page/login-page";
 
-const authFile = "e2e/.auth/user.json";
 let loginPage: LoginPage;
 
-setup("authenticate", async ({ page }) => {
+setup("authenticate", async ({ page }, testInfo) => {
   // ユーザー登録用のテストデータを生成
-  // const unique = Date.now();
-  // const testName = `e2e test User ${unique}`;
   const testEmail = `e2etest@example.com`;
   const testPassword = "password";
+  const fileName =
+    (testInfo.project.metadata.authFileName as string) || "auth-default.json";
+  const authFile = `e2e/.auth/${fileName}`;
+  console.log(`filename: ${authFile}`);
 
   loginPage = new LoginPage(page);
   // Perform authentication steps. Replace these actions with your own.

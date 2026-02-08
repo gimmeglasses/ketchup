@@ -1,14 +1,14 @@
-import { test, expect } from "@playwright/test";
-import { resetDataBase } from "@/app/db/reset";
+import { test, expect, WorkerInfo } from "@playwright/test";
+import { resetTaskData } from "../db/task-data.reset";
 import { DashboardPage } from "../page/dashboard-page";
-import { NewTaskFormPage } from "../page/new-task-form-page";
-import { EditTaskFormPage } from "../page/edit-task-form-page";
-import { DeleteTaskFormPage } from "../page/delete-task-form-page";
+import { NewTaskModal } from "../component/new-task-modal";
+import { EditTaskModal } from "../component/edit-task-modal";
+import { DeleteTaskModal } from "../component/delete-task-modal";
 
 let dashboardPage: DashboardPage;
-let newTaskFormPage: NewTaskFormPage;
-let editTaskFormPage: EditTaskFormPage;
-let deleteTaskFormPage: DeleteTaskFormPage;
+let newTaskModal: NewTaskModal;
+let editTaskModal: EditTaskModal;
+let deleteTaskModal: DeleteTaskModal;
 
 // サンプルタスク
 const taskName1 = "読書";
@@ -26,12 +26,13 @@ const estimatedMinutes2 = "180";
 const taskName3 = "洗濯";
 const note3 = "洗濯機を回す。洗濯物を干す";
 
-test.beforeEach(async ({ page }) => {
-  await resetDataBase();
+test.beforeEach(async ({ page }, workerInfo: WorkerInfo) => {
+  await resetTaskData();
   dashboardPage = new DashboardPage(page);
-  newTaskFormPage = new NewTaskFormPage(page);
-  editTaskFormPage = new EditTaskFormPage(page);
-  deleteTaskFormPage = new DeleteTaskFormPage(page);
+  newTaskModal = new NewTaskModal(page);
+  editTaskModal = new EditTaskModal(page);
+  deleteTaskModal = new DeleteTaskModal(page);
+  console.log(`Starting test in project: ${workerInfo.project.name}`);
 });
 
 // --- ページ表示 ---
@@ -73,12 +74,12 @@ test.describe("タスク登録", () => {
     await test.step("タスク追加フォームを開く", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.verifyFormVisible();
+      await newTaskModal.verifyFormVisible();
     });
 
     await test.step("タスク追加フォームを閉じる", async () => {
-      await newTaskFormPage.clickClose();
-      await newTaskFormPage.verifyFormClosed();
+      await newTaskModal.clickClose();
+      await newTaskModal.verifyFormClosed();
     });
   });
 
@@ -86,39 +87,39 @@ test.describe("タスク登録", () => {
     test("タスク名入力欄が表示されること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.waitForVisible(newTaskFormPage.getTitleInput());
+      await newTaskModal.waitForVisible(newTaskModal.getTitleInput());
     });
 
     test("タスクの説明入力欄が表示されること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.waitForVisible(newTaskFormPage.getNoteTextarea());
+      await newTaskModal.waitForVisible(newTaskModal.getNoteTextarea());
     });
 
     test("期限入力欄が表示されること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.waitForVisible(newTaskFormPage.getDueAtInput());
+      await newTaskModal.waitForVisible(newTaskModal.getDueAtInput());
     });
 
     test("予定（分）入力欄が表示されること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.waitForVisible(
-        newTaskFormPage.getEstimatedMinutesInput(),
+      await newTaskModal.waitForVisible(
+        newTaskModal.getEstimatedMinutesInput(),
       );
     });
 
     test("登録するボタンが表示されること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.waitForVisible(newTaskFormPage.getSubmitButton());
+      await newTaskModal.waitForVisible(newTaskModal.getSubmitButton());
     });
 
     test("閉じるボタンが表示されること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.waitForVisible(newTaskFormPage.getCloseButton());
+      await newTaskModal.waitForVisible(newTaskModal.getCloseButton());
     });
   });
 
@@ -126,29 +127,29 @@ test.describe("タスク登録", () => {
     test("タスク名を入力できること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(taskName1);
-      await expect(newTaskFormPage.getTitleInput()).toHaveValue(taskName1);
+      await newTaskModal.fillTitle(taskName1);
+      await expect(newTaskModal.getTitleInput()).toHaveValue(taskName1);
     });
 
     test("タスクの説明を入力できること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillNote(note1);
-      await expect(newTaskFormPage.getNoteTextarea()).toHaveValue(note1);
+      await newTaskModal.fillNote(note1);
+      await expect(newTaskModal.getNoteTextarea()).toHaveValue(note1);
     });
 
     test("期限を入力できること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillDueAt(dueAt1);
-      await expect(newTaskFormPage.getDueAtInput()).toHaveValue(dueAt1);
+      await newTaskModal.fillDueAt(dueAt1);
+      await expect(newTaskModal.getDueAtInput()).toHaveValue(dueAt1);
     });
 
     test("予定（分）を入力できること", async ({ page }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillEstimatedMinutes(estimatedMinutes1);
-      await expect(newTaskFormPage.getEstimatedMinutesInput()).toHaveValue(
+      await newTaskModal.fillEstimatedMinutes(estimatedMinutes1);
+      await expect(newTaskModal.getEstimatedMinutesInput()).toHaveValue(
         estimatedMinutes1,
       );
     });
@@ -160,11 +161,11 @@ test.describe("タスク登録", () => {
     await test.step("タスク1を登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(taskName1);
-      await newTaskFormPage.fillNote(note1);
-      await newTaskFormPage.fillDueAt(dueAt1);
-      await newTaskFormPage.fillEstimatedMinutes(estimatedMinutes1);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(taskName1);
+      await newTaskModal.fillNote(note1);
+      await newTaskModal.fillDueAt(dueAt1);
+      await newTaskModal.fillEstimatedMinutes(estimatedMinutes1);
+      await newTaskModal.clickSubmit();
     });
 
     await test.step("タスク1が一覧表示されていること", async () => {
@@ -173,11 +174,11 @@ test.describe("タスク登録", () => {
 
     await test.step("タスク2を登録する", async () => {
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(taskName2);
-      await newTaskFormPage.fillNote(note2);
-      await newTaskFormPage.fillDueAt(dueAt2);
-      await newTaskFormPage.fillEstimatedMinutes(estimatedMinutes2);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(taskName2);
+      await newTaskModal.fillNote(note2);
+      await newTaskModal.fillDueAt(dueAt2);
+      await newTaskModal.fillEstimatedMinutes(estimatedMinutes2);
+      await newTaskModal.clickSubmit();
     });
 
     await test.step("タスク2が一覧表示されていること", async () => {
@@ -186,9 +187,9 @@ test.describe("タスク登録", () => {
 
     await test.step("タスク3を登録する", async () => {
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(taskName3);
-      await newTaskFormPage.fillNote(note3);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(taskName3);
+      await newTaskModal.fillNote(note3);
+      await newTaskModal.clickSubmit();
     });
 
     await test.step("タスク3が一覧表示されていること", async () => {
@@ -210,19 +211,19 @@ test.describe("タスク編集", () => {
     await test.step("タスクを登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(beforeEditTask);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(beforeEditTask);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(beforeEditTask);
     });
 
     await test.step("編集フォームを開く", async () => {
       await dashboardPage.clickEditButton(0);
-      await editTaskFormPage.verifyFormVisible();
+      await editTaskModal.verifyFormVisible();
     });
 
     await test.step("編集フォームを閉じる", async () => {
-      await editTaskFormPage.clickClose();
-      await editTaskFormPage.verifyFormClosed();
+      await editTaskModal.clickClose();
+      await editTaskModal.verifyFormClosed();
     });
   });
 
@@ -232,17 +233,15 @@ test.describe("タスク編集", () => {
     }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(beforeEditTask);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(beforeEditTask);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(beforeEditTask);
       await dashboardPage.clickEditButton(0);
-      await editTaskFormPage.verifyFormVisible();
-      await expect(editTaskFormPage.getTitleInput()).toHaveValue(
-        beforeEditTask,
-      );
-      await editTaskFormPage.waitForVisible(editTaskFormPage.getUpdateButton());
-      await editTaskFormPage.waitForVisible(editTaskFormPage.getDeleteButton());
-      await editTaskFormPage.waitForVisible(editTaskFormPage.getCloseButton());
+      await editTaskModal.verifyFormVisible();
+      await expect(editTaskModal.getTitleInput()).toHaveValue(beforeEditTask);
+      await editTaskModal.waitForVisible(editTaskModal.getUpdateButton());
+      await editTaskModal.waitForVisible(editTaskModal.getDeleteButton());
+      await editTaskModal.waitForVisible(editTaskModal.getCloseButton());
     });
   });
 
@@ -252,19 +251,19 @@ test.describe("タスク編集", () => {
     await test.step("タスクを登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(beforeEditTask);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(beforeEditTask);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(beforeEditTask);
     });
 
     await test.step("編集フォームを開く", async () => {
       await dashboardPage.clickEditButton(0);
-      await editTaskFormPage.verifyFormVisible();
+      await editTaskModal.verifyFormVisible();
     });
 
     await test.step("タスク名を変更して更新する", async () => {
-      await editTaskFormPage.fillTitle(afterEditTask);
-      await editTaskFormPage.clickUpdate();
+      await editTaskModal.fillTitle(afterEditTask);
+      await editTaskModal.clickUpdate();
     });
 
     await test.step("変更後のタスクが一覧に表示されていること", async () => {
@@ -283,20 +282,16 @@ test.describe("タスク削除", () => {
     }) => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(deleteTargetTask);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(deleteTargetTask);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(deleteTargetTask);
       await dashboardPage.clickEditButton(0);
-      await editTaskFormPage.verifyFormVisible();
-      await editTaskFormPage.clickDelete();
-      await deleteTaskFormPage.verifyFormVisible();
-      await deleteTaskFormPage.verifyTaskTitle(deleteTargetTask);
-      await deleteTaskFormPage.waitForVisible(
-        deleteTaskFormPage.getDeleteButton(),
-      );
-      await deleteTaskFormPage.waitForVisible(
-        deleteTaskFormPage.getCancelButton(),
-      );
+      await editTaskModal.verifyFormVisible();
+      await editTaskModal.clickDelete();
+      await deleteTaskModal.verifyFormVisible();
+      await deleteTaskModal.verifyTaskTitle(deleteTargetTask);
+      await deleteTaskModal.waitForVisible(deleteTaskModal.getDeleteButton());
+      await deleteTaskModal.waitForVisible(deleteTaskModal.getCancelButton());
     });
   });
 
@@ -306,24 +301,24 @@ test.describe("タスク削除", () => {
     await test.step("タスクを登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(deleteTargetTask);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(deleteTargetTask);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(deleteTargetTask);
     });
 
     await test.step("編集フォームから削除ボタンを押す", async () => {
       await dashboardPage.clickEditButton(0);
-      await editTaskFormPage.verifyFormVisible();
-      await editTaskFormPage.clickDelete();
+      await editTaskModal.verifyFormVisible();
+      await editTaskModal.clickDelete();
     });
 
     await test.step("削除確認ダイアログが表示されること", async () => {
-      await deleteTaskFormPage.verifyFormVisible();
-      await deleteTaskFormPage.verifyTaskTitle(deleteTargetTask);
+      await deleteTaskModal.verifyFormVisible();
+      await deleteTaskModal.verifyTaskTitle(deleteTargetTask);
     });
 
     await test.step("削除を実行する", async () => {
-      await deleteTaskFormPage.clickDelete();
+      await deleteTaskModal.clickDelete();
     });
 
     await test.step("タスクが一覧から消えていること", async () => {
@@ -339,24 +334,24 @@ test.describe("タスク削除", () => {
     await test.step("タスクを登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(deleteTargetTask);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(deleteTargetTask);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(deleteTargetTask);
     });
 
     await test.step("編集フォームから削除ボタンを押す", async () => {
       await dashboardPage.clickEditButton(0);
-      await editTaskFormPage.verifyFormVisible();
-      await editTaskFormPage.clickDelete();
+      await editTaskModal.verifyFormVisible();
+      await editTaskModal.clickDelete();
     });
 
     await test.step("キャンセルする", async () => {
-      await deleteTaskFormPage.verifyFormVisible();
-      await deleteTaskFormPage.clickCancel();
+      await deleteTaskModal.verifyFormVisible();
+      await deleteTaskModal.clickCancel();
     });
 
     await test.step("編集フォームを閉じる", async () => {
-      await editTaskFormPage.clickClose();
+      await editTaskModal.clickClose();
     });
 
     await test.step("タスクが一覧に残っていること", async () => {
@@ -374,8 +369,8 @@ test.describe("タスク完了", () => {
     await test.step("タスクを登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(completeTargetTask);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(completeTargetTask);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(completeTargetTask);
     });
 
@@ -401,8 +396,8 @@ test.describe("ポモドーロタイマー実行", () => {
     await test.step("タスク1を登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(pomodoroTargetTask1);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(pomodoroTargetTask1);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
     });
 
@@ -432,16 +427,16 @@ test.describe("ポモドーロタイマー実行", () => {
     await test.step("タスク1を登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(pomodoroTargetTask1);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(pomodoroTargetTask1);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
     });
 
     await test.step("タスク2を登録する", async () => {
       await page.goto("/dashboard");
       await dashboardPage.clickAddTaskButton();
-      await newTaskFormPage.fillTitle(pomodoroTargetTask2);
-      await newTaskFormPage.clickSubmit();
+      await newTaskModal.fillTitle(pomodoroTargetTask2);
+      await newTaskModal.clickSubmit();
       await dashboardPage.verifyTaskVisible(pomodoroTargetTask2);
     });
 
