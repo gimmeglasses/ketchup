@@ -15,7 +15,6 @@
     "dayjs": "^1.11.19",
     "drizzle-orm": "^0.45.1",
     "next": "^15.5.10",
-    "drizzle-seed": "^0.3.1",
     "postgres": "^3.4.7",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -47,6 +46,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.0.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.16",
+    "drizzle-seed": "^0.3.1"
   }
 }
