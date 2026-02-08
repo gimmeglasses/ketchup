@@ -7,7 +7,7 @@ import { DashboardPage } from "../page/dashboard-page";
 import { NewTaskModal } from "../component/new-task-modal";
 import { EditTaskModal } from "../component/edit-task-modal";
 import { DeleteTaskModal } from "../component/delete-task-modal";
-import { getUserId } from "../helper/supabase.ts";
+import { getUserId } from "../helper/supabase";
 
 // サンプルタスク
 const taskName1 = "読書";
@@ -99,7 +99,7 @@ test.describe("アプリケーション統合シナリオ", () => {
 
       if (afterConfirmUrl.includes("/auth/confirm")) {
         await page.waitForURL(/\/auth\/login|\/(dashboard)/, {
-          timeout: 30000,
+          timeout: 15000,
         });
       }
     });

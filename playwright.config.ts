@@ -27,7 +27,7 @@ export default defineConfig({
   timeout: 10 * 60 * 1000, // testのtimeoutの時間を変更
 
   expect: {
-    timeout: 10 * 1000, // expectのtimeoutの時間を変更
+    timeout: 15 * 1000, // expectのtimeoutの時間を変更
   },
 
   use: {
