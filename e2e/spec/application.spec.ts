@@ -7,16 +7,7 @@ import { DashboardPage } from "../page/dashboard-page";
 import { NewTaskModal } from "../component/new-task-modal";
 import { EditTaskModal } from "../component/edit-task-modal";
 import { DeleteTaskModal } from "../component/delete-task-modal";
-
-let topPage: TopPage;
-let registerPage: RegisterPage;
-let loginPage: LoginPage;
-let dashboardPage: DashboardPage;
-let newTaskModal: NewTaskModal;
-let editTaskModal: EditTaskModal;
-let deleteTaskModal: DeleteTaskModal;
-// Path for authentication file
-const authFile = "e2e/.auth/user.json";
+import { getUserId } from "../helper/supabase.ts";
 
 // サンプルタスク
 const taskName1 = "読書";
@@ -31,24 +22,31 @@ const note2 = "コラボレーティブ開発特論のレポートを書く";
 const dueAt2 = date.toISOString().split("T")[0];
 const estimatedMinutes2 = "180";
 
-// ファイル全体をシリアル実行にして、会員登録 → ダッシュボードの順序を保証する
-test.describe.configure({ mode: "serial" });
+// タスク編集
+const beforeEditTask = "編集テスト用タスク（Before）";
+const afterEditTask = "編集テスト用タスク（After）";
+
+// タスク削除
+const deleteTargetTask = "削除テスト用タスク";
+
+// タスク完了
+const completeTargetTask = "完了テスト用タスク";
+
+// ポモドーロタイマー
+const pomodoroTargetTask1 = "ポモドーロテスト用タスク１";
+const pomodoroTargetTask2 = "ポモドーロテスト用タスク２";
 
 test.describe("アプリケーション統合シナリオ", () => {
-  test.beforeEach(async ({ page }) => {
-    topPage = new TopPage(page);
-    registerPage = new RegisterPage(page);
-    loginPage = new LoginPage(page);
-    dashboardPage = new DashboardPage(page);
-    newTaskModal = new NewTaskModal(page);
-    editTaskModal = new EditTaskModal(page);
-    deleteTaskModal = new DeleteTaskModal(page);
-  });
+  test("会員登録からダッシュボード操作までの統合シナリオ", async ({ page }) => {
+    // ページオブジェクト初期化
+    const topPage = new TopPage(page);
+    const registerPage = new RegisterPage(page);
+    const loginPage = new LoginPage(page);
+    const dashboardPage = new DashboardPage(page);
+    const newTaskModal = new NewTaskModal(page);
+    const editTaskModal = new EditTaskModal(page);
+    const deleteTaskModal = new DeleteTaskModal(page);
 
-  // --- 会員登録・ログイン（storageState なしで実行） ---
-  test("会員登録からログインしてダッシュボードに遷移できること", async ({
-    page,
-  }) => {
     // ユーザー登録用のテストデータを生成
     const unique = Date.now();
     const testName = `e2e test User ${unique}`;
@@ -56,6 +54,8 @@ test.describe("アプリケーション統合シナリオ", () => {
     const testPassword = "password";
 
     let confirmationLink: string;
+
+    // --- 会員登録・ログイン ---
 
     await test.step("トップページから会員登録ページへ遷移", async () => {
       await topPage.navigate();
@@ -99,7 +99,7 @@ test.describe("アプリケーション統合シナリオ", () => {
 
       if (afterConfirmUrl.includes("/auth/confirm")) {
         await page.waitForURL(/\/auth\/login|\/(dashboard)/, {
-          timeout: 15000,
+          timeout: 30000,
         });
       }
     });
@@ -114,260 +114,177 @@ test.describe("アプリケーション統合シナリオ", () => {
       await expect(page).toHaveURL(/\/dashboard/);
     });
 
-    // 認証済みの状態を保存して後続テストで再利用する
-    await page.context().storageState({ path: authFile });
-  });
+    // const cookieStore = await cookies(page);
+    // console.log(`user session: ${cookieStore}`);
+    const userId = await getUserId(page);
 
-  // --- 認証済みテスト（storageState を使用） ---
-  test.describe("ダッシュボードシナリオ", () => {
-    test.use({ storageState: authFile });
-    test.beforeEach(async () => {
-      await resetTaskData();
-    });
+    console.log(`user session: ${userId}`);
+
+    // --- ダッシュボードシナリオ（同一セッションで継続） ---
+
     // --- タスク登録 ---
-    test("タスク登録の後、ダッシュボード画面にタスクが一覧表示されていること", async ({
-      page,
-    }) => {
-      await test.step("タスク1を登録する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(taskName1);
-        await newTaskModal.fillNote(note1);
-        await newTaskModal.fillDueAt(dueAt1);
-        await newTaskModal.fillEstimatedMinutes(estimatedMinutes1);
-        await newTaskModal.clickSubmit();
-      });
+    await test.step("タスク登録の後、ダッシュボード画面にタスクが一覧表示されていること", async () => {
+      await resetTaskData(userId);
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
 
-      await test.step("タスク1が一覧表示されていること", async () => {
-        await dashboardPage.verifyTaskVisible(taskName1);
-      });
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(taskName1);
+      await newTaskModal.fillNote(note1);
+      await newTaskModal.fillDueAt(dueAt1);
+      await newTaskModal.fillEstimatedMinutes(estimatedMinutes1);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(taskName1);
 
-      await test.step("タスク2を登録する", async () => {
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(taskName2);
-        await newTaskModal.fillNote(note2);
-        await newTaskModal.fillDueAt(dueAt2);
-        await newTaskModal.fillEstimatedMinutes(estimatedMinutes2);
-        await newTaskModal.clickSubmit();
-      });
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(taskName2);
+      await newTaskModal.fillNote(note2);
+      await newTaskModal.fillDueAt(dueAt2);
+      await newTaskModal.fillEstimatedMinutes(estimatedMinutes2);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(taskName2);
 
-      await test.step("タスク2が一覧表示されていること", async () => {
-        await dashboardPage.verifyTaskVisible(taskName2);
-      });
-
-      await test.step("2つのタスクが一覧に表示されていること", async () => {
-        expect(await dashboardPage.getTaskCount()).toBe(2);
-      });
-      // ブラウザ上で結果を確認するために設定
+      expect(await dashboardPage.getTaskCount()).toBe(2);
       await dashboardPage.verifyPageLoaded();
     });
 
     // --- タスク編集 ---
-    const beforeEditTask = "編集テスト用タスク（Before）";
-    const afterEditTask = "編集テスト用タスク（After）";
+    await test.step("タスク編集の後、ダッシュボード画面に変更後のタスクが表示されていること", async () => {
+      await resetTaskData(userId);
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
 
-    test("タスク編集の後、ダッシュボード画面に変更後のタスクが表示されていること", async ({
-      page,
-    }) => {
-      await test.step("タスクを登録する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(beforeEditTask);
-        await newTaskModal.clickSubmit();
-        await dashboardPage.verifyTaskVisible(beforeEditTask);
-      });
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(beforeEditTask);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(beforeEditTask);
 
-      await test.step("編集フォームを開く", async () => {
-        await dashboardPage.clickEditButton(0);
-        await editTaskModal.verifyFormVisible();
-      });
+      await dashboardPage.clickEditButton(0);
+      await editTaskModal.verifyFormVisible();
 
-      await test.step("タスク名を変更して更新する", async () => {
-        await editTaskModal.fillTitle(afterEditTask);
-        await editTaskModal.clickUpdate();
-      });
+      await editTaskModal.fillTitle(afterEditTask);
+      await editTaskModal.clickUpdate();
 
-      await test.step("変更後のタスクが一覧に表示されていること", async () => {
-        await dashboardPage.verifyTaskVisible(afterEditTask);
-      });
-      // ブラウザ上で結果を確認するために設定
+      await dashboardPage.verifyTaskVisible(afterEditTask);
       await dashboardPage.verifyPageLoaded();
     });
 
     // --- タスク削除 ---
-    const deleteTargetTask = "削除テスト用タスク";
+    await test.step("タスク削除の後、ダッシュボード画面からタスクが消えていること", async () => {
+      await resetTaskData();
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
 
-    test("タスク削除の後、ダッシュボード画面からタスクが消えていること", async ({
-      page,
-    }) => {
-      await test.step("タスクを登録する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(deleteTargetTask);
-        await newTaskModal.clickSubmit();
-        await dashboardPage.verifyTaskVisible(deleteTargetTask);
-      });
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(deleteTargetTask);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(deleteTargetTask);
 
-      await test.step("編集フォームから削除ボタンを押す", async () => {
-        await dashboardPage.clickEditButton(0);
-        await editTaskModal.verifyFormVisible();
-        await editTaskModal.clickDelete();
-      });
+      await dashboardPage.clickEditButton(0);
+      await editTaskModal.verifyFormVisible();
+      await editTaskModal.clickDelete();
 
-      await test.step("削除確認ダイアログが表示されること", async () => {
-        await deleteTaskModal.verifyFormVisible();
-        await deleteTaskModal.verifyTaskTitle(deleteTargetTask);
-      });
+      await deleteTaskModal.verifyFormVisible();
+      await deleteTaskModal.verifyTaskTitle(deleteTargetTask);
 
-      await test.step("削除を実行する", async () => {
-        await deleteTaskModal.clickDelete();
-      });
+      await deleteTaskModal.clickDelete();
 
-      await test.step("タスクが一覧から消えていること", async () => {
-        await expect(
-          page.getByText(deleteTargetTask, { exact: true }),
-        ).not.toBeVisible();
-      });
-      // ブラウザ上で結果を確認するために設定
+      await expect(
+        page.getByText(deleteTargetTask, { exact: true }),
+      ).not.toBeVisible();
       await dashboardPage.verifyPageLoaded();
     });
 
     // --- タスク完了 ---
-    const completeTargetTask = "完了テスト用タスク";
+    await test.step("タスクを完了すると、ダッシュボード画面から消えること", async () => {
+      await resetTaskData();
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
 
-    test("タスクを完了すると、ダッシュボード画面から消えること", async ({
-      page,
-    }) => {
-      await test.step("タスクを登録する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(completeTargetTask);
-        await newTaskModal.clickSubmit();
-        await dashboardPage.verifyTaskVisible(completeTargetTask);
-      });
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(completeTargetTask);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(completeTargetTask);
 
-      await test.step("完了ボタンをクリックする", async () => {
-        await dashboardPage.clickCompleteButton(0);
-      });
+      await dashboardPage.clickCompleteButton(0);
 
-      await test.step("タスクが一覧から消えていること", async () => {
-        await expect(
-          page.getByText(completeTargetTask, { exact: true }),
-        ).not.toBeVisible();
-      });
-      // ブラウザ上で結果を確認するために設定
+      await expect(
+        page.getByText(completeTargetTask, { exact: true }),
+      ).not.toBeVisible();
       await dashboardPage.verifyPageLoaded();
     });
 
     // --- ポモドーロタイマー実行 ---
-    const pomodoroTargetTask1 = "ポモドーロテスト用タスク１";
-    const pomodoroTargetTask2 = "ポモドーロテスト用タスク２";
+    await test.step("タスク登録の後、ポモドーロタイマーが表示し、開始・終了すること", async () => {
+      await resetTaskData();
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
 
-    test("タスク登録の後、ポモドーロタイマーが表示し、開始・終了すること", async ({
-      page,
-    }) => {
-      await test.step("タスク1を登録する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(pomodoroTargetTask1);
-        await newTaskModal.clickSubmit();
-        await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
-      });
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(pomodoroTargetTask1);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
 
-      await test.step("タスク1を選択し、ポモドーロタイマーが表示されていること", async () => {
-        await dashboardPage.clickTask(pomodoroTargetTask1);
-        await dashboardPage.verifyPomodoroVisible();
-        await dashboardPage.verifyStartButtonEnabled();
-        await dashboardPage.verifyTimerDisplay("25");
-      });
+      await dashboardPage.clickTask(pomodoroTargetTask1);
+      await dashboardPage.verifyPomodoroVisible();
+      await dashboardPage.verifyStartButtonEnabled();
+      await dashboardPage.verifyTimerDisplay("25");
 
-      await test.step("ポモドーロタイマーが開始されること", async () => {
-        await dashboardPage.clickStartButton();
-        await expect(page.getByText("25:00")).not.toBeVisible();
-        await dashboardPage.verifyStopButtonEnabled();
-      });
+      await dashboardPage.clickStartButton();
+      await expect(page.getByText("25:00")).not.toBeVisible();
+      await dashboardPage.verifyStopButtonEnabled();
 
       await page.waitForTimeout(2000);
 
-      await test.step("ポモドーロタイマーが停止されること", async () => {
-        await dashboardPage.clickStopButton();
-        await dashboardPage.verifyStartButtonEnabled();
-        await dashboardPage.verifyTimerDisplay("25");
-      });
+      await dashboardPage.clickStopButton();
+      await dashboardPage.verifyStartButtonEnabled();
+      await dashboardPage.verifyTimerDisplay("25");
     });
 
-    test("ポモドーロタイマー実行中に別のタスクを選択すると、確認画面が表示し、タスクを切り替えられること", async ({
-      page,
-    }) => {
-      await test.step("タスク1を登録する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(pomodoroTargetTask1);
-        await newTaskModal.clickSubmit();
-        await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
-      });
+    await test.step("ポモドーロタイマー実行中に別のタスクを選択すると、確認画面が表示し、タスクを切り替えられること", async () => {
+      await resetTaskData();
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
 
-      await test.step("タスク2を登録する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-        await dashboardPage.clickAddTaskButton();
-        await newTaskModal.fillTitle(pomodoroTargetTask2);
-        await newTaskModal.clickSubmit();
-        await dashboardPage.verifyTaskVisible(pomodoroTargetTask2);
-      });
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(pomodoroTargetTask1);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(pomodoroTargetTask1);
 
-      await test.step("タスク１のポモドーロタイマーが開始し、タスク２を選択し、タスク切り替え確認ダイアログが表示されること", async () => {
-        await dashboardPage.clickTask(pomodoroTargetTask1);
-        await dashboardPage.clickStartButton();
-        await dashboardPage.clickTask(pomodoroTargetTask2);
-        await dashboardPage.verifyConfirmDialogVisible();
-      });
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
+      await dashboardPage.clickAddTaskButton();
+      await newTaskModal.fillTitle(pomodoroTargetTask2);
+      await newTaskModal.clickSubmit();
+      await dashboardPage.verifyTaskVisible(pomodoroTargetTask2);
 
-      await test.step("タスク切り替え確認ダイアログで「切り替える」ボタンをクリックし、タスク２にポモドーロタイマーが表示される", async () => {
-        await dashboardPage.clickSwitchButton();
-        await dashboardPage.verifyPomodoroTask(pomodoroTargetTask2);
-      });
-      // ブラウザ上で結果を確認するために設定
+      await dashboardPage.clickTask(pomodoroTargetTask1);
+      await dashboardPage.clickStartButton();
+      await dashboardPage.clickTask(pomodoroTargetTask2);
+      await dashboardPage.verifyConfirmDialogVisible();
+
+      await dashboardPage.clickSwitchButton();
+      await dashboardPage.verifyPomodoroTask(pomodoroTargetTask2);
       await dashboardPage.verifyPomodoroVisible();
     });
 
     // --- ナビゲーション ---
-    test("ダッシュボードからタスク一覧ページに遷移できること", async ({
-      page,
-    }) => {
-      await test.step("ダッシュボードを表示する", async () => {
-        await page.goto("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-      });
+    await test.step("ダッシュボードからタスク一覧ページに遷移できること", async () => {
+      await page.goto("/dashboard");
+      await dashboardPage.verifyPageLoaded();
 
-      await test.step("タスク一覧リンクをクリックする", async () => {
-        await dashboardPage.clickTasksNavLink();
-      });
+      await dashboardPage.clickTasksNavLink();
 
-      await test.step("タスク一覧ページに遷移していること", async () => {
-        await dashboardPage.expectUrlContains("/tasks");
-      });
+      await dashboardPage.expectUrlContains("/tasks");
     });
 
-    test("タスク一覧ページからダッシュボードに戻れること", async ({ page }) => {
-      await test.step("タスク一覧ページを表示する", async () => {
-        await page.goto("/tasks");
-      });
+    await test.step("タスク一覧ページからダッシュボードに戻れること", async () => {
+      await page.goto("/tasks");
 
-      await test.step("ダッシュボードリンクをクリックする", async () => {
-        await dashboardPage.clickDashboardNavLink();
-      });
+      await dashboardPage.clickDashboardNavLink();
 
-      await test.step("ダッシュボードに遷移していること", async () => {
-        await dashboardPage.expectUrlContains("/dashboard");
-        await dashboardPage.verifyPageLoaded();
-      });
+      await dashboardPage.expectUrlContains("/dashboard");
+      await dashboardPage.verifyPageLoaded();
     });
   });
 });

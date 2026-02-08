@@ -14,7 +14,9 @@ export const resetTaskData = async (userId?: string) => {
     return;
   }
   if (userId) {
-    await db.delete(pomodoroSessions).where(eq(pomodoroSessions.profileId, userId));
+    await db
+      .delete(pomodoroSessions)
+      .where(eq(pomodoroSessions.profileId, userId));
     await db.delete(tasks).where(eq(tasks.profileId, userId));
     console.log(`Database reset: Data cleared for user ${userId}.`);
   } else {
