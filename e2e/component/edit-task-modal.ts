@@ -56,7 +56,6 @@ export class EditTaskModal extends BaseModal {
 
   /**
    * モーダルが表示されていることを検証します
-   * @deprecated verifyModalOpen() を使用してください
    */
   async verifyFormVisible() {
     await this.verifyModalOpen();
@@ -65,7 +64,6 @@ export class EditTaskModal extends BaseModal {
 
   /**
    * モーダルが閉じたことを検証します
-   * @deprecated verifyModalClosed() を使用してください
    */
   async verifyFormClosed() {
     await this.verifyModalClosed();

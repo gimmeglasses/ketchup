@@ -48,7 +48,6 @@ export class DeleteTaskModal extends BaseModal {
 
   /**
    * 削除確認ダイアログが表示されていることを検証します
-   * @deprecated verifyModalOpen() を使用してください
    */
   async verifyFormVisible() {
     await this.waitForVisible(this.warningMessage);
@@ -58,7 +57,6 @@ export class DeleteTaskModal extends BaseModal {
 
   /**
    * モーダルが閉じたことを検証します
-   * @deprecated verifyModalClosed() を使用してください
    */
   async verifyFormClosed() {
     await this.verifyModalClosed();

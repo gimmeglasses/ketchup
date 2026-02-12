@@ -147,24 +147,30 @@ export class DashboardPage extends BasePage {
 
   /**
    * タスクの完了ボタンをクリックします
-   * @param index - タスクのインデックス（0始まり）
+   * @param taskName - タスク名
    */
-  async clickCompleteButton(index: number) {
-    await this.page
-      .getByRole("button", { name: "タスクを完了する" })
-      .nth(index)
-      .click();
+  async clickCompleteButtonByTaskName(taskName: string) {
+    const taskCard = this.page
+      .locator("div.rounded-lg")
+      .filter({ has: this.page.getByText(taskName, { exact: true }) })
+      .filter({
+        has: this.page.getByRole("button", { name: "タスクを完了する" }),
+      });
+    await taskCard.getByRole("button", { name: "タスクを完了する" }).click();
   }
 
   /**
    * タスクの編集ボタンをクリックします
-   * @param index - タスクのインデックス（0始まり）
+   * @param taskName - タスク名
    */
-  async clickEditButton(index: number) {
-    await this.page
-      .getByRole("button", { name: "タスクを編集する" })
-      .nth(index)
-      .click();
+  async clickEditButtonByTaskName(taskName: string) {
+    const taskCard = this.page
+      .locator("div.rounded-lg")
+      .filter({ has: this.page.getByText(taskName, { exact: true }) })
+      .filter({
+        has: this.page.getByRole("button", { name: "タスクを編集する" }),
+      });
+    await taskCard.getByRole("button", { name: "タスクを編集する" }).click();
   }
 
   /**
@@ -253,39 +259,5 @@ export class DashboardPage extends BasePage {
    */
   async clickSwitchButton() {
     await this.switchButton.click();
-  }
-
-  // --- Getter メソッド ---
-
-  getNav(): Locator {
-    return this.nav;
-  }
-
-  getNavLogo(): Locator {
-    return this.navLogo;
-  }
-
-  getAddTaskButton(): Locator {
-    return this.addTaskButton;
-  }
-
-  getTodayTasksHeading(): Locator {
-    return this.todayTasksHeading;
-  }
-
-  getStartButton(): Locator {
-    return this.startButton;
-  }
-
-  getStopButton(): Locator {
-    return this.stopButton;
-  }
-
-  getDashboardNavLink(): Locator {
-    return this.dashboardNavLink;
-  }
-
-  getTasksNavLink(): Locator {
-    return this.tasksNavLink;
   }
 }
