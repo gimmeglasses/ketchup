@@ -152,6 +152,7 @@ test.describe("アプリケーション統合シナリオ", () => {
 
       // --- タスク1完了 ---
       await dashboardPage.clickCompleteButtonByTaskName(taskNameAF1);
+      await page.waitForTimeout(1000);
       await expect(
         page.getByText(taskNameAF1, { exact: true }),
       ).not.toBeVisible();
