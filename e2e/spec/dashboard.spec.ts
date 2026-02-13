@@ -1,3 +1,4 @@
+import fs from "fs";
 import { test, expect, WorkerInfo } from "@playwright/test";
 import { resetTaskData } from "../db/task-data.reset";
 import { DashboardPage } from "../page/dashboard-page";
@@ -27,7 +28,6 @@ const taskName3 = "洗濯";
 const note3 = "洗濯機を回す。洗濯物を干す";
 
 test.beforeEach(async ({ page }, workerInfo: WorkerInfo) => {
-  await resetTaskData();
   dashboardPage = new DashboardPage(page);
   newTaskModal = new NewTaskModal(page);
   editTaskModal = new EditTaskModal(page);
@@ -35,11 +35,29 @@ test.beforeEach(async ({ page }, workerInfo: WorkerInfo) => {
   console.log(`Starting test in project: ${workerInfo.project.name}`);
 });
 
+test.beforeAll(async ({}, workerInfo: WorkerInfo) => {
+  // storageStateファイルからユーザーIDを取得してリセット
+  const authFile = workerInfo.project.use.storageState as string;
+  const state = JSON.parse(fs.readFileSync(authFile, "utf-8"));
+  const cookie = state.cookies.find(
+    (c: { name: string }) =>
+      c.name.startsWith("sb-") && c.name.endsWith("-auth-token"),
+  );
+  const decoded = Buffer.from(
+    cookie.value.replace(/^base64-/, ""),
+    "base64",
+  ).toString("utf-8");
+  const session = JSON.parse(decoded);
+  await resetTaskData(session.user.id);
+});
+
 // --- ページ表示 ---
 test.describe("ページ表示", () => {
   test("ページが正しく読み込まれること", async ({ page }) => {
     await page.goto("/dashboard");
     await dashboardPage.verifyPageLoaded();
+    await dashboardPage.verifyAddTaskButtonVisible();
+    await dashboardPage.verifyNavVisible();
   });
 });
 
@@ -55,38 +73,6 @@ test.describe("タスク登録", () => {
     await test.step("タスク追加フォームを閉じる", async () => {
       await newTaskModal.clickClose();
       await newTaskModal.verifyFormClosed();
-    });
-  });
-
-  test.describe("フォーム表示", () => {
-    test("タスク名入力欄が表示されること", async ({ page }) => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-    });
-
-    test("タスクの説明入力欄が表示されること", async ({ page }) => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-    });
-
-    test("期限入力欄が表示されること", async ({ page }) => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-    });
-
-    test("予定（分）入力欄が表示されること", async ({ page }) => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-    });
-
-    test("登録するボタンが表示されること", async ({ page }) => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-    });
-
-    test("閉じるボタンが表示されること", async ({ page }) => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
     });
   });
 
@@ -188,32 +174,11 @@ test.describe("タスク編集", () => {
     });
   });
 
-  test.describe("フォーム表示", () => {
-    test("編集フォーム表示確認：タスク名、更新するボタン、削除するボタン、閉じるボタンが設定されていること", async ({
-      page,
-    }) => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-      await newTaskModal.fillTitle(beforeEditTask);
-      await newTaskModal.clickSubmit();
-      await dashboardPage.verifyTaskVisible(beforeEditTask);
-      await dashboardPage.clickEditButtonByTaskName(beforeEditTask);
-      await editTaskModal.verifyFormVisible();
-    });
-  });
-
   test("タスク編集の後、ダッシュボード画面に変更後のタスクが表示されていること", async ({
     page,
   }) => {
-    await test.step("タスクを登録する", async () => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-      await newTaskModal.fillTitle(beforeEditTask);
-      await newTaskModal.clickSubmit();
-      await dashboardPage.verifyTaskVisible(beforeEditTask);
-    });
-
     await test.step("編集フォームを開く", async () => {
+      await page.goto("/dashboard");
       await dashboardPage.clickEditButtonByTaskName(beforeEditTask);
       await editTaskModal.verifyFormVisible();
     });
@@ -234,7 +199,7 @@ test.describe("タスク削除", () => {
   const deleteTargetTask = "削除テスト用タスク";
 
   test.describe("フォーム表示", () => {
-    test("タスク削除画面表示確認：削除確認メッセージ、削除対象のタスク名、削除ボタン、キャンセルボタンが表示されること/", async ({
+    test("タスク削除画面表示確認：削除確認メッセージ、削除対象のタスク名、削除ボタン、キャンセルボタンが表示されること", async ({
       page,
     }) => {
       await page.goto("/dashboard");
@@ -253,15 +218,8 @@ test.describe("タスク削除", () => {
   test("タスク削除の後、ダッシュボード画面からタスクが消えていること", async ({
     page,
   }) => {
-    await test.step("タスクを登録する", async () => {
-      await page.goto("/dashboard");
-      await dashboardPage.clickAddTaskButton();
-      await newTaskModal.fillTitle(deleteTargetTask);
-      await newTaskModal.clickSubmit();
-      await dashboardPage.verifyTaskVisible(deleteTargetTask);
-    });
-
     await test.step("編集フォームから削除ボタンを押す", async () => {
+      await page.goto("/dashboard");
       await dashboardPage.clickEditButtonByTaskName(deleteTargetTask);
       await editTaskModal.verifyFormVisible();
       await editTaskModal.clickDelete();

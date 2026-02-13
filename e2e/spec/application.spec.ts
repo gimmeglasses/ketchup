@@ -160,7 +160,7 @@ test.describe("アプリケーション統合シナリオ", () => {
     });
 
     // --- シナリオ２ ---
-    await test.step("タスク登録 → 編集 → ポモドーロ（開始・終了） → 完了の一連の操作ができること", async () => {
+    await test.step("タスク登録 → 編集（期限・予定の更新） → 削除の一連の操作ができること", async () => {
       await page.goto("/dashboard");
       await dashboardPage.verifyPageLoaded();
 

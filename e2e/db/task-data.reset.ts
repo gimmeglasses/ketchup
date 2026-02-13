@@ -5,14 +5,14 @@ import { reset } from "drizzle-seed";
 import { tasks, pomodoroSessions } from "@/app/db/schema";
 
 export const resetTaskData = async (userId?: string) => {
-  // Safety check: Never run in production
-  if (
-    process.env.DATABASE_URL?.includes("supabase.com") ||
-    process.env.NODE_ENV === "production"
-  ) {
-    console.warn("Skipping database reset: Production environment detected.");
+  // Safety check: DBリセットは明示的に許可された環境でのみ実行する
+  if (process.env.ALLOW_DB_RESET !== "true") {
+    console.warn(
+      "Avoid resetting task table ALLOW_DB_RESET is not set to 'true'.",
+    );
     return;
   }
+
   if (userId) {
     await db
       .delete(pomodoroSessions)

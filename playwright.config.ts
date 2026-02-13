@@ -8,6 +8,9 @@ import { defineConfig, devices } from "@playwright/test";
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+// E2Eテスト実行時のみTaskテーブルリセットを許可する
+process.env.ALLOW_DB_RESET = "true";
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
