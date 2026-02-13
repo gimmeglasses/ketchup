@@ -35,7 +35,6 @@ const dateForTask3 = new Date(baseDate);
 dateForTask3.setDate(dateForTask3.getDate() + 24);
 const dueAt3 = dateForTask3.toISOString().split("T")[0];
 const estimatedMinutes3 = "180";
-
 const taskName4 = "タスク4";
 const note4 = "タスク3/4：タスク切り替え→ポモドーロ（開始・停止）→画面切り替え";
 

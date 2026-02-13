@@ -8,7 +8,7 @@ export const resetTaskData = async (userId?: string) => {
   // Safety check: DBリセットは明示的に許可された環境でのみ実行する
   if (process.env.ALLOW_DB_RESET !== "true") {
     console.warn(
-      "Avoid resetting task table ALLOW_DB_RESET is not set to 'true'.",
+      "Skipping task table reset because ALLOW_DB_RESET is not set to 'true.",
     );
     return;
   }
@@ -20,6 +20,7 @@ export const resetTaskData = async (userId?: string) => {
     await db.delete(tasks).where(eq(tasks.profileId, userId));
     console.log(`Database reset: Data cleared for user ${userId}.`);
   } else {
+    await db.delete(pomodoroSessions);
     await reset(db, { tasks });
     console.log("Database reset: Tasks table cleared.");
   }
