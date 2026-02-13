@@ -11,22 +11,29 @@ import { DeleteTaskModal } from "../component/delete-task-modal";
 const taskNameBF1 = "タスク1（編集前）";
 const taskNameAF1 = "タスク1（編集後）";
 const note1 = "タスク1：登録→編集→ポモドーロ（開始・終了）→完了";
-const date = new Date();
-date.setDate(date.getDate() + 10);
-const dueAt1 = date.toISOString().split("T")[0];
+const baseDate = new Date();
+
+const dateForTask1 = new Date(baseDate);
+dateForTask1.setDate(dateForTask1.getDate() + 10);
+const dueAt1 = dateForTask1.toISOString().split("T")[0];
 const estimatedMinutes1 = "120";
 
 const taskName2 = "タスク2";
 const note2 = "タスク2：登録→編集（期限）→編集（予定）→削除";
-const dueAtBF2 = date.toISOString().split("T")[0];
-date.setDate(date.getDate() + 14);
-const dueAtAF2 = date.toISOString().split("T")[0];
+const dateForTask2Before = new Date(baseDate);
+dateForTask2Before.setDate(dateForTask2Before.getDate() + 10);
+const dueAtBF2 = dateForTask2Before.toISOString().split("T")[0];
+const dateForTask2After = new Date(baseDate);
+dateForTask2After.setDate(dateForTask2After.getDate() + 24);
+const dueAtAF2 = dateForTask2After.toISOString().split("T")[0];
 const estimatedMinutesBF2 = "180";
 const estimatedMinutesAF2 = "240";
 
 const taskName3 = "タスク3";
 const note3 = "タスク3/4：登録→ポモドーロ（開始）→タスク切り替え";
-const dueAt3 = date.toISOString().split("T")[0];
+const dateForTask3 = new Date(baseDate);
+dateForTask3.setDate(dateForTask3.getDate() + 24);
+const dueAt3 = dateForTask3.toISOString().split("T")[0];
 const estimatedMinutes3 = "180";
 
 const taskName4 = "タスク4";
