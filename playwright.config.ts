@@ -8,6 +8,9 @@ import { defineConfig, devices } from "@playwright/test";
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+// E2Eテスト実行時のみTaskテーブルリセットを許可する
+process.env.ALLOW_DB_RESET = "true";
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -24,19 +27,38 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  timeout: 90_000, // testのtimeoutの時間を変更
+
+  expect: {
+    timeout: 15_000, // expectのtimeoutの時間を変更
+  },
+
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: "http://localhost:3000",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
+    // 失敗時のスクリーンショットを保存
+    screenshot: { mode: "only-on-failure", fullPage: true },
+    video: "retain-on-failure",
+
+    // ブラウザのUI、日付、通貨などを日本語化
+    locale: "ja-JP",
+
+    // HTTPリクエストの言語指定を日本語に
+    extraHTTPHeaders: {
+      "Accept-Language": "ja-JP,ja;q=0.9",
+    },
   },
 
   /* Configure projects for major browsers */
   projects: [
     // {
     //   name: "chromium",
-    //   use: { ...devices["Desktop Chrome"] },
+    //   use: {
+    //     ...devices["Desktop Chrome"],
+    //   },
     // },
 
     // {
@@ -50,15 +72,79 @@ export default defineConfig({
     // },
 
     /* Test against mobile viewports. */
+    // Mobile Chrome（ゲスト用）：ゲスト状態（会員登録・ログイン〜ダッシュボード・タスク操作等）
+    {
+      name: "Mobile Chrome Guest",
+      use: {
+        ...devices["Pixel 5"],
+      },
+      // 以下のテストシナリオのみ実施する
+      testMatch: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
+    },
+
+    // Mobile Chrome (非ゲスト用)：認証済み状態（ダッシュボード・タスク操作等）
+    // auth setup project：認証済み状態、テーブルデータクリアのために実行
+    {
+      name: "setup-mobile-chrome",
+      metadata: {
+        authFileName: "user-mobile-chrome.json",
+      },
+      testMatch: /setup\/user-login\.setup\.ts/,
+    },
     {
       name: "Mobile Chrome",
-      use: { ...devices["Pixel 5"] },
+      use: {
+        ...devices["Pixel 5"],
+        // storageStateを使ってログイン済み状態からテスト実行
+        storageState: "e2e/.auth/user-mobile-chrome.json",
+      },
+      dependencies: ["setup-mobile-chrome"],
+      // 以下のテストシナリオは除外する
+      testIgnore: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
+    },
+    // Mobile Safari（ゲスト用）：ゲスト状態（会員登録・ログイン〜ダッシュボード・タスク操作等）
+    {
+      name: "Mobile Safari Guest",
+      use: { ...devices["iPhone 12"] },
+      // 以下のテストシナリオは実施する
+      testMatch: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
+    },
+    // Mobile Safari (非ゲスト用)：認証済み状態（ダッシュボード・タスク操作等）
+    // auth setup project：認証済み状態、テーブルデータクリアのために実行
+    {
+      name: "setup-mobile-safari",
+      metadata: {
+        authFileName: "user-mobile-safari.json",
+      },
+      testMatch: /setup\/user-login\.setup\.ts/,
     },
     {
       name: "Mobile Safari",
-      use: { ...devices["iPhone 12"] },
+      use: {
+        ...devices["iPhone 12"],
+        // storageStateを使ってログイン済み状態からテスト実行
+        storageState: "e2e/.auth/user-mobile-safari.json",
+      },
+      dependencies: ["setup-mobile-safari"],
+      // 以下のテストシナリオは除外する
+      testIgnore: [
+        "**/application.spec.ts",
+        "**/register.spec.ts",
+        "**/top.spec.ts",
+      ],
     },
-
     /* Test against branded browsers. */
     // {
     //   name: 'Microsoft Edge',
